@@ -17,6 +17,7 @@ import SabbuddheCard from '@/components/packages/SabbuddheCard';
 import SharingMeritCard from '@/components/packages/SharingMeritCard';
 import TripleGemVirtuesCard from '@/components/packages/TripleGemVirtuesCard';
 import PreceptsGuidelineCard from '@/components/guidelines/PreceptsGuidelineCard';
+import VirtuesMeditationCard from '@/components/packages/VirtuesMeditationCard';
 
 export default function PracticeDetail() {
   const router = useRouter();
@@ -45,24 +46,16 @@ export default function PracticeDetail() {
         showsVerticalScrollIndicator={false}
       >
         <OkasaCard/>
-        <ThilaRequestCard/>
+   
         <SaranagonCard/>
-        <MettaSuttaCard/>
-        <RatanaSuttaCard/>
-        <MangalaSuttaCard/>
-        <PancaSilaCard/>
-        <ParittaNidannCard/>
-        <TripleGemVirtuesCard/>
-        <SabbuddheCard/>   
-        <DirectionalMettaCard/> 
-        <Metta11Card/>
+     
+       <VirtuesMeditationCard/>
         <SharingMeritCard/>
       
-        {/* FAB ကြောင့် စာသားများ မဖုံးသွားစေရန် Space ထည့်ခြင်း */}
+  
         <View style={{ height: 100 }} /> 
       </ScrollView>
 
-      {/* 🟢 Floating Circle Button Added Here */}
       <TouchableOpacity 
         style={[styles.fab, { backgroundColor: colors.primary }]}
         onPress={() => setShowModal(true)}

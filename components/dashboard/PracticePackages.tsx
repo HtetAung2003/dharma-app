@@ -5,11 +5,13 @@ import { useTheme } from '../../context/ThemeContext';
 import { router } from 'expo-router';
 import { RelativePathString } from 'expo-router';
 const PRACTICE_DATA = [
-    { id: '1', title: 'ဥပုသ်စောင့်တည်ခြင်း ( ၅ ပါးသီလ )', duration: '၁ ရက်' },
+   { id: '6', title: 'ဘုရားတွင် ရှိခိုးရန်', duration: '၃ မိနစ်' },
+     { id: '1', title: 'ဥပုသ်စောင့်တည်ခြင်း ( ၅ ပါးသီလ )', duration: '၁ ရက်' },
      { id: '2', title: 'ဥပုသ်စောင့်တည်ခြင်း ( ၈ ပါးသီလ )', duration: '၁ ရက်' },
-    { id: '3', title: 'ဝိပဿနာတရားပွားများခြင်း', duration: '၁၅ မိနစ်' },
-    { id: '4', title: 'မေတ္တာဘာဝနာ ပွားများခြင်', duration: '၁၅ မိနစ်' },
-    { id: '5', title: 'သတ္တဝါအားလုံးကို မေတ္တာပို့သခြင်း', duration: '၁၅ မိနစ်' },
+    { id: '3', title: 'ပဋ္ဌာန်းဒေသနာတော်', duration: '၁၅ မိနစ်' },
+    { id: '4', title: 'ပရိတ်ကြီး (၁၁) သုတ်', duration: '၁၅ မိနစ်' },
+    { id: '5', title: 'မဟာသမယသုတ်တော်', duration: '၁၅ မိနစ်' },
+   
 ];
 
 const PracticePackages = () => {
@@ -23,10 +25,22 @@ const handlePress = (item: any) => {
 
     switch (item.id) {
         case '1':
-            targetPath = '/main/practice-detail';
+            targetPath = '/packagedetails/practice-detail-5thila'; // Navigate to 5thila practice detail
             break;
         case '2':
-            targetPath = '/main/dashboard'; // သင်သွားချင်တဲ့ တခြား path တစ်ခုခု
+            targetPath = '/packagedetails/practice-detail-8thila'; // Navigate to 8thila practice detail
+            break;
+             case '3':
+            targetPath = '/packagedetails/practice-detail-pahtain'; // Navigate to 3thila practice detail
+            break;
+              case '4':
+            targetPath = '/packagedetails/practice-detail-payaekyi11'; // Navigate to 3thila practice detail
+            break;
+             case '5':
+            targetPath = '/packagedetails/practice-detail-Mahasamaya'; // Navigate to 5thila practice detail
+            break;
+              case '6':
+            targetPath = '/packagedetails/practice-detail-Pagoda'; // Navigate to Pagoda practice detail
             break;
         default:
             targetPath = '/main/practice-detail';
@@ -110,7 +124,7 @@ const styles = StyleSheet.create({
     },
       seeMore: { fontWeight: '500' },
     listContainer: {
-        gap: 12, // List တစ်ခုနဲ့တစ်ခု ကြားအကွာအဝေး
+        gap: 12, 
     },
     listItem: {
         flexDirection: 'row',

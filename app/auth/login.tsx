@@ -39,13 +39,13 @@ const LoginScreen = () => {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         
         console.log("Login success");
-        router.push('/main/personalization'); // Personalization screen သို့အရင်ပို့ပါ
+        router.push('/personalization'); // Personalization screen သို့အရင်ပို့ပါ
       } catch (error: any) {
         setConfirm(false);
         alert("အီးမေးလ် သို့မဟုတ် လျှို့ဝှက်နံပါတ် မှားယွင်းနေပါသည်။");
       }
     } else {
-      router.push('/main/personalization');
+      router.push('/personalization');
     }
   };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useTheme } from '../../context/ThemeContext'; // အရင်ကဆောက်ထားတဲ့ Context
+import { useTheme } from '../context/ThemeContext'; // အရင်ကဆောက်ထားတဲ့ Context
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PersonalizationScreen() {
