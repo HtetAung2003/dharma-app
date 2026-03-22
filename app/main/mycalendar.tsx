@@ -55,16 +55,7 @@ const MyanmarBuddhistCalendar = () => {
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
       
-      {/* 🌟 Current Date Dashboard (Calendar အပေါ်တွင် ထည့်သွင်းခြင်း) */}
-      <View style={[styles.todayHeader, { backgroundColor: isDarkMode ? '#1E293B' : '#E0F2F1' }]}>
-        <Text style={[styles.todayLabel, { color: colors.textSecondary }]}>✨ ယနေ့သည်</Text>
-        <Text style={[styles.todayEng, { color: colors.textPrimary }]}>{new Date().toDateString()}</Text>
-        {todayInfo && (
-          <Text style={[styles.todayMM, { color: isDarkMode ? '#FFD700' : '#00796B' }]}>
-            {todayInfo.fullString}
-          </Text>
-        )}
-      </View>
+ 
 
       <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
         

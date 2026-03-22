@@ -61,7 +61,7 @@ const handlePress = (item: any) => {
                 <Text style={[styles.title, { color: colors.textPrimary, fontSize: dynamicSize(20) }]}>
                     အစီအစဉ်များ
                 </Text>
-                   <TouchableOpacity>
+                   <TouchableOpacity onPress={() => router.push('/main/albums')}>
                                     <Text style={[styles.seeMore, { color: colors.primary, fontSize: dynamicSize(14) }]}>
                                         အားလုံးကြည့်ရန်
                                     </Text>

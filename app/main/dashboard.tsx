@@ -1,15 +1,16 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import Packages from '@/components/dashboard/PracticePackages';
 import { router } from 'expo-router';
+import * as Notifications from 'expo-notifications';
 import { ceMmDateTime } from '@/services/ceMmDateTime';
+import { registerForPushNotificationsAsync, scheduleSabbathReminder } from '@/services/notificationService';
 
 const Dashboard = () => {
     const { colors, isDarkMode, fontSize } = useTheme();
@@ -18,17 +19,17 @@ const Dashboard = () => {
     const scale = fontSize / 16;
     const dynamicSize = (base: number) => base * scale;
 
-    // ၁။ ရက်စွဲ၊ Countdown နှင့် ဗေဒင်အချက်အလက်များကို တစ်ခါတည်းတွက်ချက်ခြင်း
+    // Memo function to calculate today's date info, astrology, and countdown to next special day
     const dateInfo = useMemo(() => {
         const now = new Date();
         const mdt = new ceMmDateTime(now);
         
-        // ယနေ့ အခြေအနေ
+      
         const todaySpecial = mdt.getSpecialDay();
         const isTodaySabbath = todaySpecial.includes("ဥပုသ်နေ့");
         const astro = mdt.getAstrologyInfo();
 
-        // နောက်ထပ် ဥပုသ်နေ့ သို့မဟုတ် ပိတ်ရက် ရှာဖွေခြင်း
+    
         let daysToSabbath = 0;
         let nextSabbathName = "";
 
@@ -60,11 +61,60 @@ const Dashboard = () => {
             isPyathada: astro.includes("ပြဿဒါး"),
         };
     }, []);
-
+// Display name logic with truncation for long names
     const displayName = userData?.fullName 
-        ? (userData.fullName.length > 4 ? `${userData.fullName.substring(0, 4)}...` : userData.fullName)
+        ? (userData.fullName.length > 10 ? `${userData.fullName.substring(0, 10)}..` : userData.fullName)
         : 'ဧည့်သည်';
+useEffect(() => {
+        // ၁။ Permission တောင်းခြင်း
+        registerForPushNotificationsAsync();
 
+        // ၂။ Notification နှိပ်လိုက်ရင် ဘယ်သွားမလဲဆိုတာ ဖမ်းခြင်း
+        const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+            router.push('/main/dashboard'); // Dashboard သို့ ပြန်လာရန်
+        });
+
+        // ၃။ ဥပုသ်နေ့ ရှိမရှိ စစ်ဆေးပြီး Reminder ပေးခြင်း
+        if (dateInfo.daysLeft <= 1) {
+            scheduleSabbathReminder(dateInfo.daysLeft, dateInfo.nextEvent || "ဥပုသ်နေ့");
+        }
+
+        return () => subscription.remove();
+    }, [dateInfo]);
+    useEffect(() => {
+    const setupNotifications = async () => {
+        // ၁။ Permission တောင်းခြင်း
+        const { status } = await Notifications.requestPermissionsAsync();
+        if (status !== 'granted') return;
+
+       
+        await Notifications.cancelAllScheduledNotificationsAsync();
+        if (dateInfo.isTodaySabbath) {
+            await Notifications.scheduleNotificationAsync({
+                content: {
+                    title: "🙏 ယနေ့သည် ဥပုသ်နေ့ဖြစ်ပါသည်",
+                    body: "ကုသိုလ်ကောင်းမှုများ ပြုလုပ်ရန် မမေ့ပါနှင့်။",
+                },
+                trigger: null, 
+            });
+        } else if (dateInfo.daysLeft === 1) {
+            
+            await Notifications.scheduleNotificationAsync({
+                content: {
+                    title: `📌 မနက်ဖြန်သည် ${dateInfo.nextEvent} ဖြစ်ပါသည်`,
+                    body: "ဥပုသ်စောင့်တည်ရန် သို့မဟုတ် ကုသိုလ်ပြုရန် ပြင်ဆင်နိုင်ပါသည်။",
+                },
+                trigger: {
+                    hour: 18,
+                    minute: 0,
+                    repeats: false,
+                },
+            });
+        }
+    };
+
+    setupNotifications();
+}, [dateInfo]);
     return (
         <LinearGradient
             colors={isDarkMode ? ['#0F0F0F', '#1A1A1A', '#000000'] : ['#F5F9FF', '#E0E7FF', '#FFFFFF']}
@@ -90,31 +140,22 @@ const Dashboard = () => {
                     </TouchableOpacity>
                 </View>
 
-                {/* Search Bar */}
-                <View style={styles.searchContainer}>
-                    <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.glassInput, { borderColor: colors.border }]}>
-                        <Ionicons name="search-outline" size={20} color={colors.textSecondary} style={styles.searchIcon} />
-                        <TextInput
-                            placeholder="Search for meditation, music..."
-                            placeholderTextColor={colors.textSecondary}
-                            style={[styles.input, { color: colors.textPrimary, fontSize: dynamicSize(16) }]}
-                        />
-                    </BlurView>
-                </View>
+              {/* body section */}
 
                 <ScrollView
                     style={{ flex: 1 }}
                     contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* 🌟 통합 မြန်မာ့ရက်စွဲ Dashboard Card */}
+                    {/* Dashboard Card */}
                     <View style={styles.dateContainer}>
                         <BlurView intensity={isDarkMode ? 30 : 60} tint={isDarkMode ? "dark" : "light"} style={styles.dateCard}>
                             <View style={styles.dateRow}>
                                 <View style={{ flex: 1 }}>
                                     <Text style={[styles.engDateText, { color: colors.textSecondary }]}>{dateInfo.engDate}</Text>
-                                    <Text style={[styles.mmDateText, { color: isDarkMode ? '#FFD700' : '#0288D1' }]}>{dateInfo.mmDate}</Text>
+                                    <Text style={[styles.mmDateText, { color:  colors.textPrimary  }]}>{dateInfo.mmDate}</Text>
                                 </View>
+                                {/* tag of normal day .. */}
                                 <View style={[styles.astroBadge, { backgroundColor: dateInfo.isYatyaza ? '#4CAF5022' : dateInfo.isPyathada ? '#F4433622' : 'rgba(255,215,0,0.1)' }]}>
                                     <Text style={[styles.astroText, { color: dateInfo.isYatyaza ? '#4CAF50' : dateInfo.isPyathada ? '#F44336' : '#FF9100' }]}>
                                         {dateInfo.astroText}
@@ -125,26 +166,27 @@ const Dashboard = () => {
                             <View style={styles.divider} />
 
                             <View style={styles.countdownRow}>
+                                {/* calendar icon */}
                                 <Ionicons 
                                     name={dateInfo.isTodaySabbath ? "sparkles" : "calendar-number-outline"} 
                                     size={22} 
-                                    color={dateInfo.isTodaySabbath ? "#4CAF50" : "#FF9100"} 
+                                    color={dateInfo.isTodaySabbath ? colors.success : colors.primary} 
                                 />
                                 <View style={{ marginLeft: 10, flex: 1 }}>
                                     {dateInfo.isTodaySabbath ? (
-                                        <Text style={[styles.statusText, { color: "#4CAF50", fontWeight: 'bold' }]}>
-                                            ✨ ယနေ့သည် {dateInfo.todaySpecial} ဖြစ်ပါသည်။ ✨
+                                        <Text style={[styles.statusText, { color: colors.success, fontWeight: 'bold' }]}>
+                                            ယနေ့သည် {dateInfo.todaySpecial} ဖြစ်ပါသည်။ 
                                         </Text>
                                     ) : (
                                         <Text style={[styles.statusText, { color: colors.textPrimary }]}>
-                                            နောက်ထပ် <Text style={{ color: '#FF9100', fontWeight: '800' }}>{dateInfo.daysLeft}</Text> ရက်အကြာတွင် <Text style={{ fontWeight: '700' }}>{dateInfo.nextEvent}</Text> ရောက်ပါမည်။
+                                            နောက်ထပ် <Text style={{ color: colors.textPrimary, fontWeight: '800' }}>{dateInfo.daysLeft}</Text> ရက်အကြာတွင် <Text style={{ fontWeight: '700' }}>{dateInfo.nextEvent}</Text> ရောက်ပါမည်။
                                         </Text>
                                     )}
                                 </View>
                             </View>
                         </BlurView>
                     </View>
-
+{/* other components */}
                     <Packages/>
                 </ScrollView>
             </SafeAreaView>
@@ -164,19 +206,6 @@ const styles = StyleSheet.create({
     },
     userName: { fontWeight: 'bold' },
     subText: { marginTop: 4 },
-    searchContainer: { marginTop: 15, marginBottom: 5 },
-    glassInput: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 15,
-        height: 55,
-        borderRadius: 15,
-        borderWidth: 1,
-        overflow: 'hidden',
-    },
-    searchIcon: { marginRight: 10 },
-    input: { flex: 1 },
-
     // Date Card Styles (Cleaned up)
     dateContainer: { marginTop: 15, marginBottom: 10 },
     dateCard: {

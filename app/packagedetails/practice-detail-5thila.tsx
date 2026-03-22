@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, SafeAreaView, TouchableOpacity, Modal } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +17,7 @@ import SabbuddheCard from '@/components/packages/SabbuddheCard';
 import SharingMeritCard from '@/components/packages/SharingMeritCard';
 import TripleGemVirtuesCard from '@/components/packages/TripleGemVirtuesCard';
 import PreceptsGuidelineCard from '@/components/guidelines/PreceptsGuidelineCard';
+import { saveReadingTime } from '@/services/statsService';
 
 export default function PracticeDetail() {
   const router = useRouter();
@@ -26,7 +27,21 @@ export default function PracticeDetail() {
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
+useEffect(() => {
+    const startTime = Date.now();
 
+    // User က ဒီ Screen ကနေ နောက်ပြန်ဆုတ်သွားတဲ့အခါ (Component unmount) အလုပ်လုပ်မည်
+    return () => {
+      const endTime = Date.now();
+      const secondsRead = Math.floor((endTime - startTime) / 1000);
+      
+      // ၅ စက္ကန့်ထက်ပိုကြာမှ သိမ်းဆည်းမည်
+      if (secondsRead > 5) {
+        saveReadingTime('Paritta', secondsRead);
+        console.log(`Saved ${secondsRead}s to Paritta category`);
+      }
+    };
+  }, []);
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: isDarkMode ? '#05111D' : '#F5F9FF' }]}>
       {/* Header Area */}

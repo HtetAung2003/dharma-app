@@ -60,7 +60,16 @@ const BottomNav = () => {
                     size={24} 
                     color={getIconColor('/main/mycalendar')} 
                 />
-                <Text style={[styles.navText, { color: getIconColor('/main/mycalendar') }]}>အစီအစဉ်</Text>
+                <Text style={[styles.navText, { color: getIconColor('/main/mycalendar') }]}>ပြက္ခဒိန်</Text>
+            </TouchableOpacity>
+               <TouchableOpacity style={styles.navItem} onPress={() => router.push('/main/analysis')}>
+                <Ionicons 
+                    name={pathname === '/main/analysis' ? "stats-chart" : "stats-chart-outline"} 
+                    size={24} 
+                    color={getIconColor('/main/analysis')} 
+                />
+               
+                <Text style={[styles.navText, { color: getIconColor('/main/analysis') }]}>စစ်ဆေးခြင်း</Text>
             </TouchableOpacity>
         </View>
         </LinearGradient>
