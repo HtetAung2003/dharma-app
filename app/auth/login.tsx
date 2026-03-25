@@ -27,7 +27,7 @@ const LoginScreen = () => {
 
   const handleSignup = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    router.push('/(auth)/register');
+    router.push('/auth/register');
   };
 
   const handleLogin = async () => {
@@ -39,13 +39,13 @@ const LoginScreen = () => {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         
         console.log("Login success");
-        router.push('/personalization'); // Personalization screen သို့အရင်ပို့ပါ
+        router.replace('/personalization'); // Personalization screen သို့အရင်ပို့ပါ
       } catch (error: any) {
         setConfirm(false);
         alert("အီးမေးလ် သို့မဟုတ် လျှို့ဝှက်နံပါတ် မှားယွင်းနေပါသည်။");
       }
     } else {
-      router.push('/personalization');
+      router.replace('/personalization');
     }
   };
 

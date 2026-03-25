@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, SafeAreaView, TouchableOpacity, Modal } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
@@ -22,6 +22,7 @@ import PatthanaCard from '@/components/packages/PatthanaCard';
 import PatthanaDetailCard from '@/components/packages/PatthanaDetailCard';
 import DevaReturnSection from '@/components/packages/DevaReturnSection';
 import PathanaGuidelineCard from '@/components/guidelines/PathanaguidelineCard';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PracticeDetail() {
   const router = useRouter();

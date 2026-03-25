@@ -77,7 +77,7 @@ export default function WelcomeScreen() {
           <View style={styles.footerSection}>
             <TouchableOpacity 
               style={[styles.button, { backgroundColor: colors.primary }]}
-              onPress={() => router.push('/auth/login')}
+              onPress={() => router.replace('/auth/login')}
             >
               <Text style={[styles.buttonText, { 
                 color: colors.secondary, 
@@ -89,7 +89,7 @@ export default function WelcomeScreen() {
 
             <TouchableOpacity 
               style={[styles.outlineButton, { borderColor: colors.primary }]}
-              onPress={() => router.push('/auth/register')}
+              onPress={() => router.replace('/auth/register')}
             >
               <Text style={[styles.outlineText, { 
                 color: colors.primary, 

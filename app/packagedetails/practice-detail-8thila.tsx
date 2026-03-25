@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, SafeAreaView, TouchableOpacity, Modal } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
@@ -17,6 +17,7 @@ import SabbuddheCard from '@/components/packages/SabbuddheCard';
 import SharingMeritCard from '@/components/packages/SharingMeritCard';
 import TripleGemVirtuesCard from '@/components/packages/TripleGemVirtuesCard';
 import PreceptsGuidelineCard from '@/components/guidelines/PreceptsGuidelineCard';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PracticeDetail() {
   const router = useRouter();

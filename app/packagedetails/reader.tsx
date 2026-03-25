@@ -36,6 +36,14 @@ import MahasamayaSuttaIntroCard from '@/components/packages/MahasamayaSuttaIntro
 import DhajaggaSuttaCard from '@/components/packages/DhajaggaSuttaCard';
 import AtanatiyaSuttaCard from '@/components/packages/AtanatiyaSuttaCard';
 import { checkIfFavorite, toggleFavorite } from '@/constants/favouriteService';
+import BuddhaCard from '@/components/packages/BuddhaCard';
+import DhammaCard from '@/components/packages/DhammaCard';
+import SanghaCard from '@/components/packages/SanghaCard';
+import AnattaLakkhanaSuttaCard from '@/components/packages/AnattaLakkhanaSuttaCard';
+import PracticeDetailMahasamaya from './practice-detail-Mahasamaya';
+import UppatasantiCard from '@/components/packages/UppatasantiCard';
+import JayantoCard from '@/components/packages/JayantoCard';
+import SolasaMangalaCard from '@/components/packages/SolasaMangalaCard';
 
 const COMPONENT_MAP: { [key: string]: React.ComponentType<any> } = {
     'OkasaCard': OkasaCard,
@@ -68,6 +76,21 @@ const COMPONENT_MAP: { [key: string]: React.ComponentType<any> } = {
     'MahasamayaSuttaIntroCard': MahasamayaSuttaIntroCard,
     'DhajaggaSuttaCard': DhajaggaSuttaCard,
     'AtanatiyaSuttaCard': AtanatiyaSuttaCard,
+    'BuddhaCard': BuddhaCard,
+    'DhammaCard': DhammaCard,
+    'SanghaCard': SanghaCard,
+    'AnattalakkhanaSuttaCard': AnattaLakkhanaSuttaCard,
+    'practice-detail-mahasamaya': PracticeDetailMahasamaya,
+    'PatthanaDetailsCard': PatthanaDetailCard,
+    'UppatasantiCard': UppatasantiCard,
+
+    // Gatha & Special Cards
+
+    'ShinThiwaliCard': ShinThiwaliGathaCard,
+    'JayantoCard': JayantoCard,
+    'SolasaMangalaCard': SolasaMangalaCard,
+ 
+    
 };
 
 export default function ReaderScreen() {

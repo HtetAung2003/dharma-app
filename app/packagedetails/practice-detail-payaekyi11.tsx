@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, SafeAreaView, TouchableOpacity, Modal } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
@@ -30,9 +30,10 @@ import AngulimalaSuttaCard from '@/components/packages/AngulimalaSuttaCard';
 import BojjhangaSuttaCard from '@/components/packages/BojjhangaSuttaCard';
 import PubbanhaSuttaCard from '@/components/packages/PubbanhaSuttaCard';
 import AtanatiyaSuttaCard from '@/components/packages/AtanatiyaSuttaCard';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PracticeDetail() {
-  const router = useRouter();
+  const router = useRouter();  
   const { id, title } = useLocalSearchParams();
   const { colors, isDarkMode, fontSize } = useTheme();
   const [showModal, setShowModal] = useState(false);

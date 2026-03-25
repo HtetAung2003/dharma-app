@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { StyleSheet, Text, View, ScrollView, SafeAreaView, TouchableOpacity, Modal } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import { saveReadingTime } from '@/services/statsService';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // အားလုံးသော Card Component များကို Import လုပ်ပါ
 import OkasaCard from '@/components/packages/OkasaCard';
@@ -20,6 +21,29 @@ import SabbuddheCard from '@/components/packages/SabbuddheCard';
 import SharingMeritCard from '@/components/packages/SharingMeritCard';
 import TripleGemVirtuesCard from '@/components/packages/TripleGemVirtuesCard';
 import PreceptsGuidelineCard from '@/components/guidelines/PreceptsGuidelineCard';
+import BuddhaAttributesCard from '@/components/packages/BuddhaCard';
+import DhammaCard from '@/components/packages/DhammaCard';
+import BuddhaCard from '@/components/packages/BuddhaCard';
+import SanghaCard from '@/components/packages/SanghaCard';
+import KhandhaSuttaCard from '@/components/packages/KhandhaSuttaCard';
+import MoraSuttaCard from '@/components/packages/MoraSuttaCard';
+import WattaSuttaCard from '@/components/packages/WattaSuttaCard';
+import DhajaggaSuttaCard from '@/components/packages/DhajaggaSuttaCard';
+import AtanatiyaSuttaCard from '@/components/packages/AtanatiyaSuttaCard';
+import AngulimalaSuttaCard from '@/components/packages/AngulimalaSuttaCard';
+import BojjhangaSuttaCard from '@/components/packages/BojjhangaSuttaCard';
+import PubbanhaSuttaCard from '@/components/packages/PubbanhaSuttaCard';
+import DhammacakkaSuttaCard from '@/components/packages/DhammacakkaSuttaCard';
+import AnattaLakkhanaSuttaCard from '@/components/packages/AnattaLakkhanaSuttaCard';
+import PatthanaCard from '@/components/packages/PatthanaCard';
+import PatthanaDetailCard from '@/components/packages/PatthanaDetailCard';
+import UppatasantiCard from '@/components/packages/UppatasantiCard';
+import PracticeDetailMahasamaya from './practice-detail-Mahasamaya';
+import GunTawKonCharCard from '@/components/packages/GunTawKonCharCard';
+import GunTawKonCharFullCard from '@/components/packages/GunTawKonCharFullCard';
+import ShinThiwaliGathaCard from '@/components/packages/ShinThiwaliGathaCard';
+import JayantoCard from '@/components/packages/JayantoCard';
+import SolasaMangalaCard from '@/components/packages/SolasaMangalaCard';
 
 export default function PracticeDetail() {
   const router = useRouter();
@@ -65,7 +89,28 @@ export default function PracticeDetail() {
       case 'RatanaSuttaCard': return <RatanaSuttaCard />;
       case 'SabbuddheCard': return <SabbuddheCard />;
       case 'SharingMeritCard': return <SharingMeritCard />;
-      case 'TripleGemVirtuesCard': return <TripleGemVirtuesCard />;
+      case 'BuddhaCard': return <BuddhaCard />;
+      case 'DhammaCard': return <DhammaCard />;
+      case 'SanghaCard': return <SanghaCard />;
+      case 'KhandhaSuttaCard': return <KhandhaSuttaCard />;
+      case 'MoraSuttaCard': return <MoraSuttaCard />;
+      case 'WattaSuttaCard': return <WattaSuttaCard />;
+      case 'DhajaggaSuttaCard': return <DhajaggaSuttaCard />;
+      case 'AtanatiyaSuttaCard': return <AtanatiyaSuttaCard />;
+      case 'AngulimalaSuttaCard': return <AngulimalaSuttaCard />;
+      case 'BojjhangaSuttaCard': return <BojjhangaSuttaCard />;
+      case 'PubbanhaSuttaCard': return <PubbanhaSuttaCard />;
+      case 'DhammacakkaSuttaCard': return <DhammacakkaSuttaCard />;
+        case 'AnattalakkhanaSuttaCard': return <AnattaLakkhanaSuttaCard />;
+     case 'PatthanaCard': return <PatthanaCard />;
+       case 'PatthanaDetailsCard': return <PatthanaDetailCard />;
+      case 'UppatasantiCard': return <UppatasantiCard />;  
+      case 'practice-detail-mahasamaya': return <PracticeDetailMahasamaya />; 
+              case 'GunTawKonCharCard': return <GunTawKonCharCard />; 
+   case 'GunTawKonCharFullCard': return <GunTawKonCharFullCard />; 
+        case 'ShinThiwaliCard': return <ShinThiwaliGathaCard />; 
+     case 'JayantoCard': return <JayantoCard />; 
+      case 'SolasaMangalaCard': return <SolasaMangalaCard />; 
       default: 
         return (
           <View style={styles.errorBox}>
@@ -98,14 +143,7 @@ export default function PracticeDetail() {
         <View style={{ height: 100 }} /> 
       </ScrollView>
 
-      {/* Guide ခလုတ် */}
-      <TouchableOpacity 
-        style={[styles.fab, { backgroundColor: colors.primary }]}
-        onPress={() => setShowModal(true)}
-        activeOpacity={0.8}
-      >
-        <Ionicons name="book" size={28} color="#FFFFFF" />
-      </TouchableOpacity>
+  
 
       {/* Guidelines Modal */}
       <Modal visible={showModal} animationType="slide" transparent={true}>

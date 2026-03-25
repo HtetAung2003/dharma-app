@@ -46,7 +46,7 @@ const AnattaLakkhanaSuttaCard = () => {
           </Text>
           {"\n\n"}
 
-          <View style={styles.divider} />
+      
 
           {/* Core Insight Equation */}
           <Text style={[styles.conclusion, { color: colors.primary }]}>

@@ -40,7 +40,7 @@ const BottomNav = () => {
                     size={24} 
                     color={getIconColor('/favorites')} 
                 />
-                <Text style={[styles.navText, { color: getIconColor('/favorites') }]}>အနှစ်သက်ဆုံး</Text>
+                <Text style={[styles.navText, { color: getIconColor('/favorites') }]}>နှစ်သက်</Text>
             </TouchableOpacity>
 
             {/* History */}
@@ -69,7 +69,7 @@ const BottomNav = () => {
                     color={getIconColor('/main/analysis')} 
                 />
                
-                <Text style={[styles.navText, { color: getIconColor('/main/analysis') }]}>စစ်ဆေးခြင်း</Text>
+                <Text style={[styles.navText, { color: getIconColor('/main/analysis') }]}>စစ်ဆေး</Text>
             </TouchableOpacity>
         </View>
         </LinearGradient>

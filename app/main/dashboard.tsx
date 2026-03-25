@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, BackHandler, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -18,7 +18,23 @@ const Dashboard = () => {
     
     const scale = fontSize / 16;
     const dynamicSize = (base: number) => base * scale;
+useEffect(() => {
+    const backAction = () => {
+      // Back ကို နှိပ်ရင် ဘာမှမလုပ်အောင် (သို့မဟုတ်) Exit confirm တောင်းရန်
+      Alert.alert("သတိပေးချက်", "App မှ ထွက်လိုပါသလား?", [
+        { text: "မထွက်ပါ", onPress: () => null, style: "cancel" },
+        { text: "ထွက်မည်", onPress: () => BackHandler.exitApp() }
+      ]);
+      return true; // True ပေးထားရင် Back logic အလုပ်မလုပ်တော့ပါ
+    };
 
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove(); // Screen ကနေ ထွက်ရင် listener ကို ဖျက်ပါ
+  }, []);
     // Memo function to calculate today's date info, astrology, and countdown to next special day
     const dateInfo = useMemo(() => {
         const now = new Date();
@@ -82,36 +98,44 @@ useEffect(() => {
         return () => subscription.remove();
     }, [dateInfo]);
     useEffect(() => {
-    const setupNotifications = async () => {
-        // ၁။ Permission တောင်းခြင်း
-        const { status } = await Notifications.requestPermissionsAsync();
-        if (status !== 'granted') return;
+  const setupNotifications = async () => {
+    // ၁။ Permission တောင်းခြင်း
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== 'granted') return;
 
-       
-        await Notifications.cancelAllScheduledNotificationsAsync();
-        if (dateInfo.isTodaySabbath) {
-            await Notifications.scheduleNotificationAsync({
-                content: {
-                    title: "🙏 ယနေ့သည် ဥပုသ်နေ့ဖြစ်ပါသည်",
-                    body: "ကုသိုလ်ကောင်းမှုများ ပြုလုပ်ရန် မမေ့ပါနှင့်။",
-                },
-                trigger: null, 
-            });
-        } else if (dateInfo.daysLeft === 1) {
-            
-            await Notifications.scheduleNotificationAsync({
-                content: {
-                    title: `📌 မနက်ဖြန်သည် ${dateInfo.nextEvent} ဖြစ်ပါသည်`,
-                    body: "ဥပုသ်စောင့်တည်ရန် သို့မဟုတ် ကုသိုလ်ပြုရန် ပြင်ဆင်နိုင်ပါသည်။",
-                },
-                trigger: {
-                    hour: 18,
-                    minute: 0,
-                    repeats: false,
-                },
-            });
-        }
-    };
+    // အဟောင်းများကို အကုန်ဖျက်ပစ်ပါ
+    await Notifications.cancelAllScheduledNotificationsAsync();
+
+    if (dateInfo.isTodaySabbath) {
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title: "🙏 ယနေ့သည် ဥပုသ်နေ့ဖြစ်ပါသည်",
+                body: "ကုသိုလ်ကောင်းမှုများ ပြုလုပ်ရန် မမေ့ပါနှင့်။",
+                 // @ts-ignore
+                android: { channelId: 'sabbath-reminders' } 
+            },
+            trigger: null, // ချက်ချင်းပြရန် (trigger: null က valid ဖြစ်ပါသည်)
+        });
+    } else if (dateInfo.daysLeft === 1) {
+        // မနက်ဖြန် ညနေ ၆ နာရီမှာ သတိပေးရန်
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title: `📌 မနက်ဖြန်သည် ${dateInfo.nextEvent} ဖြစ်ပါသည်`,
+                body: "ဥပုသ်စောင့်တည်ရန် သို့မဟုတ် ကုသိုလ်ပြုရန် ပြင်ဆင်နိုင်ပါသည်။",
+                 // @ts-ignore
+                android: { channelId: 'sabbath-reminders' }
+            },
+            trigger: {
+                // 🚀 ERROR FIX: Trigger type ကို ထည့်ပေးရပါမည်
+                type: Notifications.SchedulableTriggerInputTypes.DAILY, 
+                hour: 18,
+                minute: 0,
+                 // @ts-ignore
+                repeats: false, // တစ်ကြိမ်ပဲ ပေးချင်တာမို့ false ထားပါ
+            },
+        });
+    }
+};
 
     setupNotifications();
 }, [dateInfo]);

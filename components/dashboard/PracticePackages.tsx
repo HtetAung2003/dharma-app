@@ -10,7 +10,7 @@ const PRACTICE_DATA = [
      { id: '2', title: 'ဥပုသ်စောင့်တည်ခြင်း ( ၈ ပါးသီလ )', duration: '၁ ရက်' },
     { id: '3', title: 'ပဋ္ဌာန်းဒေသနာတော်', duration: '၁၅ မိနစ်' },
     { id: '4', title: 'ပရိတ်ကြီး (၁၁) သုတ်', duration: '၁၅ မိနစ်' },
-    { id: '5', title: 'မဟာသမယသုတ်တော်', duration: '၁၅ မိနစ်' },
+    
    
 ];
 
@@ -36,9 +36,7 @@ const handlePress = (item: any) => {
               case '4':
             targetPath = '/packagedetails/practice-detail-payaekyi11'; // Navigate to 3thila practice detail
             break;
-             case '5':
-            targetPath = '/packagedetails/practice-detail-Mahasamaya'; // Navigate to 5thila practice detail
-            break;
+          
               case '6':
             targetPath = '/packagedetails/practice-detail-Pagoda'; // Navigate to Pagoda practice detail
             break;

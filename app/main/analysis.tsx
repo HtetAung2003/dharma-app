@@ -59,7 +59,7 @@ const fetchAndAggregateData = useCallback(async () => {
 ], [rawStats]);
 
     const formatTime = (seconds: number) => {
-        if (seconds < 60) return `${seconds} စက္ကန့်`;
+        if (seconds < 60) return `${seconds} စက္ကန့်`;
         const mins = Math.floor(seconds / 60);
         return mins >= 60 ? `${(mins / 60).toFixed(1)} နာရီ` : `${mins} မိနစ်`;
     };
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     listItem: { flexDirection: 'row', alignItems: 'center', padding: 15, borderRadius: 16, marginBottom: 12 },
     iconBox: { width: 45, height: 45, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
     itemTitle: { fontSize: 16, fontWeight: '600' },
-    itemTime: { fontSize: 15, fontWeight: 'bold' },
+    itemTime: { fontSize: 15, fontWeight: 'bold' , letterSpacing: 2},
 });
 
 export default AnalysisScreen;
