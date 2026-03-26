@@ -29,6 +29,10 @@ const MyanmarBuddhistCalendar = () => {
   // 🚀 Helper to get all detailed info at once
   const getDetailedInfo = (dateString: string) => {
     const mdt = new ceMmDateTime(new Date(dateString));
+
+    // Astrology array ကို Class ထဲကနေ တိုက်ရိုက်ယူမယ်
+    const astroData = mdt.getAstrologyInfo ? mdt.getAstrologyInfo() : [];
+
     return {
       isSabbath: mdt.isSabbath(),
       isFullMoon: mdt.isFullMoon,
@@ -36,10 +40,14 @@ const MyanmarBuddhistCalendar = () => {
       mmDay: mdt.mdText,
       mpName: mdt.mpText,
       fullString: mdt.ToMString(),
-      astrology: mdt.getAstrologyInfo(),
-      isYatyaza: mdt.isYatyaza,
+      astrology: astroData, // ["နှစ်အမည်: ...", "မဟာဘုတ်: ..."]
+      // အကယ်၍ Class ထဲမှာ yatyaza တွက်ချက်မှု မပါသေးရင် error မတက်အောင် default false ထားပါ
+      isYatyaza: (mdt as any).isYatyaza || false,
       specialDays: mdt.getSpecialDay(),
-      holidays: mdt.getHolidays(), // service ထဲမှာ logic ထည့်ထားရန်လိုသည်
+      holidays: mdt.getHolidays ? mdt.getHolidays() : [],
+      // Manual Data တွေကို တိုက်ရိုက်သုံးချင်လျှင်
+      mahabote: (mdt as any).mahabote || "N/A",
+      nagaHead: (mdt as any).nagaHead || "N/A",
     };
   };
 
@@ -166,18 +174,35 @@ const MyanmarBuddhistCalendar = () => {
               </Text>
             </View>
 
+            {/* Astrology Details Section */}
             {selectedInfo.astrology.length > 0 && (
               <View style={styles.specialContainer}>
+                {selectedInfo.astrology.map((item, index) => (
+                  <Text
+                    key={index}
+                    style={[
+                      styles.astroText,
+                      { color: colors.textPrimary, marginBottom: 4 },
+                    ]}
+                  >
+                    • {item}
+                  </Text>
+                ))}
+
+                {/* ရက်ရာဇာ သို့မဟုတ် ပြဿဒါး အခြေအနေကို သီးသန့်ပြခြင်း */}
                 <Text
                   style={[
                     styles.astroText,
-                    { color: selectedInfo.isYatyaza ? "#FF9100" : "#F44336" },
+                    {
+                      marginTop: 8,
+                      color: selectedInfo.isYatyaza ? "#FF9100" : "#F44336",
+                    },
                   ]}
                 >
-                  📍 {selectedInfo.astrology.join(", ")}{" "}
+                  📍{" "}
                   {selectedInfo.isYatyaza
-                    ? "(မင်္ဂလာရှိသောနေ့)"
-                    : "(သတိထားရမည့်နေ့)"}
+                    ? "ရက်ရာဇာ (မင်္ဂလာရှိသောနေ့)"
+                    : "ပြဿဒါး (သတိထားရမည့်နေ့)"}
                 </Text>
               </View>
             )}

@@ -11,7 +11,7 @@ export class ceMmDateTime {
   public mdNum: number = 0;
   public mpNum: number = 0;
 
-  // Astrology Information
+  // Astrology Data (Manual Calculated)
   public sravana: string = "N/A";
   public mahabote: string = "N/A";
   public nakhat: string = "N/A";
@@ -21,22 +21,22 @@ export class ceMmDateTime {
     const inputDate = date instanceof Date ? date : new Date();
 
     try {
-      // ၁။ အခြေခံစာသား ရယူခြင်း
+      // ၁။ Library မှ String ရယူခြင်း
       const result = mcal.toMyanmar(inputDate);
       this.mmObj = result;
 
-      // ၂။ အသေးစိတ် Astrology Object ရယူခြင်း (true ပေးခြင်းဖြင့် Object ရနိုင်သည်)
-      const astro = mcal.toMyanmar(inputDate, true);
-
       if (typeof result === "string") {
         const parts = result.trim().split(/\s+/);
-        this.mdText = parts[0] || "N/A";
-        this.mm = parts[1] || "N/A";
-        this.my = parts[2] || "N/A";
+        this.mdText = parts[0] || "";
+        this.mm = parts[1] || "";
+        this.my = parts[2] || "";
 
+        // မြန်မာဂဏန်းကို Number ပြောင်းခြင်း
         this.mdNum = this.myanNumToEng(this.mdText);
+        const myYearInt = this.myanNumToEng(this.my);
+        const dayOfWeek = inputDate.getDay(); // 0=Sun, 1=Mon...
 
-        // Moon Phase logic
+        // ၂။ Moon Phase သတ်မှတ်ခြင်း
         if (result.includes("လပြည့်")) {
           this.mpText = "လပြည့်";
           this.mpNum = 1;
@@ -47,54 +47,105 @@ export class ceMmDateTime {
           this.mpText = this.mdNum <= 15 ? "လဆန်း" : "လဆုတ်";
           this.mpNum = this.mdNum <= 15 ? 0 : 2;
         }
-      }
 
-      // ၃။ Astrology Data Mapping
-      if (astro && typeof astro === "object") {
-        this.sravana = astro.sravana || "N/A";
-        this.mahabote = astro.mahabote || "N/A";
-        this.nakhat = astro.nakhat || "N/A";
-        this.nagaHead = astro.naga_head || "N/A";
+        // ၃။ Astrology ကို Manual တွက်ချက်ခြင်း
+        if (myYearInt > 0) {
+          this.calculateAstrology(myYearInt, dayOfWeek);
+        }
 
-        console.log("--- 🌌 MYANMAR ASTROLOGY INFO ---");
-        console.log(`🌟 Sravana Year: ${this.sravana}`);
+        // 🚀 DEBUG LOGS
+        console.log("================================");
+        console.log("📍 ASTROLOGY DEBUG LOG");
+        console.log(`📅 Date: ${inputDate.toDateString()} (Day: ${dayOfWeek})`);
+        console.log(`🇲🇲 MM Date: ${result}`);
+        console.log("--------------------------------");
+        console.log(`🌟 Year Name (Sravana): ${this.sravana}`);
         console.log(`☸️ Mahabote: ${this.mahabote}`);
         console.log(`🏹 Nakhat: ${this.nakhat}`);
         console.log(`🐍 Naga Head: ${this.nagaHead}`);
-        console.log("--------------------------------");
+        console.log("================================");
       }
     } catch (e) {
-      console.error("❌ Debug Log Error:", e);
+      console.error("❌ Calculation Error:", e);
     }
   }
 
-  private myanNumToEng(str: string): number {
-    const myanDigits = ["၀", "၁", "၂", "၃", "၄", "၅", "၆", "၇", "၈", "၉"];
-    const engStr = str.replace(/[၀-၉]/g, (d) =>
-      myanDigits.indexOf(d).toString(),
-    );
-    return parseInt(engStr) || 0;
+  private calculateAstrology(myYear: number, dayOfWeek: number) {
+    // မဟာဘုတ်တွက်နည်း: (မြန်မာသက္ကရာဇ် + မွေးနေ့ဂဏန်း) % 7
+    // တနင်္ဂနွေ=0, တနင်္လာ=1 ... စနေ=6 (ဂဏန်းသင်္ချာအရ)
+    const mahaboteList = [
+      "ဘင်္ဂ",
+      "အထွန်း",
+      "ရာဇ",
+      "အဓိပတိ",
+      "မရဏ",
+      "သိုက်",
+      "ပုတိ",
+    ];
+    const chartPos = (myYear + dayOfWeek) % 7;
+    this.mahabote = mahaboteList[chartPos] || "N/A";
+
+    // နဂါးခေါင်း (မြန်မာလအလိုက်)
+    const westMonths = ["တန်ခူး", "ကဆုန်", "နယုန်"];
+    const northMonths = ["ဝါဆို", "ဝါခေါင်", "တော်သလင်း"];
+    const eastMonths = ["သီတင်းကျွတ်", "တန်ဆောင်မုန်း", "နတ်တော်"];
+
+    if (westMonths.includes(this.mm)) this.nagaHead = "အနောက်";
+    else if (northMonths.includes(this.mm)) this.nagaHead = "မြောက်";
+    else if (eastMonths.includes(this.mm)) this.nagaHead = "အရှေ့";
+    else this.nagaHead = "တောင်";
+
+    // နှစ်အမည် (သာဝဏ စသည်)
+    const sravanaYears = ["ပုဏ္ဏား", "ဗြဟ္မဏ", "သာဝဏ", "စိတြ"];
+    this.sravana = sravanaYears[myYear % 4] || "N/A";
+
+    // နက္ခတ် (ရိုးရှင်းသော cycle)
+    this.nakhat =
+      this.mdNum % 3 === 0 ? "ဘီလူး" : this.mdNum % 3 === 1 ? "နတ်" : "လူ";
   }
 
-  public isSabbath(): boolean {
+  private myanNumToEng(str: string): number {
+    return (
+      parseInt(
+        str.replace(/[၀-၉]/g, (d) => "၀၁၂၃၄၅၆၇၈၉".indexOf(d).toString()),
+      ) || 0
+    );
+  }
+
+  public getAstrologyInfo(): string[] {
+    return [
+      `နှစ်အမည်: ${this.sravana}`,
+      `မဟာဘုတ်: ${this.mahabote}`,
+      `နက္ခတ်: ${this.nakhat}`,
+      `နဂါးခေါင်း: ${this.nagaHead}သို့ မျက်နှာမူ`,
+    ];
+  }
+  // 🌕 လပြည့် ဟုတ်မဟုတ် စစ်ဆေးသည့် Getter
+  get isFullMoon(): boolean {
+    return this.mpNum === 1;
+  }
+
+  // 🌑 လကွယ် ဟုတ်မဟုတ် စစ်ဆေးသည့် Getter
+  get isNewMoon(): boolean {
+    return this.mpNum === 3;
+  }
+
+  // 🚩 ရက်ရာဇာ (လက်ရှိ logic ထဲတွင် default false ထားပါဦးမည်)
+  get isYatyaza(): boolean {
+    // နောက်ပိုင်းတွင် ရက်ရာဇာတွက်သည့် logic ထည့်ရန်
+    return false;
+  }
+  public getHolidays(): string[] {
+    // ဥပမာ - Thingyan သို့မဟုတ် အခြား အစိုးရရုံးပိတ်ရက်များ တွက်ရန်
+    return [];
+  }44
+  public isSabbath() {
     return this.mdNum === 8 || this.mpNum === 1 || this.mpNum === 3;
   }
-
-  public ToMString(): string {
-    return typeof this.mmObj === "string" ? this.mmObj : "Data Error";
+  public ToMString() {
+    return this.mmObj || "";
   }
-
-  public getSpecialDay(): string[] {
+  public getSpecialDay() {
     return this.isSabbath() ? ["ဥပုသ်နေ့"] : [];
-  }
-  public getAstrologyInfo(): string[] {
-    let astro: string[] = [];
-
-    if (this.sravana !== "N/A") astro.push(`နှစ်အမည်: ${this.sravana}`);
-    if (this.mahabote !== "N/A") astro.push(`မဟာဘုတ်: ${this.mahabote}`);
-    if (this.nakhat !== "N/A") astro.push(`နက္ခတ်: ${this.nakhat}`);
-    if (this.nagaHead !== "N/A") astro.push(`နဂါးခေါင်း: ${this.nagaHead}`);
-
-    return astro;
   }
 }
