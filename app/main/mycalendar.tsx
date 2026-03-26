@@ -37,7 +37,7 @@ const mycalendar = () => {
       isSabbath: mdt.isSabbath(),
       isFullMoon: mdt.isFullMoon,
       isNewMoon: mdt.isNewMoon,
-      mmDay: mdt.mdText,
+      mmDay: (mdt as any).fortnightDayText || mdt.mdText,
       mpName: mdt.mpText,
       fullString: mdt.ToMString(),
       astrology: astroData, // ["နှစ်အမည်: ...", "မဟာဘုတ်: ..."]
