@@ -18,7 +18,7 @@ const PataukOverlay = () => (
   </View>
 );
 
-const MyanmarBuddhistCalendar = () => {
+const mycalendar = () => {
   const { colors, isDarkMode } = useTheme();
   const [selected, setSelected] = useState(
     new Date().toISOString().split("T")[0],
@@ -368,3 +368,5 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
 });
+
+export default mycalendar;
