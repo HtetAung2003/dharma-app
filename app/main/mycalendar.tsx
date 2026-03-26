@@ -33,17 +33,24 @@ const mycalendar = () => {
     // Astrology array ကို Class ထဲကနေ တိုက်ရိုက်ယူမယ်
     const astroData = mdt.getAstrologyInfo ? mdt.getAstrologyInfo() : [];
 
+    const formattedMmDate = [
+      (mdt as any).fortnightDayText || mdt.mdText,
+      mdt.mm,
+      mdt.mpText,
+      mdt.my,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     return {
       isSabbath: mdt.isSabbath(),
       isFullMoon: mdt.isFullMoon,
       isNewMoon: mdt.isNewMoon,
       mmDay: (mdt as any).fortnightDayText || mdt.mdText,
       mpName: mdt.mpText,
-      fullString: mdt.ToMString(),
+      fullString: formattedMmDate || mdt.ToMString(),
       astrology: astroData, // ["နှစ်အမည်: ...", "မဟာဘုတ်: ..."]
-      // အကယ်၍ Class ထဲမှာ yatyaza တွက်ချက်မှု မပါသေးရင် error မတက်အောင် default false ထားပါ
-      isYatyaza: (mdt as any).isYatyaza || false,
-      specialDays: mdt.getSpecialDay(),
+
       holidays: mdt.getHolidays ? mdt.getHolidays() : [],
       // Manual Data တွေကို တိုက်ရိုက်သုံးချင်လျှင်
       mahabote: (mdt as any).mahabote || "N/A",
@@ -190,24 +197,10 @@ const mycalendar = () => {
                 ))}
 
                 {/* ရက်ရာဇာ သို့မဟုတ် ပြဿဒါး အခြေအနေကို သီးသန့်ပြခြင်း */}
-                <Text
-                  style={[
-                    styles.astroText,
-                    {
-                      marginTop: 8,
-                      color: selectedInfo.isYatyaza ? "#FF9100" : "#F44336",
-                    },
-                  ]}
-                >
-                  📍{" "}
-                  {selectedInfo.isYatyaza
-                    ? "ရက်ရာဇာ (မင်္ဂလာရှိသောနေ့)"
-                    : "ပြဿဒါး (သတိထားရမည့်နေ့)"}
-                </Text>
               </View>
             )}
 
-            {selectedInfo.specialDays.length > 0 && (
+            {/* {selectedInfo.specialDays.length > 0 && (
               <View style={styles.specialContainer}>
                 <Text
                   style={[
@@ -218,15 +211,7 @@ const mycalendar = () => {
                   ✨ {selectedInfo.specialDays.join(", ")}
                 </Text>
               </View>
-            )}
-
-            {selectedInfo.holidays.length > 0 && (
-              <View style={styles.specialContainer}>
-                <Text style={styles.holidayText}>
-                  📌 ပိတ်ရက်: {selectedInfo.holidays.join(", ")}
-                </Text>
-              </View>
-            )}
+            )} */}
           </View>
         )}
       </ScrollView>

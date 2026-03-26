@@ -95,7 +95,7 @@ const BottomNav = () => {
           </Text>
         </TouchableOpacity>
         {/* Plan / Schedule */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.navItem}
           onPress={() => router.push("/main/mycalendar")}
         >
@@ -114,7 +114,7 @@ const BottomNav = () => {
           >
             ပြက္ခဒိန်
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => router.push("/main/analysis")}

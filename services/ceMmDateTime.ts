@@ -1,7 +1,7 @@
 // services/ceMmDateTime.ts
 // @ts-ignore
-import mcal from "myanmar-calendar";
 import { MyanmarDate } from "mm-calendar";
+import mcal from "myanmar-calendar";
 
 type SpecialDayType = "ရက်ရာဇာ" | "ပြဿဒါး";
 
@@ -111,8 +111,26 @@ export class ceMmDateTime {
   }
 
   private calculateAstrology(myYear: number) {
-    const mahaboteList = ["ဘင်္ဂ", "အထွန်း", "ရာဇ", "အဓိပတိ", "မရဏ", "သိုက်", "ပုတိ"];
-    const sravanaYears = ["ပုဏ္ဏား", "ဗြဟ္မဏ", "သရဝန်", "စိတြ"];
+    const mahaboteList = [
+      "ဘင်္ဂ",
+      "အထွန်း",
+      "ရာဇ",
+      "အဓိပတိ",
+      "မရဏ",
+      "သိုက်",
+      "ပုတိ",
+    ];
+    // 2030
+    const sravanaYears = [
+      "ပုဏ္ဏား",
+      "ဗြဟ္မဏ",
+      "သရဝန်",
+      // "ဘဒြ",
+      // "အာသိန်",
+      // "ကြတိုက်",
+      // "မြိက္ကသိုဝ်",
+      // "ပုဿ",
+    ];
     const nakhatList = ["ဘီလူး", "နတ်", "လူ"];
 
     const mahaboteIndex = this.mod(myYear - this.weekdayIndex, 7);
@@ -123,17 +141,23 @@ export class ceMmDateTime {
     this.sravana = sravanaYears[sravanaIndex] || "N/A";
     this.nakhat = nakhatList[nakhatIndex] || "N/A";
     this.nagaHead = this.getNagaHeadByMonth(this.monthIndex);
-    this.specialDays = this.calculateSpecialDays(this.monthIndex, this.weekdayIndex);
+    this.specialDays = this.calculateSpecialDays(
+      this.monthIndex,
+      this.weekdayIndex,
+    );
   }
 
-  private calculateSpecialDays(monthIndex: number, weekdayIndex: number): SpecialDayType[] {
+  private calculateSpecialDays(
+    monthIndex: number,
+    weekdayIndex: number,
+  ): SpecialDayType[] {
     const out: SpecialDayType[] = [];
     if (monthIndex < 0) return out;
 
     const monthRemainder = monthIndex % 4;
     const yatyazaWeekday1 = Math.floor(monthRemainder / 2) + 4;
     const yatyazaWeekday2 =
-      ((1 - Math.floor(monthRemainder / 2)) + (monthRemainder % 2)) *
+      (1 - Math.floor(monthRemainder / 2) + (monthRemainder % 2)) *
       (1 + 2 * (monthRemainder % 2));
 
     if (weekdayIndex === yatyazaWeekday1 || weekdayIndex === yatyazaWeekday2) {
@@ -200,18 +224,28 @@ export class ceMmDateTime {
     const matchedBase = knownMonths.find((m) => normalized.includes(m));
     if (!matchedBase) return -1;
 
-    if (matchedBase === "ဝါဆို" && (normalized.includes("ပထမ") || normalized.startsWith("ပ "))) {
+    if (
+      matchedBase === "ဝါဆို" &&
+      (normalized.includes("ပထမ") || normalized.startsWith("ပ "))
+    ) {
       return 0;
     }
     return monthMap[matchedBase] ?? -1;
   }
 
   private myanNumToEng(str: string): number {
-    return parseInt(str.replace(/[၀-၉]/g, (d) => "၀၁၂၃၄၅၆၇၈၉".indexOf(d).toString()), 10) || 0;
+    return (
+      parseInt(
+        str.replace(/[၀-၉]/g, (d) => "၀၁၂၃၄၅၆၇၈၉".indexOf(d).toString()),
+        10,
+      ) || 0
+    );
   }
 
   private engNumToMyan(num: number): string {
-    return num.toString().replace(/[0-9]/g, (d) => "၀၁၂၃၄၅၆၇၈၉"[parseInt(d, 10)] || d);
+    return num
+      .toString()
+      .replace(/[0-9]/g, (d) => "၀၁၂၃၄၅၆၇၈၉"[parseInt(d, 10)] || d);
   }
 
   private mod(n: number, m: number): number {
@@ -226,7 +260,8 @@ export class ceMmDateTime {
       `နဂါးခေါင်း: ${this.nagaHead}သို့ မျက်နှာမူ`,
     ];
 
-    if (this.specialDays.length > 0) astro.push(`နေ့ထူး: ${this.specialDays.join(" / ")}`);
+    if (this.specialDays.length > 0)
+      astro.push(`နေ့ထူး: ${this.specialDays.join(" / ")}`);
     return astro;
   }
 
@@ -263,4 +298,3 @@ export class ceMmDateTime {
     return [...out, ...this.specialDays];
   }
 }
-
