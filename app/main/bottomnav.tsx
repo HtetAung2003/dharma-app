@@ -42,16 +42,55 @@ const BottomNav = () => {
                 />
                 <Text style={[styles.navText, { color: getIconColor('/favorites') }]}>နှစ်သက်</Text>
             </TouchableOpacity>
-
-            {/* History */}
-            <TouchableOpacity style={styles.navItem} onPress={() => router.push('/main/albums')}>
+    <TouchableOpacity style={styles.navItem} onPress={() => router.push('/main/favorite')}>
                 <Ionicons 
-                    name={pathname === '/main/albums' ? "albums" : "albums-outline"} 
+                    name={pathname === '/favorites' ? "heart" : "heart-outline"} 
                     size={24} 
-                    color={getIconColor('/main/albums')} 
+                    color={getIconColor('/favorites')} 
                 />
-                <Text style={[styles.navText, { color: getIconColor('/main/albums') }]}>ဘုရားစာ</Text>
-            </TouchableOpacity>
+          <Text
+            style={[
+              styles.navText,
+              { color: getIconColor("/main/beadCounter") },
+            ]}
+          >
+            ပုတီး
+          </Text>
+        </TouchableOpacity>
+        {/* Plan / Schedule */}
+        {/* <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/main/mycalendar")}
+        >
+          <Ionicons
+            name={
+              pathname === "/main/mycalendar" ? "calendar" : "calendar-outline"
+            }
+            size={24}
+            color={getIconColor("/main/mycalendar")}
+          />
+          <Text
+            style={[
+              styles.navText,
+              { color: getIconColor("/main/mycalendar") },
+            ]}
+          >
+            ပြက္ခဒိန်
+          </Text>
+        </TouchableOpacity> */}
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/main/analysis")}
+        >
+          <Ionicons
+            name={
+              pathname === "/main/analysis"
+                ? "stats-chart"
+                : "stats-chart-outline"
+            }
+            size={24}
+            color={getIconColor("/main/analysis")}
+          />
 
             {/* Plan / Schedule */}
             <TouchableOpacity style={styles.navItem} onPress={() => router.push('/main/mycalendar')}>

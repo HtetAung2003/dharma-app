@@ -27,6 +27,7 @@ const MyanmarBuddhistCalendar = () => {
       const hDays = mdt.getHolidays(date);
       const astroData = mdt.getAstrologyInfo();
 
+<<<<<<< HEAD
       return {
         fullString: mdt.ToMString(),
         myanmarYear: mdt.my,
@@ -43,6 +44,34 @@ const MyanmarBuddhistCalendar = () => {
     } catch (e) {
       return null;
     }
+=======
+    // Astrology array ကို Class ထဲကနေ တိုက်ရိုက်ယူမယ်
+    const astroData = mdt.getAstrologyInfo ? mdt.getAstrologyInfo() : [];
+
+    const formattedMmDate = [
+      (mdt as any).fortnightDayText || mdt.mdText,
+      mdt.mm,
+      mdt.mpText,
+      mdt.my,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    return {
+      isSabbath: mdt.isSabbath(),
+      isFullMoon: mdt.isFullMoon,
+      isNewMoon: mdt.isNewMoon,
+      mmDay: (mdt as any).fortnightDayText || mdt.mdText,
+      mpName: mdt.mpText,
+      fullString: formattedMmDate || mdt.ToMString(),
+      astrology: astroData, // ["နှစ်အမည်: ...", "မဟာဘုတ်: ..."]
+
+      holidays: mdt.getHolidays ? mdt.getHolidays() : [],
+      // Manual Data တွေကို တိုက်ရိုက်သုံးချင်လျှင်
+      mahabote: (mdt as any).mahabote || "N/A",
+      nagaHead: (mdt as any).nagaHead || "N/A",
+    };
+>>>>>>> 9254392 (removed)
   };
 
   // ယနေ့အတွက် မြန်မာရက်စွဲ အချက်အလက် (Dashboard အတွက်)
@@ -130,18 +159,35 @@ const MyanmarBuddhistCalendar = () => {
 
             {selectedInfo.astrology.length > 0 && (
               <View style={styles.specialContainer}>
+<<<<<<< HEAD
                 <Text style={[styles.astroText, { color: selectedInfo.isYatyaza ? '#FF9100' : '#F44336' }]}>
                   {`📍 ${selectedInfo.astrology.join(', ')} (မင်္ဂလာယူရမည့်ရက်)`}
                 </Text>
+=======
+                {selectedInfo.astrology.map((item, index) => (
+                  <Text
+                    key={index}
+                    style={[
+                      styles.astroText,
+                      { color: colors.textPrimary, marginBottom: 4 },
+                    ]}
+                  >
+                    • {item}
+                  </Text>
+                ))}
+
+                {/* ရက်ရာဇာ သို့မဟုတ် ပြဿဒါး အခြေအနေကို သီးသန့်ပြခြင်း */}
+>>>>>>> 9254392 (removed)
               </View>
             )}
 
-            {selectedInfo.specialDays.length > 0 && (
+            {/* {selectedInfo.specialDays.length > 0 && (
               <View style={styles.specialContainer}>
                 <Text style={[styles.specialText, { color: isDarkMode ? '#FFD700' : '#0288D1' }]}>
                   {`✨ ${selectedInfo.specialDays.join(', ')}`}
                 </Text>
               </View>
+<<<<<<< HEAD
             )}
 
             {selectedInfo.holidays.length > 0 && (
@@ -151,6 +197,9 @@ const MyanmarBuddhistCalendar = () => {
                 </Text>
               </View>
             )}
+=======
+            )} */}
+>>>>>>> 9254392 (removed)
           </View>
         )}
       </ScrollView>
