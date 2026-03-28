@@ -1,18 +1,19 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { useKeepAwake } from "expo-keep-awake";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { AnimatePresence, View } from "moti";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    View as RNView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
+  Alert,
+  View as RNView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -20,6 +21,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../context/ThemeContext";
 
 const PRESET_NUMBERS = [9, 27, 45, 108, 1000];
+const BEAD_COUNTER_STATE_KEY = "bead_counter_state_v1";
 
 const BeadCounterScreen = () => {
   useKeepAwake();
@@ -32,6 +34,53 @@ const BeadCounterScreen = () => {
   const [rounds, setRounds] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [animationKey, setAnimationKey] = useState(0);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    const loadSavedState = async () => {
+      try {
+        const raw = await AsyncStorage.getItem(BEAD_COUNTER_STATE_KEY);
+        if (!raw) return;
+
+        const saved = JSON.parse(raw);
+        if (typeof saved?.target === "number") setTarget(saved.target);
+        if (typeof saved?.count === "number") setCount(saved.count);
+        if (typeof saved?.rounds === "number") setRounds(saved.rounds);
+        if (typeof saved?.startTime === "number" || saved?.startTime === null) {
+          setStartTime(saved.startTime);
+        }
+      } catch (error) {
+        console.warn("Failed to load bead counter state", error);
+      } finally {
+        setIsHydrated(true);
+      }
+    };
+
+    loadSavedState();
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+
+    const persistState = async () => {
+      try {
+        await AsyncStorage.setItem(
+          BEAD_COUNTER_STATE_KEY,
+          JSON.stringify({
+            target,
+            count,
+            rounds,
+            startTime,
+            updatedAt: Date.now(),
+          }),
+        );
+      } catch (error) {
+        console.warn("Failed to save bead counter state", error);
+      }
+    };
+
+    persistState();
+  }, [target, count, rounds, startTime, isHydrated]);
 
   const handleTap = async () => {
     if (count === 0 && rounds === 0 && !startTime) {
@@ -52,10 +101,17 @@ const BeadCounterScreen = () => {
   };
 
   const handleResetCount = () => {
-    if (count > 0) {
+    if (count > 0 || rounds > 0) {
       Alert.alert("အတည်ပြုပါ", "လက်ရှိရေတွက်ထားသည်ကို ဖျက်ပါမည်လား?", [
         { text: "မဖျက်ပါ", style: "cancel" },
-        { text: "ဖျက်မည်", onPress: () => setCount(0) },
+        {
+          text: "ဖျက်မည်",
+          onPress: () => {
+            setCount(0);
+            setRounds(0);
+            setStartTime(null);
+          },
+        },
       ]);
     }
   };
@@ -126,12 +182,17 @@ const BeadCounterScreen = () => {
             <Text style={[styles.label, { color: colors.textSecondary }]}>
               စိပ်လိုသည့် အရေအတွက် ရွေးပါ
             </Text>
-            <TouchableOpacity onPress={handleResetCount} disabled={count === 0}>
+            <TouchableOpacity
+              onPress={handleResetCount}
+              disabled={count === 0 && rounds === 0}
+            >
               <Ionicons
                 name="refresh-circle-outline"
                 size={28}
                 color={
-                  count > 0 ? colors.secondary : colors.textSecondary + "50"
+                  count > 0 || rounds > 0
+                    ? colors.secondary
+                    : colors.textSecondary + "50"
                 }
               />
             </TouchableOpacity>
@@ -146,7 +207,7 @@ const BeadCounterScreen = () => {
               <TouchableOpacity
                 key={num}
                 onPress={() => {
-                  if (count > 0) {
+                  if (count > 0 || rounds > 0) {
                     Alert.alert(
                       "သတိပေးချက်",
                       "စိပ်လက်စကို ဖျက်ပြီး အရေအတွက် အသစ်ပြောင်းမလား?",

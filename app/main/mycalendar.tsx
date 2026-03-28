@@ -198,7 +198,7 @@ const mycalendar = () => {
 
                 {/* ရက်ရာဇာ သို့မဟုတ် ပြဿဒါး အခြေအနေကို သီးသန့်ပြခြင်း */}
               </View>
-<<<<<<< HEAD
+
             )}
 
             {/* {selectedInfo.specialDays.length > 0 && (
