@@ -1,4 +1,5 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import FloatingBubble from "@increase21/rn-floating-bubble";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { useKeepAwake } from "expo-keep-awake";
@@ -9,6 +10,7 @@ import { AnimatePresence, View } from "moti";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
+  Platform,
   View as RNView,
   ScrollView,
   StyleSheet,
@@ -22,6 +24,7 @@ import { useTheme } from "../../context/ThemeContext";
 
 const PRESET_NUMBERS = [9, 27, 45, 108, 1000];
 const BEAD_COUNTER_STATE_KEY = "bead_counter_state_v1";
+const BEAD_COUNTER_BUBBLE_KEY = "bead_counter_bubble_enabled_v1";
 
 const BeadCounterScreen = () => {
   useKeepAwake();
@@ -35,6 +38,9 @@ const BeadCounterScreen = () => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [animationKey, setAnimationKey] = useState(0);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [hasBubblePermission, setHasBubblePermission] = useState(false);
+  const [isBubbleShowing, setIsBubbleShowing] = useState(false);
+  const isAndroid = Platform.OS === "android";
 
   useEffect(() => {
     const loadSavedState = async () => {
@@ -81,6 +87,72 @@ const BeadCounterScreen = () => {
 
     persistState();
   }, [target, count, rounds, startTime, isHydrated]);
+
+  useEffect(() => {
+    if (!isAndroid) return;
+
+    const bootstrapBubble = async () => {
+      try {
+        const [permission, showing, enabled] = await Promise.all([
+          FloatingBubble.hasPermission(),
+          FloatingBubble.isShowing(),
+          AsyncStorage.getItem(BEAD_COUNTER_BUBBLE_KEY),
+        ]);
+
+        setHasBubblePermission(permission);
+        setIsBubbleShowing(showing);
+
+        if (enabled === "1" && permission && !showing) {
+          await FloatingBubble.show({ size: 64, initialX: 0, initialY: 240 });
+          setIsBubbleShowing(true);
+        }
+      } catch (error) {
+        console.warn("Bubble bootstrap failed", error);
+      }
+    };
+
+    bootstrapBubble();
+  }, [isAndroid]);
+
+  const enableBubble = async () => {
+    if (!isAndroid) return;
+
+    try {
+      let granted = await FloatingBubble.hasPermission();
+      if (!granted) {
+        granted = await FloatingBubble.requestPermission();
+      }
+
+      setHasBubblePermission(granted);
+      if (!granted) {
+        Alert.alert(
+          "Permission required",
+          'Please allow "Display over other apps" to enable floating bubble.',
+        );
+        return;
+      }
+
+      await FloatingBubble.show({ size: 64, initialX: 0, initialY: 240 });
+      await AsyncStorage.setItem(BEAD_COUNTER_BUBBLE_KEY, "1");
+      setIsBubbleShowing(true);
+    } catch (error) {
+      console.warn("Failed to enable floating bubble", error);
+      Alert.alert("Error", "Could not start floating bubble.");
+    }
+  };
+
+  const disableBubble = async () => {
+    if (!isAndroid) return;
+
+    try {
+      await FloatingBubble.hide();
+      await AsyncStorage.setItem(BEAD_COUNTER_BUBBLE_KEY, "0");
+      setIsBubbleShowing(false);
+    } catch (error) {
+      console.warn("Failed to disable floating bubble", error);
+      Alert.alert("Error", "Could not stop floating bubble.");
+    }
+  };
 
   const handleTap = async () => {
     if (count === 0 && rounds === 0 && !startTime) {
@@ -329,6 +401,62 @@ const BeadCounterScreen = () => {
             ပုတီးတစ်လုံးချတိုင်း စက်ဝိုင်းအား နှိပ်ပေးပါ။
           </Text>
         </RNView>
+
+        {isAndroid && (
+          <RNView style={styles.bubbleSection}>
+            <RNView
+              style={[
+                styles.bubbleBadge,
+                {
+                  backgroundColor: isBubbleShowing
+                    ? colors.primary + "20"
+                    : colors.card,
+                },
+              ]}
+            >
+              <Ionicons
+                name={isBubbleShowing ? "radio-button-on" : "radio-button-off"}
+                size={16}
+                color={isBubbleShowing ? colors.primary : colors.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.bubbleStatusText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                {isBubbleShowing ? "Floating bubble ON" : "Floating bubble OFF"}
+              </Text>
+            </RNView>
+
+            <TouchableOpacity
+              onPress={isBubbleShowing ? disableBubble : enableBubble}
+              style={[
+                styles.bubbleButton,
+                {
+                  backgroundColor: isBubbleShowing
+                    ? colors.secondary
+                    : colors.primary,
+                },
+              ]}
+            >
+              <Text style={styles.bubbleButtonText}>
+                {isBubbleShowing ? "Disable Bubble" : "Enable Bubble"}
+              </Text>
+            </TouchableOpacity>
+
+            {!hasBubblePermission && (
+              <Text
+                style={[
+                  styles.bubbleHint,
+                  { color: colors.textSecondary + "B3" },
+                ]}
+              >
+                Requires Android "Display over other apps" permission.
+              </Text>
+            )}
+          </RNView>
+        )}
       </SafeAreaView>
     </LinearGradient>
   );
@@ -396,6 +524,35 @@ const styles = StyleSheet.create({
     paddingBottom: 30,
   },
   footerText: { fontSize: 13, textAlign: "center" },
+  bubbleSection: {
+    alignItems: "center",
+    paddingBottom: 22,
+    gap: 10,
+  },
+  bubbleBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  bubbleStatusText: { fontSize: 12, fontWeight: "600" },
+  bubbleButton: {
+    borderRadius: 24,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+  },
+  bubbleButtonText: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+    fontSize: 13,
+  },
+  bubbleHint: {
+    fontSize: 11,
+    textAlign: "center",
+    paddingHorizontal: 18,
+  },
 });
 
 export default BeadCounterScreen;

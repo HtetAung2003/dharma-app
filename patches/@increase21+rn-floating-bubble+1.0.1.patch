@@ -1,0 +1,13 @@
+diff --git a/node_modules/@increase21/rn-floating-bubble/android/src/main/java/com/rnfloatingbubble/FloatingBubbleModule.kt b/node_modules/@increase21/rn-floating-bubble/android/src/main/java/com/rnfloatingbubble/FloatingBubbleModule.kt
+index 1111111..2222222 100644
+--- a/node_modules/@increase21/rn-floating-bubble/android/src/main/java/com/rnfloatingbubble/FloatingBubbleModule.kt
++++ b/node_modules/@increase21/rn-floating-bubble/android/src/main/java/com/rnfloatingbubble/FloatingBubbleModule.kt
+@@ -121,7 +121,7 @@ class FloatingBubbleModule(
+             ).apply {
+                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+             }
+-            currentActivity?.startActivity(intent)
++            reactContext.currentActivity?.startActivity(intent)
+                 ?: run {
+                     pendingPermissionPromise = null
+                     promise.reject("NO_ACTIVITY", "No current activity found.")

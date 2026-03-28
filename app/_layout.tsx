@@ -1,16 +1,18 @@
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { Stack, useRouter, useSegments } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from '../services/firebaseConfig';
+import * as QuickActions from "expo-quick-actions";
 
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
   const segments = useSegments();
   const router = useRouter();
+  const handledInitialQuickAction = useRef(false);
 
   // ၁။ Firebase Auth State ကို စောင့်ကြည့်ခြင်း
   useEffect(() => {
@@ -36,6 +38,39 @@ export default function RootLayout() {
       router.replace('/main/dashboard');
     }
   }, [user, initializing, segments]);
+
+  useEffect(() => {
+    const handleQuickAction = (action?: QuickActions.Action) => {
+      const href = action?.params?.href;
+      if (typeof href === "string" && href.length > 0) {
+        router.push(href as any);
+      }
+    };
+
+    const setupQuickActions = async () => {
+      const supported = await QuickActions.isSupported();
+      if (!supported) return;
+
+      await QuickActions.setItems([
+        {
+          id: "bead-counter",
+          title: "Bead Counter",
+          subtitle: "Continue your count",
+          icon: "task",
+          params: { href: "/main/beadCounter" },
+        },
+      ]);
+
+      if (!handledInitialQuickAction.current) {
+        handledInitialQuickAction.current = true;
+        handleQuickAction(QuickActions.initial);
+      }
+    };
+
+    setupQuickActions();
+    const subscription = QuickActions.addListener(handleQuickAction);
+    return () => subscription.remove();
+  }, [router]);
 
   // Loading ဖြစ်နေစဉ် Screen ဗလာမပြဘဲ Spinner ပြထားခြင်း
   if (initializing) {
