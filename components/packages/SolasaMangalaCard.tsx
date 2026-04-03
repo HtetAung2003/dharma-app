@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
 const SolasaMangalaCard = () => {
-  const { colors, fontSize, isDarkMode } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -43,7 +43,7 @@ const SolasaMangalaCard = () => {
       {/* ဂါထာတော်များ Area */}
       <View style={[
         styles.verseContainer,
-        { backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.05)' : '#F0FDFA' }
+        { backgroundColor: themeMode === 'dark' ? 'rgba(16, 185, 129, 0.05)' : '#F0FDFA' }
       ]}>
         {verses.map((verse, index) => (
           <View key={index} style={styles.verseWrapper}>
@@ -55,7 +55,7 @@ const SolasaMangalaCard = () => {
       </View>
 
       {/* ရွတ်ဖတ်ရကျိုး Note */}
-      <View style={[styles.benefitBox, { backgroundColor: isDarkMode ? '#1E293B' : '#E0F2FE' }]}>
+      <View style={[styles.benefitBox, { backgroundColor: themeMode === 'dark' ? '#1E293B' : '#E0F2FE' }]}>
         <Text style={[styles.benefitTitle, { color: colors.primary, fontSize: dynamicSize(15) }]}>
           🌿 ရွတ်ဖတ်ရကျိုး
         </Text>
@@ -99,3 +99,4 @@ const styles = StyleSheet.create({
 });
 
 export default SolasaMangalaCard;
+

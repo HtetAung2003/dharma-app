@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 
 const DevaInvitationCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -22,8 +22,8 @@ const DevaInvitationCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(139, 92, 246, 0.05)' : '#F5F3FF',
-          borderColor: isDarkMode ? 'rgba(139, 92, 246, 0.2)' : '#EDE9FE'
+          backgroundColor: themeMode === 'dark' ? 'rgba(139, 92, 246, 0.05)' : '#F5F3FF',
+          borderColor: themeMode === 'dark' ? 'rgba(139, 92, 246, 0.2)' : '#EDE9FE'
         }
       ]}>
         <Text style={[
@@ -95,3 +95,4 @@ const styles = StyleSheet.create({
 });
 
 export default DevaInvitationCard;
+

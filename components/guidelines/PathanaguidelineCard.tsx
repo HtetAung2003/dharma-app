@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const PathanaGuidelineCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -48,7 +48,7 @@ const PathanaGuidelineCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -82,7 +82,7 @@ const PathanaGuidelineCard = () => {
         {/* Note Box */}
         <View style={[
           styles.noteBox, 
-          { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#EEF2FF' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(99, 102, 241, 0.1)' : '#EEF2FF' }
         ]}>
           <Text style={[styles.noteText, { color: colors.primary, fontSize: dynamicSize(14) }]}>
             မှတ်ချက်။ ။ ပဋ္ဌာန်းတရားတော်သည် အလွန်နက်နဲသောအစွမ်းရှိသဖြင့် စိတ်စေတနာသန့်ရှင်းစွာဖြင့် ရွတ်ဆိုပူဇော်ခြင်းက အကျိုးကျေးဇူး အရှိဆုံးဖြစ်ပါသည်။
@@ -111,3 +111,4 @@ const styles = StyleSheet.create({
 });
 
 export default PathanaGuidelineCard;
+

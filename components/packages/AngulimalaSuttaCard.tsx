@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const AngulimalaSuttaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -22,7 +22,7 @@ const AngulimalaSuttaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -37,7 +37,7 @@ const AngulimalaSuttaCard = () => {
         {/* Footer Note */}
         <View style={[
           styles.footerNote, 
-          { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#FDF2F8' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(99, 102, 241, 0.1)' : '#FDF2F8' }
         ]}>
           <Text style={[styles.footerText, { color: colors.primary, fontSize: dynamicSize(13) }]}>
             ကိုယ်ဝန်ဆောင်မိခင်များ ဘေးအန္တရာယ်ကင်းရှင်းစွာ သားဖွားနိုင်စေရန်နှင့် သစ္စာဆိုခြင်း၏ အကျိုးအာနိသင်ကို ရရှိစေရန် ဤအင်္ဂုလိမာလသုတ်ကို ရွတ်ဆိုပူဇော်ကြသည်။
@@ -80,3 +80,4 @@ const styles = StyleSheet.create({
 });
 
 export default AngulimalaSuttaCard;
+

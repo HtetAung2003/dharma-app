@@ -4,7 +4,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const BuddhaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -21,8 +21,8 @@ const BuddhaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
-          borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+          borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
         }
       ]}>
         <Text style={[styles.scriptText, { color: colors.textPrimary, fontSize: dynamicSize(20) }]}>
@@ -71,3 +71,5 @@ const styles = StyleSheet.create({
 });
 
 export default BuddhaCard;
+
+

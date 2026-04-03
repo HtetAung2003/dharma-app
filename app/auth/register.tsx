@@ -1,22 +1,21 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View as RNView, Alert, ActivityIndicator } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
-import { View } from 'moti'; 
 import * as Haptics from 'expo-haptics';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { StatusBar } from 'expo-status-bar';
+import { Stack, useRouter } from 'expo-router';
+import { View } from 'moti';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Theme & Firebase Imports
-import { useTheme } from '../../context/ThemeContext';
-import { SIZES } from '../../constants/Theme';
-import { auth, db } from '../../services/firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import { SIZES } from '../../constants/Theme';
+import { useTheme } from '../../context/ThemeContext';
+import { auth, db } from '../../services/firebaseConfig';
 
 const RegisterScreen = () => {
   const router = useRouter();
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -33,11 +32,11 @@ const RegisterScreen = () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      // ၁။ Firebase Auth ဖြင့် အကောင့်ဆောက်ခြင်း
+      // ၁။ Firebase Auth 
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // ၂။ Firestore ထဲတွင် User Data သိမ်းဆည်းခြင်း
+      // store data to firebase firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         fullName: name,
@@ -62,11 +61,12 @@ const RegisterScreen = () => {
 
   return (
     <LinearGradient
-      colors={isDarkMode ? ['#0F0F0F', '#1A1A1A'] : ['#F5F9FF', '#E0E7FF']} 
+      colors={ [colors.splashBackground , colors.gradientMiddle , colors.gradientEnd]} 
       style={styles.background}
     >
-      <StatusBar style={isDarkMode ? "light" : "dark"} />
+   
       <SafeAreaView style={{ flex: 1 }}>
+        {/* sign up form */}
         <Stack.Screen options={{ headerTitle: "အကောင့်သစ်ဖွင့်ရန်", headerTransparent: true }} />
 
         <View 
@@ -78,9 +78,9 @@ const RegisterScreen = () => {
             <View style={styles.inputWrapper}>
               <Text style={[styles.label, { color: colors.textSecondary }]}>အမည်</Text>
               <TextInput
-                style={[styles.input, { backgroundColor: isDarkMode ? '#1E1E1E' : '#FFF', borderColor: colors.border, color: colors.textPrimary }]}
+                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
                 placeholder="သင့်အမည် ရိုက်ထည့်ပါ"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.placeholder}
                 value={name}
                 onChangeText={setName}
               />
@@ -89,9 +89,9 @@ const RegisterScreen = () => {
             <View style={styles.inputWrapper}>
               <Text style={[styles.label, { color: colors.textSecondary }]}>အီးမေးလ်</Text>
               <TextInput
-                style={[styles.input, { backgroundColor: isDarkMode ? '#1E1E1E' : '#FFF', borderColor: colors.border, color: colors.textPrimary }]}
+                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
                 placeholder="example@email.com"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.placeholder}
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
@@ -101,9 +101,9 @@ const RegisterScreen = () => {
             <View style={styles.inputWrapper}>
               <Text style={[styles.label, { color: colors.textSecondary }]}>လျှို့ဝှက်နံပါတ်</Text>
               <TextInput
-                style={[styles.input, { backgroundColor: isDarkMode ? '#1E1E1E' : '#FFF', borderColor: colors.border, color: colors.textPrimary }]}
+                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
                 placeholder="အနည်းဆုံး ၆ လုံး"
-                placeholderTextColor="#666"
+                placeholderTextColor={colors.placeholder}
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
@@ -115,7 +115,7 @@ const RegisterScreen = () => {
               onPress={handleRegister}
               disabled={loading}
             >
-              {loading ? <ActivityIndicator color="#1A3C5A" /> : <Text style={styles.buttonText}>အကောင့်သစ်ယူမည်</Text>}
+              {loading ? <ActivityIndicator color={colors.textOnPrimary} /> : <Text style={[styles.buttonText, { color: colors.textOnPrimary }]}>အကောင့်သစ်ယူမည်</Text>}
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 20 }}>
@@ -138,7 +138,10 @@ const styles = StyleSheet.create({
   label: { fontSize: 14, fontWeight: '600', marginLeft: 4 },
   input: { height: 55, borderRadius: SIZES.radius, paddingHorizontal: 16, fontSize: 16, borderWidth: 1 },
   mainButton: { height: 55, borderRadius: SIZES.radius, justifyContent: 'center', alignItems: 'center', marginTop: 10 },
-  buttonText: { fontSize: 16, fontWeight: 'bold', color: '#1A3C5A' }
+  buttonText: { fontSize: 16, fontWeight: 'bold' }
 });
 
 export default RegisterScreen;
+
+
+

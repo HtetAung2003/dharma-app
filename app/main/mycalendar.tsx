@@ -19,7 +19,7 @@ const PataukOverlay = () => (
 );
 
 const mycalendar = () => {
-  const { colors, isDarkMode } = useTheme();
+  const { colors, themeMode } = useTheme();
   const [selected, setSelected] = useState(
     new Date().toISOString().split("T")[0],
   );
@@ -99,11 +99,11 @@ const mycalendar = () => {
                 style={[
                   styles.dayBox,
                   isSelected && {
-                    backgroundColor: isDarkMode ? "#FFD70044" : "#0288D122",
+                    backgroundColor: themeMode === 'dark' ? "#FFD70044" : "#0288D122",
                     borderRadius: 8,
                   },
                   isHoliday && {
-                    backgroundColor: isDarkMode ? "#FF525215" : "#FF525208",
+                    backgroundColor: themeMode === 'dark' ? "#FF525215" : "#FF525208",
                     borderRadius: 8,
                   },
                 ]}
@@ -158,7 +158,7 @@ const mycalendar = () => {
           <View
             style={[
               styles.detailCard,
-              { backgroundColor: isDarkMode ? "#1A2634" : "#F5F5F5" },
+              { backgroundColor: themeMode === 'dark' ? "#1A2634" : "#F5F5F5" },
             ]}
           >
             <Text style={[styles.detailTitle, { color: colors.textPrimary }]}>
@@ -174,7 +174,7 @@ const mycalendar = () => {
               <Text
                 style={[
                   styles.infoValue,
-                  { color: isDarkMode ? "#FFD700" : "#0288D1" },
+                  { color: themeMode === 'dark' ? "#FFD700" : "#0288D1" },
                 ]}
               >
                 {selectedInfo.fullString}
@@ -206,7 +206,7 @@ const mycalendar = () => {
                 <Text
                   style={[
                     styles.specialText,
-                    { color: isDarkMode ? "#FFD700" : "#0288D1" },
+                    { color: themeMode === 'dark' ? "#FFD700" : "#0288D1" },
                   ]}
                 >
                   ✨ {selectedInfo.specialDays.join(", ")}
@@ -356,3 +356,5 @@ const styles = StyleSheet.create({
 });
 
 export default mycalendar;
+
+

@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const ShinThiwaliGathaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -25,8 +25,8 @@ const ShinThiwaliGathaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
-          borderColor: isDarkMode ? 'rgba(217, 119, 6, 0.3)' : '#FEF3C7'
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          borderColor: themeMode === 'dark' ? 'rgba(217, 119, 6, 0.3)' : '#FEF3C7'
         }
       ]}>
         {/* Intro Context */}
@@ -51,7 +51,7 @@ const ShinThiwaliGathaCard = () => {
         {/* Prosperity Footer */}
         <View style={[
           styles.footerNote, 
-          { backgroundColor: isDarkMode ? 'rgba(217, 119, 6, 0.1)' : '#FFFBEB' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(217, 119, 6, 0.1)' : '#FFFBEB' }
         ]}>
           <Text style={[styles.footerText, { color: goldColor, fontSize: dynamicSize(13) }]}>
             ရှင်သီဝလိမထေရ်မြတ်၏ ဧတဒဂ်ရ အာနုဘော်တော်ကြောင့် အစစအရာရာ ပြည့်စုံကြပါစေ။
@@ -102,3 +102,4 @@ const styles = StyleSheet.create({
 });
 
 export default ShinThiwaliGathaCard;
+

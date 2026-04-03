@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const UppatasantiCard = () => {
-  const { colors, fontSize, isDarkMode } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -29,7 +29,7 @@ const UppatasantiCard = () => {
       {/* ဂါထာတော်များ ထည့်သွင်းထားသည့် အဝါနုရောင် Area */}
       <View style={[
         styles.verseContainer,
-        { backgroundColor: isDarkMode ? 'rgba(180, 83, 9, 0.05)' : '#FFFBEB' }
+        { backgroundColor: themeMode === 'dark' ? 'rgba(180, 83, 9, 0.05)' : '#FFFBEB' }
       ]}>
         {verses.map((verse, index) => (
           <View 
@@ -47,7 +47,7 @@ const UppatasantiCard = () => {
       </View>
 
       {/* ထူးခြားချက် Note */}
-      <View style={[styles.noteBox, { backgroundColor: isDarkMode ? '#1A242F' : '#F0F7FF' }]}>
+      <View style={[styles.noteBox, { backgroundColor: themeMode === 'dark' ? '#1A242F' : '#F0F7FF' }]}>
         <Text style={[styles.noteTitle, { color: colors.primary, fontSize: dynamicSize(14) }]}>
           💡 ကျမ်းစာ၏ ထူးခြားချက်
         </Text>
@@ -91,3 +91,4 @@ const styles = StyleSheet.create({
 });
 
 export default UppatasantiCard;
+

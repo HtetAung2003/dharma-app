@@ -1,11 +1,11 @@
-import { Slot } from 'expo-router';
-import { View, StyleSheet } from 'react-native';
-import BottomNav from './bottomnav'; // Path မှန်အောင်ချိန်ပါ
-import MindfulTipsBanner from './MindfulTipsBanner';
 import { useTheme } from '@/context/ThemeContext';
+import { Slot } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
+import BottomNav from './bottomnav';
+import MindfulTipsBanner from './MindfulTipsBanner';
 
 export default function MainLayout() {
-        const { colors, isDarkMode, fontSize } = useTheme();
+        const { colors } = useTheme();
     
   return (
 <View style={{ flex: 1, backgroundColor: colors.background }}>

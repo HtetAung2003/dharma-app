@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const MoraSuttaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -22,7 +22,7 @@ const MoraSuttaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -57,7 +57,7 @@ const MoraSuttaCard = () => {
         {/* Footer Note */}
         <View style={[
           styles.footerNote, 
-          { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#FFFBEB' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(99, 102, 241, 0.1)' : '#FFFBEB' }
         ]}>
           <Text style={[styles.footerText, { color: colors.primary, fontSize: dynamicSize(13) }]}>
             အန္တရာယ်ကင်းစေရန်နှင့် အစောင့်အရှောက်ရရှိရန် ဤမောရသုတ်ကို နံနက်နှင့် ညအချိန်များတွင် ရွတ်ဆိုပူဇော်ကြသည်။
@@ -128,3 +128,4 @@ const styles = StyleSheet.create({
 });
 
 export default MoraSuttaCard;
+

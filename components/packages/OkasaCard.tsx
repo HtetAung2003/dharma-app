@@ -1,10 +1,10 @@
 import { useTheme } from '@/context/ThemeContext';
 import React from 'react';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 
 const OkasaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   // Font scaling logic
   const scale = fontSize / 16;
@@ -24,8 +24,8 @@ const OkasaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
-          borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
+          backgroundColor: colors.background,
+          borderColor:colors.background
         }
       ]}>
         <Text style={[

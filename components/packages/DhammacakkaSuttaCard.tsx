@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const DhammacakkaSuttaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -22,7 +22,7 @@ const DhammacakkaSuttaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -65,7 +65,7 @@ const DhammacakkaSuttaCard = () => {
         {/* Footer Note */}
         <View style={[
           styles.noteBox, 
-          { backgroundColor: isDarkMode ? 'rgba(217, 119, 6, 0.1)' : '#FFFBEB' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(217, 119, 6, 0.1)' : '#FFFBEB' }
         ]}>
           <Text style={[styles.noteText, { color: '#B45309', fontSize: dynamicSize(13) }]}>
             မှတ်ချက်။ ။ ဤတရားတော်သည် အစွန်းနှစ်ပါးကို ရှောင်ကြဉ်၍ မဇ္ဈိမာပဋိပဒါ လမ်းစဉ်ကို လျှောက်လှမ်းရန် လမ်းညွှန်သော မြတ်စွာဘုရား၏ ပထမဦးဆုံးသော တရားတော်ဖြစ်သည်။
@@ -109,3 +109,4 @@ const styles = StyleSheet.create({
 });
 
 export default DhammacakkaSuttaCard;
+

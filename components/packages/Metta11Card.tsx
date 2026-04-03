@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 
 const Metta11Card = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -36,14 +36,14 @@ const Metta11Card = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.05)' : '#F0FDF4',
-          borderColor: isDarkMode ? 'rgba(16, 185, 129, 0.2)' : '#DCFCE7'
+          backgroundColor: themeMode === 'dark' ? 'rgba(16, 185, 129, 0.05)' : '#F0FDF4',
+          borderColor: themeMode === 'dark' ? 'rgba(16, 185, 129, 0.2)' : '#DCFCE7'
         }
       ]}>
         {mettaSteps.map((step, index) => (
           <View key={step.id}>
             <View style={styles.stepRow}>
-              <View style={[styles.numberCircle, { backgroundColor: isDarkMode ? '#065F46' : '#10B981' }]}>
+              <View style={[styles.numberCircle, { backgroundColor: themeMode === 'dark' ? '#065F46' : '#10B981' }]}>
                 <Text style={styles.numberText}>{step.id}</Text>
               </View>
               <Text style={[
@@ -58,7 +58,7 @@ const Metta11Card = () => {
               </Text>
             </View>
             {index !== mettaSteps.length - 1 && (
-              <View style={[styles.innerDivider, { backgroundColor: isDarkMode ? '#065F46' : '#BBF7D0', opacity: 0.5 }]} />
+              <View style={[styles.innerDivider, { backgroundColor: themeMode === 'dark' ? '#065F46' : '#BBF7D0', opacity: 0.5 }]} />
             )}
           </View>
         ))}
@@ -124,3 +124,4 @@ const styles = StyleSheet.create({
 });
 
 export default Metta11Card;
+

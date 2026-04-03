@@ -7,7 +7,7 @@ import { useTheme } from '@/context/ThemeContext';
 const { width } = Dimensions.get('window');
 
 const VirtuesMeditationCard = () => {
-    const { colors, isDarkMode } = useTheme();
+    const { colors, themeMode } = useTheme();
 
     return (
         <View style={styles.container}>
@@ -24,12 +24,12 @@ const VirtuesMeditationCard = () => {
                             loop: true,
                             delay: index * 1000,
                         }}
-                        style={[styles.halo, { borderColor: isDarkMode ? '#FFD700' : '#4FC3F7' }]}
+                        style={[styles.halo, { borderColor: themeMode === 'dark' ? '#FFD700' : '#4FC3F7' }]}
                     />
                 ))}
                 
                 <LinearGradient
-                    colors={isDarkMode ? ['#FFD700', '#F9A825'] : ['#B3E5FC', '#4FC3F7']}
+                    colors={themeMode === 'dark' ? ['#FFD700', '#F9A825'] : ['#B3E5FC', '#4FC3F7']}
                     style={styles.centerCircle}
                 >
                     <Text style={styles.omSymbol}>ဗုဒ္ဓံ</Text>
@@ -37,13 +37,13 @@ const VirtuesMeditationCard = () => {
             </View>
 
             {/* ဂုဏ်တော် စာသားအပိုင်း */}
-            <View style={[styles.card, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.05)' : '#FFFFFF', borderColor: colors.border }]}>
+            <View style={[styles.card, { backgroundColor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : '#FFFFFF', borderColor: colors.border }]}>
                 <Text style={[styles.paliText, { color: colors.textPrimary }]}>
                     "ဣတိပိသော ဘဂဝါ အရဟံ၊ သမ္မာသမ္ဗုဒ္ဓေါ၊ ဝိဇ္ဇာစရဏသမ္ပန္နော၊ သုဂတော၊ လောကဝိဒူ၊ အနုတ္တရော ပုရိသဒမ္မသာရထိ၊ သတ္တာ ဒေဝမနုဿာနံ၊ ဗုဒ္ဓေါ၊ ဘဂဝါ။"
                 </Text>
                 
                 <View style={styles.guideBox}>
-                    <Text style={[styles.guideText, { color: isDarkMode ? '#FFD700' : '#0277BD' }]}>
+                    <Text style={[styles.guideText, { color: themeMode === 'dark' ? '#FFD700' : '#0277BD' }]}>
                         💡 ဘုရားရှင်ရဲ့ အေးချမ်းတဲ့ ရောင်ခြည်တော်တွေ မိမိကိုယ်ပေါ်ကို လွှမ်းခြုံထားတယ်လို့ အာရုံပြုပါ။
                     </Text>
                 </View>
@@ -116,3 +116,4 @@ const styles = StyleSheet.create({
 });
 
 export default VirtuesMeditationCard;
+

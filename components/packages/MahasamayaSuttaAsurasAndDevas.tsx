@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const MahasamayaSuttaAsurasAndDevas = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -20,7 +20,7 @@ const MahasamayaSuttaAsurasAndDevas = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -167,7 +167,7 @@ const MahasamayaSuttaAsurasAndDevas = () => {
           </Text>
         </View>
 
-        <View style={[styles.footer, { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#F5F3FF' }]}>
+        <View style={[styles.footer, { backgroundColor: themeMode === 'dark' ? 'rgba(99, 102, 241, 0.1)' : '#F5F3FF' }]}>
           <Text style={[styles.footerText, { color: colors.primary }]}>
             ဤအပိုင်းတွင် အသူရာများနှင့် သဟဗျူနတ်များ၏ အမည်များကို အဓိကထား၍ ရွတ်ဆိုပူဇော်ရပါသည်။
           </Text>
@@ -201,3 +201,4 @@ const styles = StyleSheet.create({
 });
 
 export default MahasamayaSuttaAsurasAndDevas;
+

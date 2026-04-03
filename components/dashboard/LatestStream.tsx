@@ -22,7 +22,7 @@ const LatestStream = () => {
     const router = useRouter();
     
     // Theme နဲ့ Music Store မှ လိုအပ်သည်များယူခြင်း
-    const { colors, isDarkMode, fontSize } = useTheme();
+    const { colors, fontSize, themeMode } = useTheme();
    
 
     // Font scaling logic
@@ -87,8 +87,8 @@ const LatestStream = () => {
                         style={[
                             styles.card, 
                             { 
-                                backgroundColor: isDarkMode ? '#1E293B' : '#FFFFFF',
-                                shadowColor: isDarkMode ? '#000' : '#94A3B8'
+                                backgroundColor: themeMode === 'dark' ? '#1E293B' : '#FFFFFF',
+                                shadowColor: themeMode === 'dark' ? '#000' : '#94A3B8'
                             }
                         ]}
                         onPress={() => handleSongPress(item)}
@@ -140,3 +140,4 @@ const styles = StyleSheet.create({
 });
 
 export default LatestStream;
+

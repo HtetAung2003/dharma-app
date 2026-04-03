@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View as RNView } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
-import { View } from 'moti'; 
-import * as Haptics from 'expo-haptics';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { AntDesign } from '@expo/vector-icons';
-import { StatusBar } from 'expo-status-bar';
+import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import { View } from 'moti';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Theme Context ကို import လုပ်ပါ
-import { useTheme } from '../../context/ThemeContext';
-import { SIZES } from '../../constants/Theme';
-import { auth, db } from '../../services/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import { SIZES } from '../../constants/Theme';
+import { useTheme } from '../../context/ThemeContext';
+import { auth, db } from '../../services/firebaseConfig';
 
 const LoginScreen = () => {
   const router = useRouter();
-  const { colors, isDarkMode, fontSize } = useTheme(); // Context မှ dynamic data များယူပါ
+  const { colors, fontSize, themeMode } = useTheme(); // Context မှ dynamic data များယူပါ
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -51,12 +50,12 @@ const LoginScreen = () => {
 
   return (
     <LinearGradient
-      colors={isDarkMode ? ['#0F0F0F', '#1A1A1A'] : ['#F5F9FF', '#E0E7FF']} 
+      colors={ [colors.splashBackground , colors.gradientMiddle , colors.gradientEnd]} 
       style={styles.background}
     >
-      <StatusBar style={isDarkMode ? "light" : "dark"} />
+     
       <SafeAreaView style={{ flex: 1 }}>
-        <Stack.Screen
+        {/* <Stack.Screen
           options={{
             headerTitle: "",
             headerTransparent: true,
@@ -71,8 +70,8 @@ const LoginScreen = () => {
               </TouchableOpacity>
             ),
           }}
-        />
-
+        /> */}
+      {/* //sign up section */}
         <View 
           from={{ opacity: 0, translateY: 20 }}
           animate={{ opacity: 1, translateY: 0 }}
@@ -88,18 +87,18 @@ const LoginScreen = () => {
             </Text>
           </Text>
         </View>
-
+            // Login Form Section
         <View style={styles.formSection}>
           <View style={styles.inputWrapper}>
             <Text style={[styles.label, { color: colors.textSecondary }]}>အီးမေးလ် လိပ်စာ</Text>
             <TextInput
               style={[styles.input, { 
-                backgroundColor: isDarkMode ? '#1E1E1E' : '#FFF',
+                backgroundColor: colors.inputBackground,
                 borderColor: colors.border,
                 color: colors.textPrimary 
               }]}
               placeholder="example@email.com"
-              placeholderTextColor="#666"
+              placeholderTextColor={colors.placeholder}
               value={email}
               onChangeText={setEmail}
             />
@@ -109,43 +108,43 @@ const LoginScreen = () => {
             <Text style={[styles.label, { color: colors.textSecondary }]}>လျှို့ဝှက်နံပါတ်</Text>
             <TextInput
               style={[styles.input, { 
-                backgroundColor: isDarkMode ? '#1E1E1E' : '#FFF',
+                backgroundColor: colors.inputBackground,
                 borderColor: colors.border,
                 color: colors.textPrimary 
               }]}
               placeholder="Password ရိုက်ထည့်ပါ"
-              placeholderTextColor="#666"
+              placeholderTextColor={colors.placeholder}
               secureTextEntry={true}
               value={password}
               onChangeText={setPassword}
             />
           </View>
         </View>
-
+              {/* // other authentication options */}
         <View style={styles.socialSection}>
           <Text style={[styles.orText, { color: colors.textSecondary }]}>သို့မဟုတ် အခြားနည်းလမ်းဖြင့် ဝင်ရန်</Text>
           <View style={styles.iconContainer}>
             <TouchableOpacity style={styles.glassIconWrapper}>
-              <AntDesign name="google" size={28} color="#EA4335" />
+              <AntDesign name="google" size={28} color={colors.google} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.glassIconWrapper}>
               <AntDesign name="apple" size={30} color={colors.textPrimary} />
             </TouchableOpacity>
           </View>
         </View>
-
+              {/* footer section */}
         <View style={styles.footerSection}>
           <TouchableOpacity 
             style={[styles.button, { backgroundColor: colors.secondary }]}
             onPress={handleLogin}
           >
-            <Text style={[styles.buttonText, { color: '#FFF' }]}>အကောင့် ဝင်မည်</Text>
+            <Text style={[styles.buttonText, { color: colors.textOnSecondary }]}>အကောင့် ဝင်မည်</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.button, { backgroundColor: colors.primary }]}
             onPress={handleLogin}
           >
-            <Text style={[styles.buttonText, { color: '#1A3C5A' }]}>ကျော်မည်</Text>
+            <Text style={[styles.buttonText, { color: colors.textOnPrimary }]}>ကျော်မည်</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -153,7 +152,7 @@ const LoginScreen = () => {
   );
 };
 
-// Styles များတွင် Dynamic Colors များ ထည့်သွင်းရန် မလိုအပ်တော့ပါ (Inline သုံးထားသောကြောင့်)
+
 const styles = StyleSheet.create({
   background: { flex: 1 },
   headerBtnText: { fontSize: 18, fontWeight: 'bold' },
@@ -187,3 +186,5 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
+
+

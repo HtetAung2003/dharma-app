@@ -1,12 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/ThemeContext';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { toggleFavorite } from '@/constants/favouriteService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 interface PlanItem {
@@ -26,17 +27,19 @@ interface PlanSection {
 
 const PlanScreen = () => {
   const router = useRouter();
-  const { colors, isDarkMode, fontSize } = useTheme();
-const [favorites, setFavorites] = useState<string[]>([]); // Favorite id များကို သိမ်းရန်
-const [searchQuery, setSearchQuery] = useState(''); // 🔍 Search State  
+  const { colors, fontSize, themeMode } = useTheme();
+const [favorites, setFavorites] = useState<string[]>([]); // Favorite id 
+const [searchQuery, setSearchQuery] = useState(''); //  Search State  
 const scale = fontSize / 16;
-  const dynamicSize = (base: number) => base * scale;
+const dynamicSize = (base: number) => base * scale;
+
 useEffect(() => {
     const loadFavorites = async () => {
       try {
+        // take fav data from async storage
         const jsonValue = await AsyncStorage.getItem('user_favorites');
         const favList = jsonValue ? JSON.parse(jsonValue) : [];
-        setFavorites(favList.map((f: any) => f.id));
+        setFavorites(favList.map((f: any) => f.id));  
       } catch (e) {
         console.error(e);
       }
@@ -44,8 +47,9 @@ useEffect(() => {
     loadFavorites();
   }, []);
 
-  
+  // fav  function
   const handleToggleFav = async (item: any) => {
+    // call fav service to toggle fav in async storage and get the result (added or removed)
     const isAdded = await toggleFavorite({
       id: item.id,
       title: item.title,
@@ -119,6 +123,7 @@ const sections: PlanSection[] = [
     ]
   }
 ];
+// for search function that used useMemo to optimize performance by memoizing the filtered results based on the search query and sections data
 const filteredSections = useMemo(() => {
     if (!searchQuery.trim()) return sections;
 
@@ -131,21 +136,30 @@ const filteredSections = useMemo(() => {
       }))
       .filter((section) => section.data.length > 0); // Only show sections that have results
   }, [searchQuery]);
+  // frame navigation handler to navigate to detail screen with component key and id when click on item and also pass the function to toggle fav in detail screen
 const handlePress = (item: PlanItem) => {
   router.push({
-    // ⚠️ Path ကို သေချာစစ်ဆေးပါ (app folder ထဲက လမ်းကြောင်းအတိုင်း ဖြစ်ရပါမယ်)
+  
     pathname: '/packagedetails/package-details', 
     params: { 
       id: item.id, 
       title: item.title, 
       category: item.category,
-      componentKey: item.componentKey // Detail screen မှာ ဘယ် Card ပြရမလဲ သိအောင် ပို့ပေးခြင်း
+      componentKey: item.componentKey // whwich card to show in detail screen
     }
   });
 };
 
   return (
-    <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: isDarkMode ? '#05111D' : '#F5F9FF' }]} >
+     <LinearGradient
+                  colors={
+                    [colors.splashBackground , colors.gradientMiddle , colors.gradientEnd]
+                  
+                  }
+                  
+                  style={{ flex: 1 }}
+                >
+    <SafeAreaView edges={['top']} style={[styles.container]} >
       <View style={styles.header}>
      
         <Text style={[styles.headerTitle, { color: colors.textPrimary, fontSize: dynamicSize(20) }]}>
@@ -154,7 +168,7 @@ const handlePress = (item: PlanItem) => {
         <View style={{ width: 40 }} />
       </View>
 <View style={styles.searchContainer}>
-        <View style={[styles.searchBar, { backgroundColor: isDarkMode ? '#161B22' : '#FFFFFF' }]}>
+        <View style={[styles.searchBar, { backgroundColor: colors.inputBackground }]}>
           <Ionicons name="search" size={20} color={colors.textSecondary} style={{ marginRight: 10 }} />
           <TextInput
             placeholder="ခေါင်းစဉ်ဖြင့် ရှာဖွေပါ..."
@@ -174,17 +188,17 @@ const handlePress = (item: PlanItem) => {
         {filteredSections.length > 0 ? (
           filteredSections.map((section, sIndex) => (
             <View key={sIndex} style={styles.sectionWrapper}>
-              <Text style={[styles.sectionHeader, { color: colors.primary, fontSize: dynamicSize(16) }]}>
+              <Text style={[styles.sectionHeader, { color: colors.textPrimary, fontSize: dynamicSize(16) }]}>
                 {section.sectionTitle}
               </Text>
               
-              <View style={[styles.card, { backgroundColor: isDarkMode ? '#161B22' : '#FFFFFF' }]}>
+              <View style={[styles.card]}>
                 {section.data.map((item) => {
                   const isFav = favorites.includes(item.id);
                   return (
                     <TouchableOpacity 
                       key={item.id} 
-                      style={styles.itemRow} 
+                      style={[styles.itemRow, { backgroundColor: colors.card } ]} 
                       onPress={() => handlePress(item)}
                       activeOpacity={0.7}
                     >
@@ -206,11 +220,11 @@ const handlePress = (item: PlanItem) => {
 
                       <View style={styles.itemRightContainer}>
                         {item.duration && (
-                          <Text style={[styles.durationText, { color: colors.primary, fontSize: dynamicSize(11) }]}>
+                          <Text style={[styles.durationText, { color: colors.textPrimary, fontSize: dynamicSize(11) }]}>
                             {item.duration}
                           </Text>
                         )}
-                        <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} style={{ marginLeft: 4 }} />
+                        <Ionicons name="chevron-forward" size={18} color={colors.primary} style={{ marginLeft: 4 }} />
                       </View>
                     </TouchableOpacity>
                   );
@@ -226,6 +240,7 @@ const handlePress = (item: PlanItem) => {
         <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>
+    </LinearGradient>
   );
 };
 
@@ -249,7 +264,7 @@ const styles = StyleSheet.create({
   sectionWrapper: { marginBottom: 25 },
   sectionHeader: { fontWeight: 'bold', marginBottom: 12, marginLeft: 5 },
   card: { borderRadius: 16, overflow: 'hidden', elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5, shadowOffset: { width: 0, height: 2 } },
-  itemRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 },
+  itemRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 , marginBottom: 10 },
   itemTextContainer: { flex: 1 },
   itemTitle: { fontWeight: '600' },
   itemSubTitle: { marginTop: 4 },
@@ -269,3 +284,4 @@ const styles = StyleSheet.create({
 });
 
 export default PlanScreen;
+

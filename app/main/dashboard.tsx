@@ -2,11 +2,9 @@ import Packages from "@/components/dashboard/PracticePackages";
 import { useAuth } from "@/context/AuthContext";
 import { ceMmDateTime } from "@/services/ceMmDateTime";
 import {
-  registerForPushNotificationsAsync,
-  scheduleSabbathReminder,
+  registerForPushNotificationsAsync
 } from "@/services/notificationService";
 import { Ionicons } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
@@ -24,19 +22,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../../context/ThemeContext";
 
 const Dashboard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
   const { userData } = useAuth();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
   useEffect(() => {
     const backAction = () => {
-      // Back ကို နှိပ်ရင် ဘာမှမလုပ်အောင် (သို့မဟုတ်) Exit confirm တောင်းရန်
+    
       Alert.alert("သတိပေးချက်", "App မှ ထွက်လိုပါသလား?", [
         { text: "မထွက်ပါ", onPress: () => null, style: "cancel" },
         { text: "ထွက်မည်", onPress: () => BackHandler.exitApp() },
       ]);
-      return true; // True ပေးထားရင် Back logic အလုပ်မလုပ်တော့ပါ
+      return true; 
     };
 
     const backHandler = BackHandler.addEventListener(
@@ -44,7 +42,7 @@ const Dashboard = () => {
       backAction,
     );
 
-    return () => backHandler.remove(); // Screen ကနေ ထွက်ရင် listener ကို ဖျက်ပါ
+    return () => backHandler.remove(); 
   }, []);
   const dateInfo = useMemo(() => {
     const now = new Date();
@@ -57,7 +55,7 @@ const Dashboard = () => {
     let daysToSabbath = 0;
     let nextSabbathName = "ဥပုသ်နေ့";
 
-    // ရှေ့လာမည့် ဥပုသ်နေ့ကို ရှာဖွေခြင်း
+    // find sabbath within next 32 days
     if (!isTodaySabbath) {
       for (let i = 1; i <= 32; i++) {
         const nextDate = new Date();
@@ -65,10 +63,10 @@ const Dashboard = () => {
         const nextMdt = new ceMmDateTime(nextDate);
         if (nextMdt.isSabbath()) {
           daysToSabbath = i;
-          // လပြည့် သို့မဟုတ် လကွယ်ဖြစ်ကြောင်း အသေးစိတ်ပြလိုလျှင်
+          // to show details of next sabbath, check if it's full moon or new moon
           nextSabbathName =
             nextMdt.ToMString().split(" ").pop() === "လပြည့်"
-              ? "လပြည့်ဥပုသ်နေ့"
+              ? "လပြည့်နေ့"
               : "ဥပုသ်နေ့";
           break;
         }
@@ -83,92 +81,75 @@ const Dashboard = () => {
       daysLeft: daysToSabbath,
       nextEvent: nextSabbathName,
       astroText: astro.length > 0 ? astro.join(" / ") : "သာမန်ရက်",
-      isYatyaza: astro.includes("ရက်ရာဇာ"),
-      isPyathada: astro.includes("ပြဿဒါး"),
+      isYatyaza: astro.some(item => item.includes("ရက်ရာဇာ")),
+      isPyathada: astro.some(item => item.includes("ပြဿဒါး")),
     };
   }, []);
+  
   // Display name logic with truncation for long names
   const displayName = userData?.fullName
     ? userData.fullName.length > 10
       ? `${userData.fullName.substring(0, 10)}..`
       : userData.fullName
     : "ဧည့်သည်";
-  useEffect(() => {
-    // ၁။ Permission တောင်းခြင်း
-    registerForPushNotificationsAsync();
+ useEffect(() => {
+  //  Permission 
+  registerForPushNotificationsAsync();
 
-    // ၂။ Notification နှိပ်လိုက်ရင် ဘယ်သွားမလဲဆိုတာ ဖမ်းခြင်း
-    const subscription = Notifications.addNotificationResponseReceivedListener(
-      (response) => {
-        router.push("/main/dashboard"); // Dashboard သို့ ပြန်လာရန်
-      },
-    );
+  
+  const subscription = Notifications.addNotificationResponseReceivedListener(() => {
+    router.push("/main/dashboard");
+  });
 
-    // ၃။ ဥပုသ်နေ့ ရှိမရှိ စစ်ဆေးပြီး Reminder ပေးခြင်း
-    if (dateInfo.daysLeft <= 1) {
-      scheduleSabbathReminder(
-        dateInfo.daysLeft,
-        dateInfo.nextEvent || "ဥပုသ်နေ့",
-      );
+  
+  const setupSabbathNotifications = async () => {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+    const now = new Date();
+    const currentHour = now.getHours();
+
+    if (dateInfo.daysLeft === 1 && currentHour < 18) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: `📌 မနက်ဖြန်သည် ${dateInfo.nextEvent} ဖြစ်ပါသည်`,
+          body: "ဥပုသ်စောင့်တည်ရန် သို့မဟုတ် ကုသိုလ်ပြုရန် ပြင်ဆင်နိုင်ပါသည်။",
+          android: { channelId: "sabbath-reminders" },
+        },
+        trigger: { hour: 18, minute: 0, repeats: false },
+      });
     }
 
-    return () => subscription.remove();
-  }, [dateInfo]);
-  useEffect(() => {
-    const setupNotifications = async () => {
-      // ၁။ Permission တောင်းခြင်း
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== "granted") return;
+    
+    if (dateInfo.isTodaySabbath && currentHour < 9) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "🙏 ယနေ့သည် ဥပုသ်နေ့ဖြစ်ပါသည်",
+          body: "ကုသိုလ်ကောင်းမှုများ ပြုလုပ်ရန် မမေ့ပါနှင့်။",
+          android: { channelId: "sabbath-reminders" },
+        },
+        trigger: { hour: 9, minute: 0, repeats: false },
+      });
+    }
+  };
 
-      // အဟောင်းများကို အကုန်ဖျက်ပစ်ပါ
-      await Notifications.cancelAllScheduledNotificationsAsync();
+  setupSabbathNotifications();
 
-      if (dateInfo.isTodaySabbath) {
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: "🙏 ယနေ့သည် ဥပုသ်နေ့ဖြစ်ပါသည်",
-            body: "ကုသိုလ်ကောင်းမှုများ ပြုလုပ်ရန် မမေ့ပါနှင့်။",
-            // @ts-ignore
-            android: { channelId: "sabbath-reminders" },
-          },
-          trigger: null, // ချက်ချင်းပြရန် (trigger: null က valid ဖြစ်ပါသည်)
-        });
-      } else if (dateInfo.daysLeft === 1) {
-        // မနက်ဖြန် ညနေ ၆ နာရီမှာ သတိပေးရန်
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: `📌 မနက်ဖြန်သည် ${dateInfo.nextEvent} ဖြစ်ပါသည်`,
-            body: "ဥပုသ်စောင့်တည်ရန် သို့မဟုတ် ကုသိုလ်ပြုရန် ပြင်ဆင်နိုင်ပါသည်။",
-            // @ts-ignore
-            android: { channelId: "sabbath-reminders" },
-          },
-          trigger: {
-            // 🚀 ERROR FIX: Trigger type ကို ထည့်ပေးရပါမည်
-            type: Notifications.SchedulableTriggerInputTypes.DAILY,
-            hour: 18,
-            minute: 0,
-            // @ts-ignore
-            repeats: false, // တစ်ကြိမ်ပဲ ပေးချင်တာမို့ false ထားပါ
-          },
-        });
-      }
-    };
+  return () => subscription.remove();
+}, [dateInfo.daysLeft, dateInfo.isTodaySabbath]); 
 
-    setupNotifications();
-  }, [dateInfo]);
+
   return (
     <LinearGradient
       colors={
-        isDarkMode
-          ? ["#0F0F0F", "#1A1A1A", "#000000"]
-          : ["#F5F9FF", "#E0E7FF", "#FFFFFF"]
+        [colors.splashBackground , colors.gradientMiddle , colors.gradientEnd]
+      
       }
+      
       style={styles.background}
     >
       <SafeAreaView style={styles.container} edges={["top"]}>
         {/* Header Section */}
         <View style={styles.header}>
-          <View>
+          <View style={{ width: "70%" }}>
             <Text
               numberOfLines={1}
               style={[
@@ -178,14 +159,14 @@ const Dashboard = () => {
             >
               မင်္ဂလာပါ {displayName} !
             </Text>
-            <Text
+            {/* <Text
               style={[
                 styles.subText,
                 { color: colors.textSecondary, fontSize: dynamicSize(16) },
               ]}
             >
-              How are you feeling today?
-            </Text>
+              သင့်ရဲ့ ဓမ္မလမ်းခရီးကို အကောင်းဆုံး စတင်နိုင်ဖို့ ဒီနေ့ ဘာတွေ ရှိလဲ ကြည့်ကြပါစို့။
+            </Text> */}
           </View>
 
           <TouchableOpacity onPress={() => router.push("/personalization")}>
@@ -205,30 +186,12 @@ const Dashboard = () => {
           showsVerticalScrollIndicator={false}
         >
           {/* Dashboard Card */}
-          <View style={styles.dateContainer}>
-            <BlurView
-              intensity={isDarkMode ? 30 : 60}
-              tint={isDarkMode ? "dark" : "light"}
-              style={styles.dateCard}
-            >
+          <View style={[styles.dateContainer, { backgroundColor: colors.card }]}>
+          
               <View style={styles.dateRow}>
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={[
-                      styles.engDateText,
-                      { color: colors.textSecondary },
-                    ]}
-                  >
-                    {dateInfo.engDate}
-                  </Text>
-                  <Text
-                    style={[styles.mmDateText, { color: colors.textPrimary }]}
-                  >
-                    {dateInfo.mmDate}
-                  </Text>
-                </View>
+             
                 {/* tag of normal day .. */}
-                <View
+              <View
                   style={[
                     styles.astroBadge,
                     {
@@ -242,13 +205,26 @@ const Dashboard = () => {
                 >
                   <Text
                     style={[
+                      styles.engDateText,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
+                    {dateInfo.engDate}
+                  </Text>
+                  <Text
+                    style={[styles.mmDateText, { color: colors.textPrimary }]}
+                  >
+                    {dateInfo.mmDate}
+                  </Text>
+                  <Text
+                    style={[
                       styles.astroText,
                       {
                         color: dateInfo.isYatyaza
-                          ? "#4CAF50"
+                          ? colors.success
                           : dateInfo.isPyathada
-                            ? "#F44336"
-                            : "#FF9100",
+                            ? colors.error
+                            : "#202020",
                       },
                     ]}
                   >
@@ -256,7 +232,7 @@ const Dashboard = () => {
                   </Text>
                 </View>
               </View>
-
+  
               <View style={styles.divider} />
 
               <View style={styles.countdownRow}>
@@ -301,7 +277,7 @@ const Dashboard = () => {
                   )}
                 </View>
               </View>
-            </BlurView>
+         
           </View>
           {/* other components */}
           <Packages />
@@ -315,33 +291,43 @@ const styles = StyleSheet.create({
   background: { flex: 1 },
   container: { flex: 1, paddingHorizontal: 15 },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 10,
-    width: "100%",
+   flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  paddingHorizontal: 20,
+  paddingVertical: 15,
+  width: "100%",
+  shadowColor: "#000",
+  shadowOffset: {
+    width: 0,
+    height: 4, 
+  },
+  shadowOpacity: 0.15,
+  shadowRadius: 8,
+  elevation: 8,
+  borderBottomLeftRadius: 20,
+  borderBottomRightRadius: 20,
+  zIndex: 1000,
   },
   userName: { fontWeight: "bold" },
   subText: { marginTop: 4 },
-  // Date Card Styles (Cleaned up)
-  dateContainer: { marginTop: 15, marginBottom: 10 },
-  dateCard: {
-    padding: 18,
+  dateContainer: { marginTop: 15, marginBottom: 10,     padding: 18,
     borderRadius: 24,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.15)",
-    overflow: "hidden",
-  },
+    overflow: "hidden", },
+ 
   dateRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
+    
   },
   engDateText: { fontSize: 12, fontWeight: "600", marginBottom: 2 },
   mmDateText: { fontSize: 18, fontWeight: "800" },
   astroBadge: {
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 10,
     borderRadius: 10,
   },
   astroText: { fontSize: 11, fontWeight: "bold" },
@@ -355,3 +341,5 @@ const styles = StyleSheet.create({
 });
 
 export default Dashboard;
+
+

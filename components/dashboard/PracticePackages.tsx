@@ -1,9 +1,8 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
 import { router } from 'expo-router';
-import { RelativePathString } from 'expo-router';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
 const PRACTICE_DATA = [
    { id: '6', title: 'ဘုရားတွင် ရှိခိုးရန်', duration: '၃ မိနစ်' },
      { id: '1', title: 'ဥပုသ်စောင့်တည်ခြင်း ( ၅ ပါးသီလ )', duration: '၁ ရက်' },
@@ -15,7 +14,7 @@ const PRACTICE_DATA = [
 ];
 
 const PracticePackages = () => {
-    const { colors, isDarkMode, fontSize } = useTheme();
+    const { colors, fontSize, themeMode } = useTheme();
 
     // Font scaling logic
     const scale = fontSize / 16;
@@ -60,7 +59,7 @@ const handlePress = (item: any) => {
                     အစီအစဉ်များ
                 </Text>
                    <TouchableOpacity onPress={() => router.push('/main/albums')}>
-                                    <Text style={[styles.seeMore, { color: colors.primary, fontSize: dynamicSize(14) }]}>
+                                    <Text style={[styles.seeMore, { color: colors.textPrimary, fontSize: dynamicSize(14) }]}>
                                         အားလုံးကြည့်ရန်
                                     </Text>
                                 </TouchableOpacity>
@@ -76,8 +75,8 @@ const handlePress = (item: any) => {
                         style={[
                             styles.listItem,
                             {  
-                                backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
-                                borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : '#E0E0E0'
+                               backgroundColor: colors.card,
+                         
                             }
                         ]}
                     >
@@ -98,7 +97,7 @@ const handlePress = (item: any) => {
                         </View>
 
                         {/* ညာဘက်က မြှားပုံစံလေး */}
-                        <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                        <Ionicons name="chevron-forward" size={20} color={colors.primary} />
                     </TouchableOpacity>
                 ))}
             </View>
@@ -129,12 +128,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 16,
         borderRadius: 16,
-        borderWidth: 1,
-        // Shadow effect
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
         elevation: 1,
     },
     content: {
@@ -155,3 +148,4 @@ const styles = StyleSheet.create({
 });
 
 export default PracticePackages;
+

@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
 
 const PreceptsGuidelineCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -45,7 +45,7 @@ const PreceptsGuidelineCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -79,7 +79,7 @@ const PreceptsGuidelineCard = () => {
         {/* Note Box */}
         <View style={[
           styles.noteBox, 
-          { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#EEF2FF' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(99, 102, 241, 0.1)' : '#EEF2FF' }
         ]}>
           <Text style={[styles.noteText, { color: colors.primary, fontSize: dynamicSize(14) }]}>
             မှတ်ချက်။ ။ ၅ ပါးသီလသည် နေ့စဉ်စောင့်ထိန်းအပ်သော သီလဖြစ်သော်လည်း ဥပုသ်နေ့များတွင် ပိုမိုစင်ကြယ်အောင် ထိန်းသိမ်းခြင်းက အကျိုးကြီးမားစေပါသည်။
@@ -162,3 +162,4 @@ const styles = StyleSheet.create({
 });
 
 export default PreceptsGuidelineCard;
+

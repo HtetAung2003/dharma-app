@@ -1,49 +1,49 @@
-import React, { useEffect, useState } from 'react';
-import { View, ScrollView, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
 // Import all package components
-import OkasaCard from '@/components/packages/OkasaCard';
-import ThilaRequestCard from '@/components/packages/ThilaRequestCard';
-import SaranagonCard from '@/components/packages/SaranagonCard';
-import MettaSuttaCard from '@/components/packages/MettaSuttaCard';
-import DirectionalMettaCard from '@/components/packages/DirectionalMettaCard';
-import MangalaSuttaCard from '@/components/packages/MangalaSuttaCard';
-import Metta11Card from '@/components/packages/Metta11Card';
-import PancaSilaCard from '@/components/packages/PancaSilaCard';
-import ParittaNidannCard from '@/components/packages/ParittaNidannCard';
-import RatanaSuttaCard from '@/components/packages/RatanaSuttaCard';
-import SabbuddheCard from '@/components/packages/SabbuddheCard';
-import SharingMeritCard from '@/components/packages/SharingMeritCard';
-import TripleGemVirtuesCard from '@/components/packages/TripleGemVirtuesCard';
-import PatthanaCard from '@/components/packages/PatthanaCard';
-import PatthanaDetailCard from '@/components/packages/PatthanaDetailCard';
-import GunTawKonCharCard from '@/components/packages/GunTawKonCharCard';
-import GunTawKonCharFullCard from '@/components/packages/GunTawKonCharFullCard';
-import ShinThiwaliGathaCard from '@/components/packages/ShinThiwaliGathaCard';
+import AnattaLakkhanaSuttaCard from '@/components/packages/AnattaLakkhanaSuttaCard';
 import AngulimalaSuttaCard from '@/components/packages/AngulimalaSuttaCard';
-import DevaInvitationCard from '@/components/packages/DevaInvitationCard';
-import MoraSuttaCard from '@/components/packages/MoraSuttaCard';
-import KhandhaSuttaCard from '@/components/packages/KhandhaSuttaCard';
-import WattaSuttaCard from '@/components/packages/WattaSuttaCard';
+import AtanatiyaSuttaCard from '@/components/packages/AtanatiyaSuttaCard';
 import BojjhangaSuttaCard from '@/components/packages/BojjhangaSuttaCard';
+import BuddhaCard from '@/components/packages/BuddhaCard';
+import DevaInvitationCard from '@/components/packages/DevaInvitationCard';
+import DhajaggaSuttaCard from '@/components/packages/DhajaggaSuttaCard';
 import DhammacakkaFourTruthsCard from '@/components/packages/DhammacakkaFourTruthsCard';
 import DhammacakkaSuttaCard from '@/components/packages/DhammacakkaSuttaCard';
-import PubbanhaSuttaCard from '@/components/packages/PubbanhaSuttaCard';
-import MahasamayaSuttaIntroCard from '@/components/packages/MahasamayaSuttaIntroCard';
-import DhajaggaSuttaCard from '@/components/packages/DhajaggaSuttaCard';
-import AtanatiyaSuttaCard from '@/components/packages/AtanatiyaSuttaCard';
-import { checkIfFavorite, toggleFavorite } from '@/constants/favouriteService';
-import BuddhaCard from '@/components/packages/BuddhaCard';
 import DhammaCard from '@/components/packages/DhammaCard';
-import SanghaCard from '@/components/packages/SanghaCard';
-import AnattaLakkhanaSuttaCard from '@/components/packages/AnattaLakkhanaSuttaCard';
-import PracticeDetailMahasamaya from './practice-detail-Mahasamaya';
-import UppatasantiCard from '@/components/packages/UppatasantiCard';
+import DirectionalMettaCard from '@/components/packages/DirectionalMettaCard';
+import GunTawKonCharCard from '@/components/packages/GunTawKonCharCard';
+import GunTawKonCharFullCard from '@/components/packages/GunTawKonCharFullCard';
 import JayantoCard from '@/components/packages/JayantoCard';
+import KhandhaSuttaCard from '@/components/packages/KhandhaSuttaCard';
+import MahasamayaSuttaIntroCard from '@/components/packages/MahasamayaSuttaIntroCard';
+import MangalaSuttaCard from '@/components/packages/MangalaSuttaCard';
+import Metta11Card from '@/components/packages/Metta11Card';
+import MettaSuttaCard from '@/components/packages/MettaSuttaCard';
+import MoraSuttaCard from '@/components/packages/MoraSuttaCard';
+import OkasaCard from '@/components/packages/OkasaCard';
+import PancaSilaCard from '@/components/packages/PancaSilaCard';
+import ParittaNidannCard from '@/components/packages/ParittaNidannCard';
+import PatthanaCard from '@/components/packages/PatthanaCard';
+import PatthanaDetailCard from '@/components/packages/PatthanaDetailCard';
+import PubbanhaSuttaCard from '@/components/packages/PubbanhaSuttaCard';
+import RatanaSuttaCard from '@/components/packages/RatanaSuttaCard';
+import SabbuddheCard from '@/components/packages/SabbuddheCard';
+import SanghaCard from '@/components/packages/SanghaCard';
+import SaranagonCard from '@/components/packages/SaranagonCard';
+import SharingMeritCard from '@/components/packages/SharingMeritCard';
+import ShinThiwaliGathaCard from '@/components/packages/ShinThiwaliGathaCard';
 import SolasaMangalaCard from '@/components/packages/SolasaMangalaCard';
+import ThilaRequestCard from '@/components/packages/ThilaRequestCard';
+import TripleGemVirtuesCard from '@/components/packages/TripleGemVirtuesCard';
+import UppatasantiCard from '@/components/packages/UppatasantiCard';
+import WattaSuttaCard from '@/components/packages/WattaSuttaCard';
+import { checkIfFavorite, toggleFavorite } from '@/constants/favouriteService';
+import PracticeDetailMahasamaya from './practice-detail-Mahasamaya';
 
 const COMPONENT_MAP: { [key: string]: React.ComponentType<any> } = {
     'OkasaCard': OkasaCard,
@@ -96,7 +96,7 @@ const COMPONENT_MAP: { [key: string]: React.ComponentType<any> } = {
 export default function ReaderScreen() {
     const router = useRouter();
     const { title, componentKey,id } = useLocalSearchParams();
-    const { colors, isDarkMode, fontSize } = useTheme();
+    const { colors, fontSize, themeMode } = useTheme();
 const [isFav, setIsFav] = useState(false);
     const scale = fontSize / 16;
     const dynamicSize = (base: number) => base * scale;
@@ -118,7 +118,7 @@ const handleFavoritePress = async () => {
     setIsFav(status);
 };
     return (
-        <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: isDarkMode ? '#05111D' : '#F5F9FF' }]}>
+        <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: themeMode === 'dark' ? '#05111D' : '#F5F9FF' }]}>
        <View style={styles.header}>
     <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
         <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
@@ -176,3 +176,4 @@ const styles = StyleSheet.create({
         padding: 15 
     },
 });
+

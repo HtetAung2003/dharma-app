@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
 const KhandhaSuttaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -22,7 +22,7 @@ const KhandhaSuttaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -50,7 +50,7 @@ const KhandhaSuttaCard = () => {
         {/* Footer Protection Note */}
         <View style={[
           styles.footerNote, 
-          { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#F5F3FF' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(99, 102, 241, 0.1)' : '#F5F3FF' }
         ]}>
           <Text style={[styles.footerText, { color: colors.primary, fontSize: dynamicSize(13) }]}>
             ဘေးအန္တရာယ်ကင်းစင်စေရန်နှင့် အဆိပ်ရှိသတ္တဝါတို့၏ ဘေးမှ ကာကွယ်ရန် ဤခန္ဓသုတ်ကို ရွတ်ဆိုပူဇော်ကြသည်။
@@ -113,3 +113,4 @@ const styles = StyleSheet.create({
 });
 
 export default KhandhaSuttaCard;
+

@@ -55,7 +55,7 @@ export const MINDFUL_TIPS = [
 const MindfulTipsBanner = () => {
     // စဖွင့်ချင်းမှာ random တစ်ခု အရင်ပြရန်
     const [currentIndex, setCurrentIndex] = useState(Math.floor(Math.random() * MINDFUL_TIPS.length));
-    const { colors, isDarkMode } = useTheme();
+    const { colors, themeMode } = useTheme();
     const scrollX = useRef(new Animated.Value(width)).current;
 
     useEffect(() => {
@@ -88,9 +88,9 @@ const MindfulTipsBanner = () => {
     return (
         <View style={styles.outerContainer}>
             {/* ကျန်တဲ့ UI code တွေက အရင်အတိုင်းပါပဲ */}
-            <View style={[styles.container, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.05)' : '#E3F2FD', borderColor: colors.border }]}>
+            <View style={[styles.container, { backgroundColor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : '#E3F2FD', borderColor: colors.border }]}>
                 <View style={styles.iconWrapper}>
-                    <Ionicons name="sparkles" size={16} color={isDarkMode ? '#FFD700' : '#0288D1'} />
+                    <Ionicons name="sparkles" size={16} color={themeMode === 'dark' ? '#FFD700' : '#0288D1'} />
                 </View>
 
                 <View style={styles.mask}>
@@ -144,3 +144,4 @@ const styles = StyleSheet.create({
 });
 
 export default MindfulTipsBanner;
+

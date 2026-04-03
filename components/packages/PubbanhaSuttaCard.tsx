@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const PubbanhaSuttaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -22,7 +22,7 @@ const PubbanhaSuttaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -57,7 +57,7 @@ const PubbanhaSuttaCard = () => {
         {/* Footer Note */}
         <View style={[
           styles.footerNote, 
-          { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#F0F9FF' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(99, 102, 241, 0.1)' : '#F0F9FF' }
         ]}>
           <Text style={[styles.footerText, { color: colors.primary, fontSize: dynamicSize(13) }]}>
             မကောင်းသော အိပ်မက်များ၊ အတိတ်နိမိတ်များနှင့် ဂြိုဟ်ဆိုးများ၏ အန္တရာယ်မှ ကင်းဝေးစေရန် ဤပုဗ္ဗဏှသုတ်ကို ရွတ်ဆိုပူဇော်ကြသည်။
@@ -112,3 +112,4 @@ const styles = StyleSheet.create({
 });
 
 export default PubbanhaSuttaCard;
+

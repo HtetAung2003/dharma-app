@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
 const GunTawKonCharFullCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -42,7 +42,7 @@ const GunTawKonCharFullCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -73,7 +73,7 @@ const GunTawKonCharFullCard = () => {
         </View>
 
         {/* Closing Note */}
-        <View style={[styles.footer, { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#EEF2FF' }]}>
+        <View style={[styles.footer, { backgroundColor: themeMode === 'dark' ? 'rgba(99, 102, 241, 0.1)' : '#EEF2FF' }]}>
           <Text style={[styles.footerText, { color: colors.primary, fontSize: dynamicSize(13) }]}>
             နေ့စဉ် ရွတ်ဆိုပူဇော်ခြင်းဖြင့် ဘေးအန္တရာယ်ကင်း၍ ဘုန်းကံကြီးမားစေပါသည်။
           </Text>
@@ -108,3 +108,4 @@ const styles = StyleSheet.create({
 });
 
 export default GunTawKonCharFullCard;
+

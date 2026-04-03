@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const AtanatiyaSuttaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -22,7 +22,7 @@ const AtanatiyaSuttaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -60,7 +60,7 @@ const AtanatiyaSuttaCard = () => {
         {/* Footer Note */}
         <View style={[
           styles.footerNote, 
-          { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#F0FDF4' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(99, 102, 241, 0.1)' : '#F0FDF4' }
         ]}>
           <Text style={[styles.footerText, { color: colors.primary, fontSize: dynamicSize(13) }]}>
             မကောင်းသော ဘေးအန္တရာယ်များမှ ကာကွယ်ရန်နှင့် နတ်ကောင်းနတ်မြတ်တို့၏ စောင့်ရှောက်မှုကို ရရှိစေရန် ဤအာဋာနာဋိယသုတ်ကို ရွတ်ဆိုပူဇော်ကြသည်။
@@ -103,3 +103,4 @@ const styles = StyleSheet.create({
 });
 
 export default AtanatiyaSuttaCard;
+

@@ -1,35 +1,35 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
-import OkasaCard from '@/components/packages/OkasaCard';
-import ThilaRequestCard from '@/components/packages/ThilaRequestCard';
-import SaranagonCard from '@/components/packages/SaranagonCard';
-import MettaSuttaCard from '@/components/packages/MettaSuttaCard';
+import PreceptsGuidelineCard from '@/components/guidelines/PreceptsGuidelineCard';
 import DirectionalMettaCard from '@/components/packages/DirectionalMettaCard';
 import MangalaSuttaCard from '@/components/packages/MangalaSuttaCard';
 import Metta11Card from '@/components/packages/Metta11Card';
+import MettaSuttaCard from '@/components/packages/MettaSuttaCard';
+import OkasaCard from '@/components/packages/OkasaCard';
 import PancaSilaCard from '@/components/packages/PancaSilaCard';
 import ParittaNidannCard from '@/components/packages/ParittaNidannCard';
 import RatanaSuttaCard from '@/components/packages/RatanaSuttaCard';
 import SabbuddheCard from '@/components/packages/SabbuddheCard';
+import SaranagonCard from '@/components/packages/SaranagonCard';
 import SharingMeritCard from '@/components/packages/SharingMeritCard';
+import ThilaRequestCard from '@/components/packages/ThilaRequestCard';
 import TripleGemVirtuesCard from '@/components/packages/TripleGemVirtuesCard';
-import PreceptsGuidelineCard from '@/components/guidelines/PreceptsGuidelineCard';
+import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function PracticeDetail() {
   const router = useRouter();
   const { id, title } = useLocalSearchParams();
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
   const [showModal, setShowModal] = useState(false);
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: isDarkMode ? '#05111D' : '#F5F9FF' }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: themeMode === 'dark' ? '#05111D' : '#F5F9FF' }]}>
       {/* Header Area */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -76,7 +76,7 @@ export default function PracticeDetail() {
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' }}>
           <View style={[
             styles.modalContent, 
-            { backgroundColor: isDarkMode ? '#161B22' : '#FFF' }
+            { backgroundColor: themeMode === 'dark' ? '#161B22' : '#FFF' }
           ]}>
             {/* Handle Bar to close */}
             <TouchableOpacity onPress={() => setShowModal(false)} style={styles.modalHandleWrapper}>
@@ -151,3 +151,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#CCC',
   },
 });
+

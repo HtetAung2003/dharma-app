@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
 const DhajaggaSuttaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -22,7 +22,7 @@ const DhajaggaSuttaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -62,7 +62,7 @@ const DhajaggaSuttaCard = () => {
         {/* Footer Note */}
         <View style={[
           styles.footerNote, 
-          { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#F0F9FF' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(99, 102, 241, 0.1)' : '#F0F9FF' }
         ]}>
           <Text style={[styles.footerText, { color: colors.primary, fontSize: dynamicSize(13) }]}>
             ထိတ်လန့်ခြင်း၊ ကြောက်ရွံ့ခြင်းနှင့် မွေးညင်းမတ်ရပ်ထခြင်းတို့မှ ကင်းဝေးစေရန် ဤဓဇဂ္ဂသုတ်ကို ရွတ်ဆိုပူဇော်ကြသည်။
@@ -108,3 +108,4 @@ const styles = StyleSheet.create({
 });
 
 export default DhajaggaSuttaCard;
+

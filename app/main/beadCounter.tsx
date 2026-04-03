@@ -1,3 +1,4 @@
+import { saveBeadCounterStats } from "@/services/statsService";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import FloatingBubble from "@increase21/rn-floating-bubble";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -11,15 +12,13 @@ import React, { useEffect, useState } from "react";
 import {
   Alert,
   Platform,
-  View as RNView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
+  View as RNView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-// Theme Context (သင့် project လမ်းကြောင်းအတိုင်း ပြင်ပါ)
 import { useTheme } from "../../context/ThemeContext";
 
 const PRESET_NUMBERS = [9, 27, 45, 108, 1000];
@@ -29,9 +28,8 @@ const BEAD_COUNTER_BUBBLE_KEY = "bead_counter_bubble_enabled_v1";
 const BeadCounterScreen = () => {
   useKeepAwake();
   const router = useRouter();
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
-  // States
   const [target, setTarget] = useState(108);
   const [count, setCount] = useState(0);
   const [rounds, setRounds] = useState(0);
@@ -174,10 +172,10 @@ const BeadCounterScreen = () => {
 
   const handleResetCount = () => {
     if (count > 0 || rounds > 0) {
-      Alert.alert("အတည်ပြုပါ", "လက်ရှိရေတွက်ထားသည်ကို ဖျက်ပါမည်လား?", [
-        { text: "မဖျက်ပါ", style: "cancel" },
+      Alert.alert("Reset count", "Clear the current bead counter session?", [
+        { text: "Cancel", style: "cancel" },
         {
-          text: "ဖျက်မည်",
+          text: "Reset",
           onPress: () => {
             setCount(0);
             setRounds(0);
@@ -188,45 +186,59 @@ const BeadCounterScreen = () => {
     }
   };
 
-  const handleFinish = () => {
-    if (!startTime) return;
-    Alert.alert(
-      "သာဓု ခေါ်ဆိုပါသည်",
-      "ယနေ့ ပုတီးစိပ်မှတ်တမ်းကို သိမ်းဆည်းလိုပါသလား?",
-      [
-        { text: "မသိမ်းပါ", style: "cancel", onPress: () => router.back() },
-        { text: "သိမ်းဆည်းမည်", onPress: saveAndExit },
-      ],
-    );
-  };
-
-  const saveAndExit = () => {
-    const duration = startTime
-      ? Math.floor((Date.now() - startTime) / 1000)
-      : 0;
+  const saveAndExit = async () => {
+    const duration = startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+    const totalBeads = rounds * target + count;
     const record = {
       target_type: target,
-      total_beads: rounds * target + count,
+      total_beads: totalBeads,
       duration_seconds: duration,
       date: new Date().toISOString(),
     };
+
+    try {
+      await saveBeadCounterStats({
+        seconds: duration,
+        count: totalBeads,
+        rounds,
+        presetNumber: target,
+      });
+      await AsyncStorage.removeItem(BEAD_COUNTER_STATE_KEY);
+      setCount(0);
+      setRounds(0);
+      setStartTime(null);
+    } catch (error) {
+      console.warn("Failed to save bead counter session", error);
+    }
+
     console.log("Saving...", record);
     router.back();
   };
 
-  // Progress calculation
+  const handleFinish = () => {
+    if (!startTime) return;
+    Alert.alert(
+      "Save session",
+      "Do you want to save this bead counter session?",
+      [
+        { text: "No", style: "cancel", onPress: () => router.back() },
+        { text: "Save", onPress: saveAndExit },
+      ],
+    );
+  };
+
   const rotateVal = `${(count / target) * 360 + 180}deg`;
 
   return (
     <LinearGradient
-      colors={isDarkMode ? ["#0F172A", "#1E293B"] : ["#F0F9FF", "#E0F2FE"]}
-      style={styles.background}
+      colors={[colors.splashBackground, colors.gradientMiddle, colors.gradientEnd]}
+      style={{ flex: 1 }}
     >
-      <StatusBar style={isDarkMode ? "light" : "dark"} />
+      <StatusBar style={themeMode === "dark" ? "light" : "dark"} />
       <SafeAreaView style={styles.safeArea}>
         <Stack.Screen
           options={{
-            headerTitle: "ပုတီးစိပ်ခြင်း",
+            headerTitle: "Bead Counter",
             headerTransparent: true,
             headerTintColor: colors.textPrimary,
             headerRight: () => (
@@ -241,19 +253,16 @@ const BeadCounterScreen = () => {
                     fontWeight: "bold",
                   }}
                 >
-                  ပြီးမည်
+                  Finish
                 </Text>
               </TouchableOpacity>
             ),
           }}
         />
 
-        {/* ၁။ Selector & Reset Section */}
         <RNView style={styles.topSection}>
           <RNView style={styles.selectorHeader}>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>
-              စိပ်လိုသည့် အရေအတွက် ရွေးပါ
-            </Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Choose a preset count</Text>
             <TouchableOpacity
               onPress={handleResetCount}
               disabled={count === 0 && rounds === 0}
@@ -281,12 +290,12 @@ const BeadCounterScreen = () => {
                 onPress={() => {
                   if (count > 0 || rounds > 0) {
                     Alert.alert(
-                      "သတိပေးချက်",
-                      "စိပ်လက်စကို ဖျက်ပြီး အရေအတွက် အသစ်ပြောင်းမလား?",
+                      "Change preset",
+                      "Reset the current session and switch preset?",
                       [
-                        { text: "မပြောင်းပါ", style: "cancel" },
+                        { text: "Cancel", style: "cancel" },
                         {
-                          text: "ပြောင်းမည်",
+                          text: "Switch",
                           onPress: () => {
                             setTarget(num);
                             setCount(0);
@@ -303,8 +312,7 @@ const BeadCounterScreen = () => {
                 style={[
                   styles.chip,
                   {
-                    backgroundColor:
-                      target === num ? colors.primary : colors.card,
+                    backgroundColor: target === num ? colors.primary : colors.card,
                     borderColor: colors.border,
                   },
                 ]}
@@ -315,14 +323,13 @@ const BeadCounterScreen = () => {
                     { color: target === num ? "#1A3C5A" : colors.textPrimary },
                   ]}
                 >
-                  {num} လုံး
+                  {num}
                 </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </RNView>
 
-        {/* ၂။ Rounds Display */}
         <RNView style={styles.middleSection}>
           <RNView
             style={[
@@ -335,18 +342,11 @@ const BeadCounterScreen = () => {
               size={18}
               color={colors.secondary}
             />
-            <Text style={[styles.roundText, { color: colors.secondary }]}>
-              {rounds} ပတ်ပြည့်
-            </Text>
+            <Text style={[styles.roundText, { color: colors.secondary }]}>{rounds} rounds</Text>
           </RNView>
         </RNView>
 
-        {/* ၃။ Tap Area (The Bead) */}
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={handleTap}
-          style={styles.tapArea}
-        >
+        <TouchableOpacity activeOpacity={1} onPress={handleTap} style={styles.tapArea}>
           <AnimatePresence exitBeforeEnter>
             <View
               key={animationKey}
@@ -356,8 +356,8 @@ const BeadCounterScreen = () => {
               style={[
                 styles.mainBead,
                 {
-                  backgroundColor: isDarkMode ? colors.card : "#FFF",
-                  borderColor: isDarkMode ? colors.border : colors.border,
+                  backgroundColor: themeMode === "dark" ? colors.card : "#FFF",
+                  borderColor: colors.border,
                 },
               ]}
             >
@@ -379,27 +379,18 @@ const BeadCounterScreen = () => {
               >
                 {count}
               </Text>
-              <Text
-                style={[styles.targetText, { color: colors.textSecondary }]}
-              >
-                / {target}
-              </Text>
+              <Text style={[styles.targetText, { color: colors.textSecondary }]}>/ {target}</Text>
             </View>
           </AnimatePresence>
         </TouchableOpacity>
 
-        {/* ၄။ Footer Hint */}
         <RNView style={styles.footer}>
           <Ionicons
             name="finger-print"
             size={20}
             color={colors.textSecondary + "80"}
           />
-          <Text
-            style={[styles.footerText, { color: colors.textSecondary + "80" }]}
-          >
-            ပုတီးတစ်လုံးချတိုင်း စက်ဝိုင်းအား နှိပ်ပေးပါ။
-          </Text>
+          <Text style={[styles.footerText, { color: colors.textSecondary + "80" }]}>Tap the circle once for each bead.</Text>
         </RNView>
 
         {isAndroid && (

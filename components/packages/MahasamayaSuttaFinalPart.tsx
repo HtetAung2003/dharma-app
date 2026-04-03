@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const MahasamayaSuttaFinalPart = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -20,7 +20,7 @@ const MahasamayaSuttaFinalPart = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -136,7 +136,7 @@ const MahasamayaSuttaFinalPart = () => {
         </View>
   <View style={styles.divider} />
         {/* Closing Note */}
-        <View style={[styles.footer, { backgroundColor: isDarkMode ? 'rgba(34, 197, 94, 0.1)' : '#F0FDF4' }]}>
+        <View style={[styles.footer, { backgroundColor: themeMode === 'dark' ? 'rgba(34, 197, 94, 0.1)' : '#F0FDF4' }]}>
           <Text style={[styles.footerText, { color: '#15803D', fontSize: dynamicSize(13) }]}>
             မဟာသမယသုတ်တော် မြတ်စွာဘုရားဟောကြားတော်မူ၍ ပြီးပြည့်စုံသွားပါပြီ။
           </Text>
@@ -175,3 +175,4 @@ const styles = StyleSheet.create({
 });
 
 export default MahasamayaSuttaFinalPart;
+

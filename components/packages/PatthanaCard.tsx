@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 
 const PatthanaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -33,8 +33,8 @@ const PatthanaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(180, 83, 9, 0.05)' : '#FFFBEB',
-          borderColor: isDarkMode ? 'rgba(180, 83, 9, 0.2)' : '#FEF3C7'
+          backgroundColor: themeMode === 'dark' ? 'rgba(180, 83, 9, 0.05)' : '#FFFBEB',
+          borderColor: themeMode === 'dark' ? 'rgba(180, 83, 9, 0.2)' : '#FEF3C7'
         }
       ]}>
         <View style={styles.gridContainer}>
@@ -111,3 +111,4 @@ const styles = StyleSheet.create({
 });
 
 export default PatthanaCard;
+

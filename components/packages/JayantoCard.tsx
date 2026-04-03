@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const JayantoCard = () => {
-  const { colors, fontSize, isDarkMode } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -19,8 +19,8 @@ const JayantoCard = () => {
       <View style={[
         styles.verseCard, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(212, 175, 55, 0.05)' : '#FFFDFA',
-          borderColor: isDarkMode ? 'rgba(212, 175, 55, 0.3)' : '#D4AF37'
+          backgroundColor: themeMode === 'dark' ? 'rgba(212, 175, 55, 0.05)' : '#FFFDFA',
+          borderColor: themeMode === 'dark' ? 'rgba(212, 175, 55, 0.3)' : '#D4AF37'
         }
       ]}>
         <Text style={[styles.paliText, { color: colors.textPrimary, fontSize: dynamicSize(17) }]}>
@@ -57,7 +57,7 @@ const JayantoCard = () => {
       </View>
 
       {/* မြန်မာပြန် အနှစ်ချုပ် */}
-      <View style={[styles.translationBox, { backgroundColor: isDarkMode ? '#161B22' : '#F8FAFC' }]}>
+      <View style={[styles.translationBox, { backgroundColor: themeMode === 'dark' ? '#161B22' : '#F8FAFC' }]}>
         <Text style={[styles.transTitle, { color: colors.primary, fontSize: dynamicSize(15) }]}>
           ✨ မြန်မာပြန် အနှစ်ချုပ်
         </Text>
@@ -108,3 +108,4 @@ const styles = StyleSheet.create({
 });
 
 export default JayantoCard;
+

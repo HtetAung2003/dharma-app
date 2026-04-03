@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const GunTawKonCharCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -22,7 +22,7 @@ const GunTawKonCharCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -47,7 +47,7 @@ const GunTawKonCharCard = () => {
         {/* Footer Protection Note */}
         <View style={[
           styles.footerNote, 
-          { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#F0F9FF' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(99, 102, 241, 0.1)' : '#F0F9FF' }
         ]}>
           <Text style={[styles.footerText, { color: colors.primary, fontSize: dynamicSize(13) }]}>
             "ကွန်ချာ" ဟု ဆိုသည့်အတိုင်း ဘုရားဂုဏ်တော်များဖြင့် ဘေးအန္တရာယ်များ မဝင်ရောက်နိုင်အောင် ကာကွယ်ထားခြင်း ဖြစ်သည်။
@@ -103,3 +103,5 @@ const styles = StyleSheet.create({
 });
 
 export default GunTawKonCharCard;
+
+

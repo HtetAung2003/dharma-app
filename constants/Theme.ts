@@ -1,47 +1,93 @@
 export const COLORS = {
   light: {
-    primary: '#FFD700',      // Golden Yellow
-    secondary: '#1A3C5A',    // Deep Navy Blue
-    background: '#F5F9FF',   // Very Light Blue/White
-    surface: '#FFFFFF',      // White for Cards
-    textPrimary: '#1A3C5A',  // Dark Blue for Titles
-    textSecondary: '#546E7A',// Grayish Blue for Descriptions
+    primary: '#FFD700',
+    secondary: '#1A3C5A',
+    background: '#F5F9FF',
+    surface: '#FFFFFF',
+    surfaceAlt: '#E3F2FD',
+    surfaceMuted: '#F5F5F5',
+    surfaceSoft: '#F9F9F9',
+    card: '#FFFFFF',
+    cardBorder: '#D1D9E6',
+    inputBackground: '#FFFFFF',
+    textPrimary: '#1A3C5A',
+    textSecondary: '#546E7A',
+    textOnPrimary: '#1A3C5A',
+    textOnSecondary: '#FFFFFF',
     accent: '#E64A19',
     border: '#D1D9E6',
-    error: '#FF5252',
-    success: '#4CAF50',
+    divider: '#E5E7EB',
+    placeholder: '#666666',
     icon: '#1A3C5A',
-  },
-  dark: {
-    primary: '#FFD700',      // Golden Yellow (Keep as Brand Identity)
-    secondary: '#B0BEC5',    // Lighter Blue/Gray for contrast on dark
-    background: '#0F0F0F',   // Pure Dark/Deep Black
-    surface: '#1E1E1E',      // Dark Gray for Cards
-    textPrimary: '#FFFFFF',  // White for Titles
-    textSecondary: '#AAAAAA',// Light Gray for Descriptions
-    accent: '#FF7043',       // Slightly lighter orange for dark mode
-    border: '#333333',
+    iconMuted: '#90A4AE',
     error: '#FF5252',
-    success: '#81C784',
-    icon: '#FFD700',         // Golden Icons for dark theme
-  }
-};
-export const ThemeColors = {
-  light: {
-    background: '#FFFFFF',
-    text: '#1A3C5A',
-    surface: '#F2F2F7',
-    primary: '#FFD700', // ရွှေရောင်
-    secondary: '#1A3C5A',
+    errorSoft: '#FF525208',
+    success: '#4CAF50',
+    successSoft: '#4CAF5022',
+    warning: '#FF9100',
+    warningSoft: '#FFD7001A',
+    info: '#0288D1',
+    infoSoft: '#0288D122',
+    favorite: '#FF4B4B',
+    google: '#EA4335',
+    overlay: '#00000099',
+    overlaySoft: '#0000000D',
+    shadow: '#000000',
+    shadowSoft: '#94A3B8',
+    activeTint: '#FFD7001A',
+    gradientStart: '#F5F9FF',
+    gradientMiddle: '#E0E7FF',
+    gradientEnd: '#FFFFFF',
+    splashBackground: '#F5F9FF',
+    splashSpinner: '#FFD700',
   },
   dark: {
-    background: '#000000',
-    text: '#FFFFFF',
-    surface: '#1C1C1E',
     primary: '#FFD700',
     secondary: '#B0BEC5',
-  }
-};
+    background: '#0F0F0F',
+    surface: '#1E1E1E',
+    surfaceAlt: '#1A2634',
+    surfaceMuted: '#161B22',
+    surfaceSoft: '#1E1E1E',
+    card: '#1E1E1E',
+    cardBorder: '#333333',
+    inputBackground: '#1E1E1E',
+    textPrimary: '#FFFFFF',
+    textSecondary: '#AAAAAA',
+    textOnPrimary: '#1A3C5A',
+    textOnSecondary: '#FFFFFF',
+    accent: '#FF7043',
+    border: '#333333',
+    divider: '#333333',
+    placeholder: '#666666',
+    icon: '#FFD700',
+    iconMuted: '#90A4AE',
+    error: '#FF5252',
+    errorSoft: '#FF525215',
+    success: '#81C784',
+    successSoft: '#4CAF5022',
+    warning: '#FFD700',
+    warningSoft: '#FFD70044',
+    info: '#FFD700',
+    infoSoft: '#FFFFFF0D',
+    favorite: '#FF4B4B',
+    google: '#EA4335',
+    overlay: '#00000099',
+    overlaySoft: '#FFFFFF0D',
+    shadow: '#000000',
+    shadowSoft: '#000000',
+    activeTint: '#FFD7001A',
+    gradientStart: '#0F0F0F',
+    gradientMiddle: '#1A1A1A',
+    gradientEnd: '#000000',
+    splashBackground: '#000000',
+    splashSpinner: '#FFD700',
+  },
+} as const;
+
+export type ThemeMode = keyof typeof COLORS;
+export type ThemeColors = (typeof COLORS)[ThemeMode];
+
 export const SIZES = {
   base: 8,
   font: 14,
@@ -50,8 +96,7 @@ export const SIZES = {
 };
 
 export const FONTS = {
-  // မြန်မာစာအတွက် Pyidaungsu သို့မဟုတ် Noto Sans သုံးရန်
-  regular: 'sans-serif', 
+  regular: 'sans-serif',
   medium: 'sans-serif-medium',
   bold: 'sans-serif-bold',
 };

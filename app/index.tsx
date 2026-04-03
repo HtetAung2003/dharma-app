@@ -11,7 +11,7 @@ const { height } = Dimensions.get('window');
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   // အခြေခံ fontSize အပေါ်မူတည်ပြီး အချိုးကျ တွက်ချက်ခြင်း
   const scale = fontSize / 16; // Default size 16 ကို base ထားပါသည်
@@ -19,12 +19,11 @@ export default function WelcomeScreen() {
 
   return (
     <>
-      <StatusBar style={isDarkMode ? "light" : "dark"} />
+      <StatusBar style={themeMode === 'dark' ? "light" : "dark"} />
       
       <LinearGradient
-        colors={isDarkMode 
-          ? [colors.secondary, '#0D2137', '#000000'] 
-          : ['#E0F2F1', '#B2DFDB', '#F5F9FF']} 
+        colors={themeMode === 'dark' 
+          ? [colors.gradientStart, colors.gradientMiddle, colors.gradientEnd] : [colors.gradientStart, colors.gradientMiddle, colors.gradientEnd]} 
         style={styles.background}
       >
         <View style={styles.innerContent}>
@@ -38,7 +37,7 @@ export default function WelcomeScreen() {
             </View>
             {/* မင်္ဂလာပါ စာသား - အခြေခံ ၂၀ အပေါ်မူတည်ပြီး ကြီးလာမည် */}
             <Text style={[styles.welcomeText, { 
-              color: isDarkMode ? '#FFF' : colors.secondary,
+              color: colors.secondary,
               fontSize: dynamicSize(20) 
             }]}>
               မင်္ဂလာပါ
@@ -56,14 +55,14 @@ export default function WelcomeScreen() {
             <View style={[styles.divider, { backgroundColor: colors.primary }]} />
             
             <Text style={[styles.tagline, { 
-              color: isDarkMode ? '#FFF' : colors.secondary, 
+              color: colors.secondary, 
               fontSize: dynamicSize(18) 
             }]}>
               စိတ်နှလုံးအေးချမ်းစေဖို့ ဓမ္မလမ်းကိုလျှောက်လှမ်းစို့
             </Text>
 
             <Text style={[styles.description, { 
-              color: isDarkMode ? '#B0BEC5' : '#546E7A', 
+              color: colors.textSecondary, 
               fontSize: dynamicSize(16) 
             }]}>
               နေ့စဉ်ဘဝရဲ့ ပင်ပန်းနွမ်းနယ်မှုတွေကို {"\n"}
@@ -139,3 +138,5 @@ const styles = StyleSheet.create({
   },
   outlineText: { fontWeight: '600' },
 });
+
+

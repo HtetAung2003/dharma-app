@@ -1,20 +1,20 @@
-import React, { useState, useCallback } from 'react';
-import { useFocusEffect, useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StyleSheet, TouchableOpacity, View, Text, FlatList } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext'; // လမ်းကြောင်းမှန်အောင် ချိန်ပါ
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function FavoriteScreen() {
     const [favs, setFavs] = useState<any[]>([]);
     const router = useRouter();
-    const { colors, isDarkMode, fontSize } = useTheme();
+    const { colors, fontSize } = useTheme();
 
     const scale = fontSize / 16;
     const dynamicSize = (base: number) => base * scale;
 
-    // Screen ဆီ ပြန်ရောက်တိုင်း data update ဖြစ်အောင် လုပ်ခြင်း
+    // refresh data when screen is focused
     useFocusEffect(
         useCallback(() => {
             const loadFavs = async () => {
@@ -28,7 +28,7 @@ export default function FavoriteScreen() {
     const renderFavItem = ({ item }: { item: any }) => (
         <TouchableOpacity
             style={[styles.favItem, { 
-                backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                backgroundColor: colors.card,
                 borderColor: colors.border 
             }]}
             onPress={() => router.push({ 
@@ -37,8 +37,8 @@ export default function FavoriteScreen() {
             })}
         >
             <View style={styles.itemInfo}>
-                <View style={[styles.iconContainer, { backgroundColor: isDarkMode ? '#1A3C5A' : '#E3F2FD' }]}>
-                    <Ionicons name="heart" size={20} color="#FF5252" />
+                <View style={[styles.iconContainer, { backgroundColor: colors.textOnSecondary }]}>
+                    <Ionicons name="heart" size={20} color={colors.favorite}/>
                 </View>
                 <Text style={[styles.itemTitle, { color: colors.textPrimary, fontSize: dynamicSize(16) }]}>
                     {item.title}

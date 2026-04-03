@@ -1,29 +1,21 @@
 import { useTheme } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 
-import { LinearGradient } from "expo-linear-gradient";
 import { usePathname, useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const BottomNav = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const { colors, fontSize, isDarkMode } = useTheme();
+  const { colors, fontSize } = useTheme();
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
-  // Active ဖြစ်နေတဲ့ Icon အရောင် (သင်သုံးထားတဲ့ color code အတိုင်း)
+ 
   const getIconColor = (path: string) =>
-    pathname === path ? "#1A3C5A" : "#90A4AE";
+    pathname === path ? colors.secondary : colors.iconMuted;
 
   return (
-    <LinearGradient
-      colors={
-        isDarkMode
-          ? ["#0F0F0F", "#1A1A1A", "#000000"]
-          : ["#F5F9FF", "#E0E7FF", "#FFFFFF"]
-      }
-      style={styles.background}
-    >
+ 
       <View style={styles.navBar}>
         {/* Home */}
         <TouchableOpacity
@@ -33,9 +25,9 @@ const BottomNav = () => {
           <Ionicons
             name={pathname === "/main/dashboard" ? "home" : "home-outline"}
             size={24}
-            color={getIconColor("/")}
+            color={getIconColor("/main/dashboard")}
           />
-          <Text style={[styles.navText, { color: getIconColor("/") }]}>
+          <Text style={[styles.navText, { color: getIconColor("/main/dashboard") }]}>
             ပင်မ
           </Text>
         </TouchableOpacity>
@@ -46,11 +38,11 @@ const BottomNav = () => {
           onPress={() => router.push("/main/favorite")}
         >
           <Ionicons
-            name={pathname === "/favorites" ? "heart" : "heart-outline"}
+            name={pathname === "/main/favorite" ? "heart" : "heart-outline"}
             size={24}
-            color={getIconColor("/favorites")}
+            color={getIconColor("/main/favorite")}
           />
-          <Text style={[styles.navText, { color: getIconColor("/favorites") }]}>
+          <Text style={[styles.navText, { color: getIconColor("/main/favorite") }]}>
             နှစ်သက်
           </Text>
         </TouchableOpacity>
@@ -61,7 +53,7 @@ const BottomNav = () => {
           onPress={() => router.push("/main/albums")}
         >
           <Ionicons
-            name={pathname === "/main/albums" ? "albums" : "albums-outline"}
+            name={pathname === "/main/albums" ? "book" : "book-outline"}
             size={24}
             color={getIconColor("/main/albums")}
           />
@@ -78,8 +70,8 @@ const BottomNav = () => {
           <Ionicons
             name={
               pathname === "/main/beadCounter"
-                ? "stats-chart"
-                : "stats-chart-outline"
+                ? "leaf"
+                : "leaf-outline"
             }
             size={24}
             color={getIconColor("/main/beadCounter")}
@@ -136,17 +128,17 @@ const BottomNav = () => {
           </Text>
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+  
   );
 };
 
 const styles = StyleSheet.create({
-  background: {},
+
   navBar: {
     flexDirection: "row",
-    height: 75,
+   
 
-    paddingBottom: 12,
+    padding: 12,
     justifyContent: "space-around",
     alignItems: "center",
     // Shadow (iOS/Android)
@@ -161,3 +153,5 @@ const styles = StyleSheet.create({
 });
 
 export default BottomNav;
+
+

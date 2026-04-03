@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const BojjhangaSuttaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -22,7 +22,7 @@ const BojjhangaSuttaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
+          backgroundColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
           borderColor: colors.border
         }
       ]}>
@@ -50,7 +50,7 @@ const BojjhangaSuttaCard = () => {
         {/* Footer Note */}
         <View style={[
           styles.footerNote, 
-          { backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.1)' : '#ECFDF5' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(16, 185, 129, 0.1)' : '#ECFDF5' }
         ]}>
           <Text style={[styles.footerText, { color: colors.primary, fontSize: dynamicSize(13) }]}>
             နာမကျန်းဖြစ်ခြင်းနှင့် ရောဂါဝေဒနာများမှ ကင်းဝေးစေရန်နှင့် အမြန်ဆုံး ကျန်းမာလာစေရန် ဤဗောဇ္ဈင်္ဂသုတ်ကို ယုံကြည်ကြည်ညိုစွာဖြင့် ရွတ်ဆိုပူဇော်ကြသည်။
@@ -90,3 +90,4 @@ const styles = StyleSheet.create({
 });
 
 export default BojjhangaSuttaCard;
+

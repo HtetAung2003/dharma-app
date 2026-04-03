@@ -5,10 +5,9 @@ import * as Device from 'expo-device';
 // ၁။ Notification ပေါ်မည့်ပုံစံကို သတ်မှတ်ခြင်း
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
-    shouldShowBanner: true, 
+    shouldShowBanner: true,
     shouldShowList: true,
   }),
 });

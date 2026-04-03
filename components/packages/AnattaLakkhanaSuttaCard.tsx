@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const AnattaLakkhanaSuttaCard = () => {
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
@@ -22,8 +22,8 @@ const AnattaLakkhanaSuttaCard = () => {
       <View style={[
         styles.card, 
         { 
-          backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : '#FFFFFF',
-          borderColor: colors.border
+           backgroundColor: colors.background,
+          borderColor:colors.border
         }
       ]}>
         {/* Intro Context */}
@@ -58,7 +58,7 @@ const AnattaLakkhanaSuttaCard = () => {
         {/* Footer Note */}
         <View style={[
           styles.footerNote, 
-          { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#F8FAFC' }
+          { backgroundColor: themeMode === 'dark' ? 'rgba(99, 102, 241, 0.1)' : '#F8FAFC' }
         ]}>
           <Text style={[styles.footerText, { color: colors.textSecondary, fontSize: dynamicSize(13) }]}>
             မမြဲခြင်း (အနိစ္စ) ဖြစ်သောကြောင့် ဆင်းရဲ (ဒုက္ခ) ဖြစ်၏၊ ဆင်းရဲခြင်းဖြစ်သောကြောင့် ငါ မဟုတ် (အနတ္တ) ဟု ဆင်ခြင်ရန် ဖြစ်သည်။
@@ -109,3 +109,4 @@ const styles = StyleSheet.create({
 });
 
 export default AnattaLakkhanaSuttaCard;
+

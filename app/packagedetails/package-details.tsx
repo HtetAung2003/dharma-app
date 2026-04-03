@@ -1,49 +1,47 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
 import { saveReadingTime } from '@/services/statsService';
+import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/ThemeContext';
 
 // အားလုံးသော Card Component များကို Import လုပ်ပါ
-import OkasaCard from '@/components/packages/OkasaCard';
-import ThilaRequestCard from '@/components/packages/ThilaRequestCard';
-import SaranagonCard from '@/components/packages/SaranagonCard';
-import MettaSuttaCard from '@/components/packages/MettaSuttaCard';
-import DirectionalMettaCard from '@/components/packages/DirectionalMettaCard';
-import MangalaSuttaCard from '@/components/packages/MangalaSuttaCard';
-import Metta11Card from '@/components/packages/Metta11Card';
-import PancaSilaCard from '@/components/packages/PancaSilaCard';
-import ParittaNidannCard from '@/components/packages/ParittaNidannCard';
-import RatanaSuttaCard from '@/components/packages/RatanaSuttaCard';
-import SabbuddheCard from '@/components/packages/SabbuddheCard';
-import SharingMeritCard from '@/components/packages/SharingMeritCard';
-import TripleGemVirtuesCard from '@/components/packages/TripleGemVirtuesCard';
 import PreceptsGuidelineCard from '@/components/guidelines/PreceptsGuidelineCard';
-import BuddhaAttributesCard from '@/components/packages/BuddhaCard';
-import DhammaCard from '@/components/packages/DhammaCard';
-import BuddhaCard from '@/components/packages/BuddhaCard';
-import SanghaCard from '@/components/packages/SanghaCard';
-import KhandhaSuttaCard from '@/components/packages/KhandhaSuttaCard';
-import MoraSuttaCard from '@/components/packages/MoraSuttaCard';
-import WattaSuttaCard from '@/components/packages/WattaSuttaCard';
-import DhajaggaSuttaCard from '@/components/packages/DhajaggaSuttaCard';
-import AtanatiyaSuttaCard from '@/components/packages/AtanatiyaSuttaCard';
-import AngulimalaSuttaCard from '@/components/packages/AngulimalaSuttaCard';
-import BojjhangaSuttaCard from '@/components/packages/BojjhangaSuttaCard';
-import PubbanhaSuttaCard from '@/components/packages/PubbanhaSuttaCard';
-import DhammacakkaSuttaCard from '@/components/packages/DhammacakkaSuttaCard';
 import AnattaLakkhanaSuttaCard from '@/components/packages/AnattaLakkhanaSuttaCard';
-import PatthanaCard from '@/components/packages/PatthanaCard';
-import PatthanaDetailCard from '@/components/packages/PatthanaDetailCard';
-import UppatasantiCard from '@/components/packages/UppatasantiCard';
-import PracticeDetailMahasamaya from './practice-detail-Mahasamaya';
+import AngulimalaSuttaCard from '@/components/packages/AngulimalaSuttaCard';
+import AtanatiyaSuttaCard from '@/components/packages/AtanatiyaSuttaCard';
+import BojjhangaSuttaCard from '@/components/packages/BojjhangaSuttaCard';
+import BuddhaCard from '@/components/packages/BuddhaCard';
+import DhajaggaSuttaCard from '@/components/packages/DhajaggaSuttaCard';
+import DhammacakkaSuttaCard from '@/components/packages/DhammacakkaSuttaCard';
+import DhammaCard from '@/components/packages/DhammaCard';
+import DirectionalMettaCard from '@/components/packages/DirectionalMettaCard';
 import GunTawKonCharCard from '@/components/packages/GunTawKonCharCard';
 import GunTawKonCharFullCard from '@/components/packages/GunTawKonCharFullCard';
-import ShinThiwaliGathaCard from '@/components/packages/ShinThiwaliGathaCard';
 import JayantoCard from '@/components/packages/JayantoCard';
+import KhandhaSuttaCard from '@/components/packages/KhandhaSuttaCard';
+import MangalaSuttaCard from '@/components/packages/MangalaSuttaCard';
+import Metta11Card from '@/components/packages/Metta11Card';
+import MettaSuttaCard from '@/components/packages/MettaSuttaCard';
+import MoraSuttaCard from '@/components/packages/MoraSuttaCard';
+import OkasaCard from '@/components/packages/OkasaCard';
+import PancaSilaCard from '@/components/packages/PancaSilaCard';
+import ParittaNidannCard from '@/components/packages/ParittaNidannCard';
+import PatthanaCard from '@/components/packages/PatthanaCard';
+import PatthanaDetailCard from '@/components/packages/PatthanaDetailCard';
+import PubbanhaSuttaCard from '@/components/packages/PubbanhaSuttaCard';
+import RatanaSuttaCard from '@/components/packages/RatanaSuttaCard';
+import SabbuddheCard from '@/components/packages/SabbuddheCard';
+import SanghaCard from '@/components/packages/SanghaCard';
+import SaranagonCard from '@/components/packages/SaranagonCard';
+import SharingMeritCard from '@/components/packages/SharingMeritCard';
+import ShinThiwaliGathaCard from '@/components/packages/ShinThiwaliGathaCard';
 import SolasaMangalaCard from '@/components/packages/SolasaMangalaCard';
+import ThilaRequestCard from '@/components/packages/ThilaRequestCard';
+import UppatasantiCard from '@/components/packages/UppatasantiCard';
+import WattaSuttaCard from '@/components/packages/WattaSuttaCard';
+import PracticeDetailMahasamaya from './practice-detail-Mahasamaya';
 
 export default function PracticeDetail() {
   const router = useRouter();
@@ -55,7 +53,7 @@ export default function PracticeDetail() {
     componentKey: string;
   }>();
   
-  const { colors, isDarkMode, fontSize } = useTheme();
+  const { colors, fontSize, themeMode } = useTheme();
   const [showModal, setShowModal] = useState(false);
 
   const scale = fontSize / 16;
@@ -121,7 +119,7 @@ export default function PracticeDetail() {
   }, [componentKey, colors]);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: isDarkMode ? '#05111D' : '#F5F9FF' }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: themeMode === 'dark' ? '#05111D' : '#F5F9FF' }]}>
       {/* Header Area */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -148,7 +146,7 @@ export default function PracticeDetail() {
       {/* Guidelines Modal */}
       <Modal visible={showModal} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: isDarkMode ? '#161B22' : '#FFF' }]}>
+          <View style={[styles.modalContent, { backgroundColor: themeMode === 'dark' ? '#161B22' : '#FFF' }]}>
             <TouchableOpacity onPress={() => setShowModal(false)} style={styles.modalHandleWrapper}>
                <Text style={{ color: colors.textPrimary, fontSize: dynamicSize(16) }}>ပိတ်ရန်</Text>
             </TouchableOpacity>
@@ -176,3 +174,4 @@ const styles = StyleSheet.create({
   modalHandleWrapper: { alignSelf: 'center', paddingVertical: 15, width: '100%', alignItems: 'center' },
   errorBox: { padding: 40, alignItems: 'center' }
 });
+

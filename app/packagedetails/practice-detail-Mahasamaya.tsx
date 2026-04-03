@@ -1,24 +1,21 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
-import PreceptsGuidelineCard from '@/components/guidelines/PreceptsGuidelineCard';
-import MahasamayaSuttaIntroCard from '@/components/packages/MahasamayaSuttaIntroCard';
-import MahasamayaSuttaPart2 from '@/components/packages/MahasamayaSuttaPart2';
-import MahasamayaSuttaFourKings from '@/components/packages/MahasamayaSuttaFourKings';
 import MahasamayaSuttaAsurasAndDevas from '@/components/packages/MahasamayaSuttaAsurasAndDevas';
 import MahasamayaSuttaFinalPart from '@/components/packages/MahasamayaSuttaFinalPart';
+import MahasamayaSuttaFourKings from '@/components/packages/MahasamayaSuttaFourKings';
+import MahasamayaSuttaIntroCard from '@/components/packages/MahasamayaSuttaIntroCard';
+import MahasamayaSuttaPart2 from '@/components/packages/MahasamayaSuttaPart2';
+import React from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function PracticeDetailMahasamaya() {
 
-  const {  isDarkMode, fontSize } = useTheme();
+  const { fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: isDarkMode ? '#05111D' : '#F5F9FF' }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: themeMode === 'dark' ? '#05111D' : '#F5F9FF' }]}>
       {/* Header Area */}
  
 
@@ -99,3 +96,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#CCC',
   },
 });
+
