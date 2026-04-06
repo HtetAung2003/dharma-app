@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import * as Device from 'expo-device';
+import { ceMmDateTime } from '@/services/ceMmDateTime';
 
 // ၁။ Notification ပေါ်မည့်ပုံစံကို သတ်မှတ်ခြင်း
 Notifications.setNotificationHandler({
@@ -37,6 +38,13 @@ export async function registerForPushNotificationsAsync() {
   }
 }
 
+function isTomorrowSabbath() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  return new ceMmDateTime(tomorrow).isSabbath();
+}
+
 // ၃။ ဥပုသ်နေ့အတွက် Notification Schedule လုပ်ခြင်း
 export async function scheduleSabbathReminder(daysLeft: number, eventName: string) {
   // အဟောင်းများကို အကုန်ဖျက်ပစ်ပါ
@@ -63,7 +71,7 @@ export async function scheduleSabbathReminder(daysLeft: number, eventName: strin
     repeats: false,
   },
     });
-  } else if (daysLeft === 1) {
+  } else if (daysLeft === 1 && isTomorrowSabbath()) {
     // မနက်ဖြန် (၁ နာရီအကြာတွင် စမ်းသပ်ပြရန်)
     await Notifications.scheduleNotificationAsync({
       content: {

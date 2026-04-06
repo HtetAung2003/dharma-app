@@ -1,15 +1,18 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type Category = 'Paritta' | 'Sutta' | 'Gatha' | 'Beads' | 'Daily';
+export type Category = 'Paritta' | 'Sutta' | 'Gatha' | 'Beads' | 'Sila' | 'Miscellaneous' ;
 export const READING_STATS_KEY_PREFIX = '@reading_stats_';
 const MAX_HISTORY_DAYS = 30;
 
 type StoredStats = {
+    
     Paritta?: number;
     Sutta?: number;
     Gatha?: number;
     Beads?: number;
-    Daily?: number;
+    Sila?: number;
+    Miscellaneous?: number;
+   
     BeadsCount?: number;
     BeadsRounds?: number;
     BeadsPresets?: number[];

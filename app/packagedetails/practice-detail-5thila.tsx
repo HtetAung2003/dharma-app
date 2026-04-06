@@ -12,7 +12,7 @@ import SaranagonCard from '@/components/packages/SaranagonCard';
 import SharingMeritCard from '@/components/packages/SharingMeritCard';
 import ThilaRequestCard from '@/components/packages/ThilaRequestCard';
 import TripleGemVirtuesCard from '@/components/packages/TripleGemVirtuesCard';
-import { saveReadingTime } from '@/services/statsService';
+import { Category, saveReadingTime } from '@/services/statsService';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -28,23 +28,12 @@ export default function PracticeDetail() {
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
-useEffect(() => {
-    const startTime = Date.now();
 
-    // User က ဒီ Screen ကနေ နောက်ပြန်ဆုတ်သွားတဲ့အခါ (Component unmount) အလုပ်လုပ်မည်
-    return () => {
-      const endTime = Date.now();
-      const secondsRead = Math.floor((endTime - startTime) / 1000);
-      
-      // ၅ စက္ကန့်ထက်ပိုကြာမှ သိမ်းဆည်းမည်
-      if (secondsRead > 5) {
-        saveReadingTime('Paritta', secondsRead);
-        console.log(`Saved ${secondsRead}s to Paritta category`);
-      }
-    };
-  }, []);
+
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: themeMode === 'dark' ? '#05111D' : '#F5F9FF' }]}>
+      
       {/* Header Area */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -60,17 +49,22 @@ useEffect(() => {
         contentContainerStyle={styles.scrollContent} 
         showsVerticalScrollIndicator={false}
       >
+       
+      <ReadingTracker categories={['Sila', 'Paritta', 'Gatha', 'Miscellaneous']} />
         <OkasaCard/>
         <ThilaRequestCard/>
         <SaranagonCard/>
+      
         <MettaSuttaCard/>
         <RatanaSuttaCard/>
         <MangalaSuttaCard/>
         <PancaSilaCard/>
         <ParittaNidannCard/>
+           
         <TripleGemVirtuesCard/>
         <SabbuddheCard/>   
         <DirectionalMettaCard/> 
+          
         <Metta11Card/>
         <SharingMeritCard/>
       
@@ -109,7 +103,37 @@ useEffect(() => {
     </SafeAreaView>
   );
 }
+// category နေရာမှာ categories (Array) လက်ခံနိုင်အောင် ပြင်ပါ
+const ReadingTracker = ({ categories }: { categories: Category[] }) => {
+  useEffect(() => {
+    const startTime = Date.now();
+    console.log(`⏱️ Timer started for: ${categories.join(", ")}`);
 
+    return () => {
+      const endTime = Date.now();
+      const secondsRead = Math.floor((endTime - startTime) / 1000);
+
+      if (secondsRead > 5) {
+        // 💡 ဤနေရာတွင် logic ကို အဓိက ပြင်ဆင်ထားပါသည်
+        // တစ်ခုချင်းစီကို Sequential (တန်းစီပြီး) သိမ်းခိုင်းခြင်းဖြစ်သည်
+        const saveAll = async () => {
+          for (const cat of categories) {
+            try {
+              await saveReadingTime(cat, secondsRead);
+              console.log(`✅ Saved ${secondsRead}s to ${cat}`);
+            } catch (err) {
+              console.error(`❌ Error saving ${cat}:`, err);
+            }
+          }
+        };
+        
+        saveAll();
+      }
+    };
+  }, []); // categories ကို dependency ထဲမထည့်ပါနှင့် (တစ်ကြိမ်ပဲ run ရန်)
+
+  return null;
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,

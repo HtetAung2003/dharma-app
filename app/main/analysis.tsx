@@ -6,12 +6,14 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getStatsRangeDays, pruneOldStats, READING_STATS_KEY_PREFIX } from '../../services/statsService';
 import { useTheme } from '../../context/ThemeContext';
+import { getStatsRangeDays, pruneOldStats, READING_STATS_KEY_PREFIX } from '../../services/statsService';
 
 const BEAD_COUNTER_STATE_KEY = 'bead_counter_state_v1';
 
 type AggregatedStats = {
+    Sila : number;
+    Miscellaneous : number;
     Paritta: number;
     Sutta: number;
     Gatha: number;
@@ -22,6 +24,8 @@ type AggregatedStats = {
 };
 
 const createInitialStats = (): AggregatedStats => ({
+    Sila : 0,
+    Miscellaneous : 0,
     Paritta: 0,
     Sutta: 0,
     Gatha: 0,
@@ -36,7 +40,8 @@ const AnalysisScreen = () => {
     const { colors, themeMode } = useTheme();
     const [filter, setFilter] = useState<'Daily' | 'Weekly' | 'Monthly'>('Daily');
     const [rawStats, setRawStats] = useState<AggregatedStats>(createInitialStats());
-
+    console.log(rawStats);
+    
     const fetchAndAggregateData = useCallback(async () => {
         await pruneOldStats();
         const allKeys = await AsyncStorage.getAllKeys();
@@ -56,8 +61,11 @@ const AnalysisScreen = () => {
 
             const data = await AsyncStorage.getItem(key);
             if (!data) continue;
-
+                console.log(data);
+                
             const parsed = JSON.parse(data);
+            aggregated.Sila += parsed.Sila || 0;
+            aggregated.Miscellaneous += parsed.Miscellaneous || 0;
             aggregated.Paritta += parsed.Paritta || 0;
             aggregated.Sutta += parsed.Sutta || 0;
             aggregated.Gatha += parsed.Gatha || 0;
@@ -123,10 +131,13 @@ const AnalysisScreen = () => {
     };
 
     const statsList = [
+
         { id: '1', title: 'Paritta', time: formatTime(rawStats.Paritta), icon: 'book-outline', color: '#4CAF50', detail: 'Total reading time' },
         { id: '2', title: 'Sutta', time: formatTime(rawStats.Sutta), icon: 'document-text-outline', color: '#2196F3', detail: 'Total reading time' },
         { id: '3', title: 'Gatha', time: formatTime(rawStats.Gatha), icon: 'star-outline', color: '#FF9800', detail: 'Total reading time' },
         { id: '4', title: 'Bead Counter', time: `${rawStats.BeadsCount} Count`, icon: 'disc-outline', color: '#9C27B0', detail: `${rawStats.BeadsRounds} rounds , ${rawStats.BeadsPresets.length} presets` },
+        { id: '5', title: 'Sila', time: formatTime(rawStats.Sila), icon: 'shield-checkmark-outline', color: '#E91E63', detail: 'Total reading time' },
+        { id: '6', title: 'Miscellaneous', time: formatTime(rawStats.Miscellaneous), icon: 'ellipsis-horizontal-outline', color: '#607D8B', detail: 'Total reading time' },
     ];
 
     return (

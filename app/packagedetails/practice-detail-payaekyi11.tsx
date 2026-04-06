@@ -10,9 +10,10 @@ import MoraSuttaCard from '@/components/packages/MoraSuttaCard';
 import PubbanhaSuttaCard from '@/components/packages/PubbanhaSuttaCard';
 import RatanaSuttaCard from '@/components/packages/RatanaSuttaCard';
 import WattaSuttaCard from '@/components/packages/WattaSuttaCard';
+import { saveReadingTime } from '@/services/statsService';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
@@ -25,7 +26,19 @@ export default function PracticeDetail() {
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
-
+useEffect(() => {
+    const startTime = Date.now();
+    return () => {
+      const endTime = Date.now();
+      const secondsRead = Math.floor((endTime - startTime) / 1000);
+      
+    
+      if (secondsRead > 5) {
+        saveReadingTime('Paritta', secondsRead);
+        console.log(`Saved ${secondsRead}s to Paritta category`);
+      }
+    };
+  }, []);
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: themeMode === 'dark' ? '#05111D' : '#F5F9FF' }]}>
       {/* Header Area */}

@@ -3,9 +3,10 @@ import OkasaCard from '@/components/packages/OkasaCard';
 import SaranagonCard from '@/components/packages/SaranagonCard';
 import SharingMeritCard from '@/components/packages/SharingMeritCard';
 import VirtuesMeditationCard from '@/components/packages/VirtuesMeditationCard';
+import { Category, saveReadingTime } from '@/services/statsService';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
@@ -36,6 +37,7 @@ export default function PracticeDetail() {
         contentContainerStyle={styles.scrollContent} 
         showsVerticalScrollIndicator={false}
       >
+            <ReadingTracker categories={['Sila', 'Gatha', 'Miscellaneous']} />
         <OkasaCard/>
    
         <SaranagonCard/>
@@ -78,7 +80,36 @@ export default function PracticeDetail() {
     </SafeAreaView>
   );
 }
+const ReadingTracker = ({ categories }: { categories: Category[] }) => {
+  useEffect(() => {
+    const startTime = Date.now();
+    console.log(`⏱️ Timer started for: ${categories.join(", ")}`);
 
+    return () => {
+      const endTime = Date.now();
+      const secondsRead = Math.floor((endTime - startTime) / 1000);
+
+      if (secondsRead > 5) {
+        // 💡 ဤနေရာတွင် logic ကို အဓိက ပြင်ဆင်ထားပါသည်
+        // တစ်ခုချင်းစီကို Sequential (တန်းစီပြီး) သိမ်းခိုင်းခြင်းဖြစ်သည်
+        const saveAll = async () => {
+          for (const cat of categories) {
+            try {
+              await saveReadingTime(cat, secondsRead);
+              console.log(`✅ Saved ${secondsRead}s to ${cat}`);
+            } catch (err) {
+              console.error(`❌ Error saving ${cat}:`, err);
+            }
+          }
+        };
+        
+        saveAll();
+      }
+    };
+  }, []); // categories ကို dependency ထဲမထည့်ပါနှင့် (တစ်ကြိမ်ပဲ run ရန်)
+
+  return null;
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,

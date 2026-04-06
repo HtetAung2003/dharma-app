@@ -27,6 +27,7 @@ const Dashboard = () => {
 
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
+  const todayKey = new Date().toDateString();
   useEffect(() => {
     const backAction = () => {
     
@@ -84,7 +85,7 @@ const Dashboard = () => {
       isYatyaza: astro.some(item => item.includes("ရက်ရာဇာ")),
       isPyathada: astro.some(item => item.includes("ပြဿဒါး")),
     };
-  }, []);
+  }, [todayKey]);
   
   // Display name logic with truncation for long names
   const displayName = userData?.fullName
@@ -106,8 +107,11 @@ const Dashboard = () => {
     await Notifications.cancelAllScheduledNotificationsAsync();
     const now = new Date();
     const currentHour = now.getHours();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const isTomorrowSabbath = new ceMmDateTime(tomorrow).isSabbath();
 
-    if (dateInfo.daysLeft === 1 && currentHour < 18) {
+    if (dateInfo.daysLeft === 1 && isTomorrowSabbath && currentHour < 18) {
       await Notifications.scheduleNotificationAsync({
         content: {
           title: `📌 မနက်ဖြန်သည် ${dateInfo.nextEvent} ဖြစ်ပါသည်`,

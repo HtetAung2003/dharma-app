@@ -3,7 +3,8 @@ import MahasamayaSuttaFinalPart from '@/components/packages/MahasamayaSuttaFinal
 import MahasamayaSuttaFourKings from '@/components/packages/MahasamayaSuttaFourKings';
 import MahasamayaSuttaIntroCard from '@/components/packages/MahasamayaSuttaIntroCard';
 import MahasamayaSuttaPart2 from '@/components/packages/MahasamayaSuttaPart2';
-import React from 'react';
+import { saveReadingTime } from '@/services/statsService';
+import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
@@ -13,7 +14,19 @@ export default function PracticeDetailMahasamaya() {
   const { fontSize, themeMode } = useTheme();
 
   const scale = fontSize / 16;
-
+useEffect(() => {
+    const startTime = Date.now();
+    return () => {
+      const endTime = Date.now();
+      const secondsRead = Math.floor((endTime - startTime) / 1000);
+      
+    
+      if (secondsRead > 5) {
+        saveReadingTime('Sutta', secondsRead);
+        console.log(`Saved ${secondsRead}s to Sutta category`);
+      }
+    };
+  }, []);
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: themeMode === 'dark' ? '#05111D' : '#F5F9FF' }]}>
       {/* Header Area */}
