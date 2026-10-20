@@ -13,8 +13,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setUser(firebaseUser);
+      try {
       if (firebaseUser) {
-        setUser(firebaseUser);
         // Firestore မှ User Data (FullName) ကို ဆွဲယူမည်
         const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
         if (userDoc.exists()) {
@@ -24,7 +25,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
         setUserData(null);
       }
-      setLoading(false);
+      } catch (error) {
+        console.warn('Failed to load authenticated user data', error);
+        setUserData(null);
+      } finally {
+        setLoading(false);
+      }
     });
     return unsubscribe;
   }, []);

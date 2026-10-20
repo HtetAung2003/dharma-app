@@ -4,27 +4,28 @@ import * as Device from 'expo-device';
 import { ceMmDateTime } from '@/services/ceMmDateTime';
 
 // ၁။ Notification ပေါ်မည့်ပုံစံကို သတ်မှတ်ခြင်း
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+function configureNotificationHandler() {
+  if (Platform.OS === 'web' || !Device.isDevice) return;
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+}
 
 export async function registerForPushNotificationsAsync() {
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      return;
-    }
+  if (Platform.OS === 'web' || !Device.isDevice) return;
+  configureNotificationHandler();
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
   }
+  if (finalStatus !== 'granted') return;
 
   // ၂။ Android အတွက် Channel ဆောက်ခြင်း (Custom Sound ပါဝင်သည်)
   if (Platform.OS === 'android') {

@@ -1,9 +1,7 @@
 import Packages from "@/components/dashboard/PracticePackages";
 import { useAuth } from "@/context/AuthContext";
 import { ceMmDateTime } from "@/services/ceMmDateTime";
-import {
-  registerForPushNotificationsAsync
-} from "@/services/notificationService";
+import { registerForPushNotificationsAsync, scheduleSabbathReminder } from "@/services/notificationService";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Notifications from "expo-notifications";
@@ -93,52 +91,12 @@ const Dashboard = () => {
       ? `${userData.fullName.substring(0, 10)}..`
       : userData.fullName
     : "ဧည့်သည်";
- useEffect(() => {
-  //  Permission 
-  registerForPushNotificationsAsync();
-
-  
-  const subscription = Notifications.addNotificationResponseReceivedListener(() => {
-    router.push("/main/dashboard");
-  });
-
-  
-  const setupSabbathNotifications = async () => {
-    await Notifications.cancelAllScheduledNotificationsAsync();
-    const now = new Date();
-    const currentHour = now.getHours();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const isTomorrowSabbath = new ceMmDateTime(tomorrow).isSabbath();
-
-    if (dateInfo.daysLeft === 1 && isTomorrowSabbath && currentHour < 18) {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: `📌 မနက်ဖြန်သည် ${dateInfo.nextEvent} ဖြစ်ပါသည်`,
-          body: "ဥပုသ်စောင့်တည်ရန် သို့မဟုတ် ကုသိုလ်ပြုရန် ပြင်ဆင်နိုင်ပါသည်။",
-          android: { channelId: "sabbath-reminders" },
-        },
-        trigger: { hour: 18, minute: 0, repeats: false },
-      });
-    }
-
-    
-    if (dateInfo.isTodaySabbath && currentHour < 9) {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "🙏 ယနေ့သည် ဥပုသ်နေ့ဖြစ်ပါသည်",
-          body: "ကုသိုလ်ကောင်းမှုများ ပြုလုပ်ရန် မမေ့ပါနှင့်။",
-          android: { channelId: "sabbath-reminders" },
-        },
-        trigger: { hour: 9, minute: 0, repeats: false },
-      });
-    }
-  };
-
-  setupSabbathNotifications();
-
-  return () => subscription.remove();
-}, [dateInfo.daysLeft, dateInfo.isTodaySabbath]); 
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+    scheduleSabbathReminder(dateInfo.daysLeft, dateInfo.nextEvent);
+    const subscription = Notifications.addNotificationResponseReceivedListener(() => router.push('/main/dashboard'));
+    return () => subscription.remove();
+  }, [dateInfo.daysLeft, dateInfo.nextEvent]);
 
 
   return (

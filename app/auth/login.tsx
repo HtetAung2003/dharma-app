@@ -87,7 +87,7 @@ const LoginScreen = () => {
             </Text>
           </Text>
         </View>
-            // Login Form Section
+        {/* Login Form Section */}
         <View style={styles.formSection}>
           <View style={styles.inputWrapper}>
             <Text style={[styles.label, { color: colors.textSecondary }]}>အီးမေးလ် လိပ်စာ</Text>
