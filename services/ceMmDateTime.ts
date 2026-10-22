@@ -1,7 +1,9 @@
 // services/ceMmDateTime.ts
-// Myanmar Calendar based on ceMmDateTime.js algorithm
+// Myanmar Calendar based on ceMmDateTime.js algorithm.
 // Source: https://yan9a.github.io/mmcal/
 // MIT License - Copyright (c) 2018 Yan Naing Aye
+// Western dates use the British calendar: Julian through 1752-09-02,
+// followed by Gregorian dates from 1752-09-14.
 
 type SpecialDayType = "ရက်ရာဇာ" | "ပြဿဒါး";
 
@@ -295,8 +297,6 @@ function cal_nagahle(mm: number) {
 }
 
 function cal_mahabote(my: number, wd: number) {
-  console.log(my, wd);
-
   return (((my - wd) % 7) + 7) % 7;
 }
 
@@ -450,36 +450,34 @@ function dateToJDN(date: Date): number {
   const y = date.getFullYear();
   const m = date.getMonth() + 1;
   const d = date.getDate();
-  const h = date.getHours();
-  const n = date.getMinutes();
-  const s = date.getSeconds();
 
   const a = Math.floor((14 - m) / 12);
   const y_adj = y + 4800 - a;
   const m_adj = m + 12 * a - 3;
 
-  const jdn =
+  const isGregorian =
+    y > 1752 ||
+    (y === 1752 && (m > 9 || (m === 9 && d >= 14)));
+
+  if (isGregorian) {
+    return (
+      d +
+      Math.floor((153 * m_adj + 2) / 5) +
+      365 * y_adj +
+      Math.floor(y_adj / 4) -
+      Math.floor(y_adj / 100) +
+      Math.floor(y_adj / 400) -
+      32045
+    );
+  }
+
+  return (
     d +
     Math.floor((153 * m_adj + 2) / 5) +
     365 * y_adj +
     Math.floor(y_adj / 4) -
-    Math.floor(y_adj / 100) +
-    Math.floor(y_adj / 400) -
-    32045;
-
-  // let jd =
-  //   d +
-  //   Math.floor((153 * (m + 12 * Math.floor((14 - m) / 12) - 3) + 2) / 5) +
-  //   365 * (y + 4800 - Math.floor((14 - m) / 12)) +
-  //   Math.floor((y + 4800 - Math.floor((14 - m) / 12)) / 4) -
-  //   Math.floor((y + 4800 - Math.floor((14 - m) / 12)) / 100) +
-  //   Math.floor((y + 4800 - Math.floor((14 - m) / 12)) / 400) -
-  //   32045;
-  // console.log("Date TO JDN", jdn + (h - 12) / 24 + n / 1440 + s / 86400);
-  console.log("JDN", jdn);
-  return jdn;
-
-  // return jd + (h - 12) / 24 + n / 1440 + s / 86400;
+    32083
+  );
 }
 // =============================================================================
 // ceMmDateTime Class
@@ -513,12 +511,10 @@ export class ceMmDateTime {
   private monthIndex: number = -1;
 
   constructor(date?: Date) {
-    const inputDate = new Date();
-    // const inputDate = new Date("2026-10-22T08:26:45.540Z");
-    console.log("InputDate", inputDate);
+    const inputDate = date ? new Date(date.getTime()) : new Date();
     this._date = inputDate;
     this._jdn = dateToJDN(inputDate);
-    this._weekday = (this._jdn + 1) % 7; // 0=Sat, 1=Sun, ..., 6=Fri
+    this._weekday = ((this._jdn + 2) % 7 + 7) % 7; // 0=Sat, 1=Sun, ..., 6=Fri
     this._yo = j2m(this._jdn);
 
     // Set legacy properties
@@ -531,9 +527,6 @@ export class ceMmDateTime {
     const mm = yo.mm;
     const md = yo.md;
     const myt = yo.myt;
-
-    // Debug logging
-    console.log("DEBUG: my =", my, "mm =", mm, "weekday =", this._weekday);
 
     // Myanmar year
     this.my = this.toMyanmarNumber(my);
@@ -582,19 +575,9 @@ export class ceMmDateTime {
     const sravanaIdx = (my + 3) % 4;
     const nakhatIdx = cal_nakhat(my);
 
-    console.log(
-      "DEBUG: mahaboteIdx =",
-      mahaboteIdx,
-      "mahaboteList length =",
-      mahaboteList.length,
-    );
-    console.log("DEBUG: sravanaIdx =", sravanaIdx, "nakhatIdx =", nakhatIdx);
-
     this.mahabote = mahaboteList[mahaboteIdx] || "N/A";
     this.sravana = sravanaYears[sravanaIdx] || "N/A";
     this.nakhat = nakhatList[nakhatIdx] || "N/A";
-
-    console.log("DEBUG: this.mahabote =", this.mahabote);
 
     const nagahleIdx = cal_nagahle(mm);
     const nagaDirs = ["အနောက်", "မြောက်", "အရှေ့", "တောင်"];
@@ -660,14 +643,6 @@ export class ceMmDateTime {
 
   // Legacy methods
   public getAstrologyInfo(): string[] {
-    console.log(
-      "DEBUG getAstrologyInfo: mahabote =",
-      this.mahabote,
-      "nakhat =",
-      this.nakhat,
-      "nagaHead =",
-      this.nagaHead,
-    );
     const astro = [
       `နှစ်အမည်: ${this.my}`,
       `မဟာဘုတ်: ${this.mahabote}`,
@@ -728,43 +703,3 @@ export class ceMmDateTime {
     return [...out, ...this.specialDays];
   }
 }
-
-const inputDate: Date = new Date("2026-10-30T09:08:31.233Z");
-
-const day: number = inputDate.getDay();
-const hour: number = inputDate.getHours();
-
-let dateList: number[] = [
-  day === 0
-    ? 1 // Sunday
-    : day === 1
-      ? 2 // Monday
-      : day === 2
-        ? 3 // Tuesday
-        : day === 3
-          ? hour < 12
-            ? 4
-            : 5 // Wednesday AM/PM
-          : day === 4
-            ? 6 // Thursday
-            : 0, // Friday or Saturday
-];
-
-const mahaboteList = [
-  // "ဘင်္ဂ",
-  // "မရဏ",
-  "အထွန်း",
-  "ဘင်္ဂ",
-  "ပုတိ",
-  "သိုက်",
-  "မရဏ",
-  "အဓိပတိ",
-  "ရာဇ",
-];
-console.log(day);
-console.log("DateList", dateList);
-
-if (dateList == 0 || dateList == 7) {
-  dateList = 7;
-}
-console.log("DateList", mahaboteList[dateList - 1]);
