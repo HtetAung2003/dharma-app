@@ -1,12 +1,12 @@
 import Packages from "@/components/dashboard/PracticePackages";
 import { useAuth } from "@/context/AuthContext";
 import { ceMmDateTime } from "@/services/ceMmDateTime";
-import { registerForPushNotificationsAsync, scheduleSabbathReminder } from "@/services/notificationService";
+import { registerForPushNotificationsAsync } from "@/services/notificationService";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   Alert,
   BackHandler,
@@ -28,12 +28,11 @@ const Dashboard = () => {
   const todayKey = new Date().toDateString();
   useEffect(() => {
     const backAction = () => {
-    
       Alert.alert("သတိပေးချက်", "App မှ ထွက်လိုပါသလား?", [
         { text: "မထွက်ပါ", onPress: () => null, style: "cancel" },
         { text: "ထွက်မည်", onPress: () => BackHandler.exitApp() },
       ]);
-      return true; 
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
@@ -41,15 +40,17 @@ const Dashboard = () => {
       backAction,
     );
 
-    return () => backHandler.remove(); 
+    return () => backHandler.remove();
   }, []);
   const dateInfo = useMemo(() => {
     const now = new Date();
     const mdt = new ceMmDateTime(now);
+    // console.log(mdt.ToMString());
 
     const todaySpecials = mdt.getSpecialDay();
     const isTodaySabbath = mdt.isSabbath();
     const astro = mdt.getAstrologyInfo();
+    console.log(astro);
 
     let daysToSabbath = 0;
     let nextSabbathName = "ဥပုသ်နေ့";
@@ -80,32 +81,37 @@ const Dashboard = () => {
       daysLeft: daysToSabbath,
       nextEvent: nextSabbathName,
       astroText: astro.length > 0 ? astro.join(" / ") : "သာမန်ရက်",
-      isYatyaza: astro.some(item => item.includes("ရက်ရာဇာ")),
-      isPyathada: astro.some(item => item.includes("ပြဿဒါး")),
+      isYatyaza: astro.some((item) => item.includes("ရက်ရာဇာ")),
+      isPyathada: astro.some((item) => item.includes("ပြဿဒါး")),
     };
   }, [todayKey]);
-  
+
+  // In dashboard.tsx, add before the displayName line:
+  // console.log("userData:", userData);
+  //console.log('user:', user);
   // Display name logic with truncation for long names
   const displayName = userData?.fullName
     ? userData.fullName.length > 10
       ? `${userData.fullName.substring(0, 10)}..`
       : userData.fullName
     : "ဧည့်သည်";
+
   useEffect(() => {
     registerForPushNotificationsAsync();
-    scheduleSabbathReminder(dateInfo.daysLeft, dateInfo.nextEvent);
-    const subscription = Notifications.addNotificationResponseReceivedListener(() => router.push('/main/dashboard'));
+    // scheduleSabbathReminder(dateInfo.daysLeft, dateInfo.nextEvent);
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      () => router.push("/main/dashboard"),
+    );
     return () => subscription.remove();
   }, [dateInfo.daysLeft, dateInfo.nextEvent]);
 
-
   return (
     <LinearGradient
-      colors={
-        [colors.splashBackground , colors.gradientMiddle , colors.gradientEnd]
-      
-      }
-      
+      colors={[
+        colors.splashBackground,
+        colors.gradientMiddle,
+        colors.gradientEnd,
+      ]}
       style={styles.background}
     >
       <SafeAreaView style={styles.container} edges={["top"]}>
@@ -148,98 +154,94 @@ const Dashboard = () => {
           showsVerticalScrollIndicator={false}
         >
           {/* Dashboard Card */}
-          <View style={[styles.dateContainer, { backgroundColor: colors.card }]}>
-          
-              <View style={styles.dateRow}>
-             
-                {/* tag of normal day .. */}
+          <View
+            style={[styles.dateContainer, { backgroundColor: colors.card }]}
+          >
+            <View style={styles.dateRow}>
+              {/* tag of normal day .. */}
               <View
+                style={[
+                  styles.astroBadge,
+                  {
+                    backgroundColor: dateInfo.isYatyaza
+                      ? "#4CAF5022"
+                      : dateInfo.isPyathada
+                        ? "#F4433622"
+                        : "rgba(255,215,0,0.1)",
+                  },
+                ]}
+              >
+                <Text
+                  style={[styles.engDateText, { color: colors.textSecondary }]}
+                >
+                  {dateInfo.engDate}
+                </Text>
+                <Text
+                  style={[styles.mmDateText, { color: colors.textPrimary }]}
+                >
+                  {dateInfo.mmDate}
+                </Text>
+                <Text
                   style={[
-                    styles.astroBadge,
+                    styles.astroText,
                     {
-                      backgroundColor: dateInfo.isYatyaza
-                        ? "#4CAF5022"
+                      color: dateInfo.isYatyaza
+                        ? colors.success
                         : dateInfo.isPyathada
-                          ? "#F4433622"
-                          : "rgba(255,215,0,0.1)",
+                          ? colors.error
+                          : "#202020",
                     },
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.engDateText,
-                      { color: colors.textSecondary },
-                    ]}
-                  >
-                    {dateInfo.engDate}
-                  </Text>
-                  <Text
-                    style={[styles.mmDateText, { color: colors.textPrimary }]}
-                  >
-                    {dateInfo.mmDate}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.astroText,
-                      {
-                        color: dateInfo.isYatyaza
-                          ? colors.success
-                          : dateInfo.isPyathada
-                            ? colors.error
-                            : "#202020",
-                      },
-                    ]}
-                  >
-                    {dateInfo.astroText}
-                  </Text>
-                </View>
+                  {dateInfo.astroText}
+                </Text>
               </View>
-  
-              <View style={styles.divider} />
+            </View>
 
-              <View style={styles.countdownRow}>
-                {/* calendar icon */}
-                <Ionicons
-                  name={
-                    dateInfo.isTodaySabbath
-                      ? "sparkles"
-                      : "calendar-number-outline"
-                  }
-                  size={22}
-                  color={
-                    dateInfo.isTodaySabbath ? colors.success : colors.primary
-                  }
-                />
-                <View style={{ marginLeft: 10, flex: 1 }}>
-                  {dateInfo.isTodaySabbath ? (
+            <View style={styles.divider} />
+
+            <View style={styles.countdownRow}>
+              {/* calendar icon */}
+              <Ionicons
+                name={
+                  dateInfo.isTodaySabbath
+                    ? "sparkles"
+                    : "calendar-number-outline"
+                }
+                size={22}
+                color={
+                  dateInfo.isTodaySabbath ? colors.success : colors.primary
+                }
+              />
+              <View style={{ marginLeft: 10, flex: 1 }}>
+                {dateInfo.isTodaySabbath ? (
+                  <Text
+                    style={[
+                      styles.statusText,
+                      { color: colors.success, fontWeight: "bold" },
+                    ]}
+                  >
+                    ယနေ့သည် {dateInfo.todaySpecial} ဖြစ်ပါသည်။
+                  </Text>
+                ) : (
+                  <Text
+                    style={[styles.statusText, { color: colors.textPrimary }]}
+                  >
+                    နောက်ထပ်{" "}
                     <Text
-                      style={[
-                        styles.statusText,
-                        { color: colors.success, fontWeight: "bold" },
-                      ]}
+                      style={{ color: colors.textPrimary, fontWeight: "800" }}
                     >
-                      ယနေ့သည် {dateInfo.todaySpecial} ဖြစ်ပါသည်။
-                    </Text>
-                  ) : (
-                    <Text
-                      style={[styles.statusText, { color: colors.textPrimary }]}
-                    >
-                      နောက်ထပ်{" "}
-                      <Text
-                        style={{ color: colors.textPrimary, fontWeight: "800" }}
-                      >
-                        {dateInfo.daysLeft}
-                      </Text>{" "}
-                      ရက်အကြာတွင်{" "}
-                      <Text style={{ fontWeight: "700" }}>
-                        {dateInfo.nextEvent}
-                      </Text>{" "}
-                      ရောက်ပါမည်။
-                    </Text>
-                  )}
-                </View>
+                      {dateInfo.daysLeft}
+                    </Text>{" "}
+                    ရက်အကြာတွင်{" "}
+                    <Text style={{ fontWeight: "700" }}>
+                      {dateInfo.nextEvent}
+                    </Text>{" "}
+                    ရောက်ပါမည်။
+                  </Text>
+                )}
               </View>
-         
+            </View>
           </View>
           {/* other components */}
           <Packages />
@@ -253,37 +255,40 @@ const styles = StyleSheet.create({
   background: { flex: 1 },
   container: { flex: 1, paddingHorizontal: 15 },
   header: {
-   flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  paddingHorizontal: 20,
-  paddingVertical: 15,
-  width: "100%",
-  shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 4, 
-  },
-  shadowOpacity: 0.15,
-  shadowRadius: 8,
-  elevation: 8,
-  borderBottomLeftRadius: 20,
-  borderBottomRightRadius: 20,
-  zIndex: 1000,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    width: "100%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    zIndex: 1000,
   },
   userName: { fontWeight: "bold" },
   subText: { marginTop: 4 },
-  dateContainer: { marginTop: 15, marginBottom: 10,     padding: 18,
+  dateContainer: {
+    marginTop: 15,
+    marginBottom: 10,
+    padding: 18,
     borderRadius: 24,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.15)",
-    overflow: "hidden", },
- 
+    overflow: "hidden",
+  },
+
   dateRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    
   },
   engDateText: { fontSize: 12, fontWeight: "600", marginBottom: 2 },
   mmDateText: { fontSize: 18, fontWeight: "800" },
@@ -303,5 +308,3 @@ const styles = StyleSheet.create({
 });
 
 export default Dashboard;
-
-
