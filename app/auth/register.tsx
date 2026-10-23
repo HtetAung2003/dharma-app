@@ -2,7 +2,7 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Stack, useRouter } from 'expo-router';
 import { View } from 'moti';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -36,15 +36,19 @@ const RegisterScreen = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // store data to firebase firestore
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        fullName: name,
-        email: email,
-        createdAt: new Date().toISOString(),
-        role: 'user'
-      });
-
+try {
+    await setDoc(doc(db, "users", user.uid), {
+      uid: user.uid,
+      fullName: name || "",
+      email: email || "",
+      createdAt: new Date().toISOString(),
+      role: 'user'
+    });
+    console.log("Document successfully written!");
+  } catch (error) {
+    console.error("Error writing document: ", error);
+  }
+      router.replace('/personalization')
       Alert.alert("အောင်မြင်ပါသည်", "အကောင့်အသစ် ဖွင့်လှစ်ပြီးပါပြီ။", [
         { text: "OK", onPress: () => router.replace('/personalization') }
       ]);

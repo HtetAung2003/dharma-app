@@ -4,15 +4,13 @@ export type Category = 'Paritta' | 'Sutta' | 'Gatha' | 'Beads' | 'Sila' | 'Misce
 export const READING_STATS_KEY_PREFIX = '@reading_stats_';
 const MAX_HISTORY_DAYS = 30;
 
-type StoredStats = {
-    
+type StoredStats = { 
     Paritta?: number;
     Sutta?: number;
     Gatha?: number;
     Beads?: number;
     Sila?: number;
     Miscellaneous?: number;
-   
     BeadsCount?: number;
     BeadsRounds?: number;
     BeadsPresets?: number[];

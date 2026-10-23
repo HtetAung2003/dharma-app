@@ -40,9 +40,11 @@ const LoginScreen = () => {
           password,
         );
         const user = userCredential.user;
+        console.log("user" , user);
+        
         const userDoc = await getDoc(doc(db, "users", user.uid));
 
-        console.log("Login success");
+        console.log("Login success" , userDoc);
         router.replace("/personalization"); // Personalization screen သို့အရင်ပို့ပါ
       } catch (error: any) {
         setConfirm(false);
