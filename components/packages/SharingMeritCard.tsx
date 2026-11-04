@@ -26,7 +26,7 @@ const SharingMeritCard = () => {
           borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
         }
       ]}>
-        {/* တစ်ဦးတည်းရွတ်ဆိုရန် အပိုင်း */}
+        {/* Solo recitation section */}
         <Text style={[
           styles.scriptText, 
           { 
@@ -44,7 +44,7 @@ const SharingMeritCard = () => {
 
         <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-        {/* သံပြိုင်ရွတ်ဆိုရန် အပိုင်း */}
+        {/* Group recitation section */}
         <View style={styles.groupSection}>
           <Text style={[styles.groupLabel, { color: colors.primary, fontSize: dynamicSize(14) }]}>
             (အားလုံး သံပြိုင်ရွတ်ဆိုရန်)

@@ -35,7 +35,6 @@ useEffect(() => {
     
       if (secondsRead > 5) {
         saveReadingTime('Paritta', secondsRead);
-        console.log(`Saved ${secondsRead}s to Paritta category`);
       }
     };
   }, []);

@@ -7,7 +7,7 @@ import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Theme Context ကို import လုပ်ပါ
+// Import Theme Context
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { SIZES } from "../../constants/Theme";
@@ -33,19 +33,16 @@ const LoginScreen = () => {
     if (email && password) {
       setConfirm(true);
       try {
-        console.log(email, password);
         const userCredential = await signInWithEmailAndPassword(
           auth,
           email,
           password,
         );
         const user = userCredential.user;
-        console.log("user" , user);
         
         const userDoc = await getDoc(doc(db, "users", user.uid));
 
-        console.log("Login success" , userDoc);
-        router.replace("/personalization"); // Personalization screen သို့အရင်ပို့ပါ
+        router.replace("/personalization"); // Navigate to Personalization screen
       } catch (error: any) {
         setConfirm(false);
         alert("အီးမေးလ် သို့မဟုတ် လျှို့ဝှက်နံပါတ် မှားယွင်းနေပါသည်။");
@@ -65,23 +62,8 @@ const LoginScreen = () => {
       style={styles.background}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        {/* <Stack.Screen
-          options={{
-            headerTitle: "",
-            headerTransparent: true,
-            headerRight: () => (
-              <TouchableOpacity
-                onPress={handleLogin}
-                style={{ paddingHorizontal: 16 }}
-              >
-                <Text style={[styles.headerBtnText, { color: colors.primary }]}>
-                  {email || password ? (confirm ? 'ခေတ္တစောင့်ပါ...' : 'အတည်ပြုမည်') : 'ကျော်မည်'}
-                </Text>
-              </TouchableOpacity>
-            ),
-          }}
-        /> */}
-        {/* //sign up section */}
+        {/* Header options placeholder */}
+        {/* Sign up section */}
         <View
           from={{ opacity: 0, translateY: 20 }}
           animate={{ opacity: 1, translateY: 0 }}
@@ -226,7 +208,7 @@ const styles = StyleSheet.create({
     borderRadius: SIZES.radius,
     justifyContent: "center",
     alignItems: "center",
-    flex: 1, // ၅၀% စီ ညီတူညီမျှ ခွဲယူရန်
+    flex: 1,
   },
   buttonText: { fontSize: 16, fontWeight: "bold" },
 });

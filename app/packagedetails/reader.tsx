@@ -103,7 +103,7 @@ const [isFav, setIsFav] = useState(false);
 
     const ComponentToRender = componentKey && typeof componentKey === 'string' ? COMPONENT_MAP[componentKey] : null;
 useEffect(() => {
-        // id ရှိမရှိ စစ်ပြီးမှ Favorite ဟုတ်မဟုတ် စစ်ဆေးပါ
+        // Check if item is in favorites only if id exists
         if (id) {
             checkIfFavorite(id as string).then(setIsFav);
         }

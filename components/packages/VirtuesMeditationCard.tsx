@@ -11,7 +11,7 @@ const VirtuesMeditationCard = () => {
 
     return (
         <View style={styles.container}>
-            {/* ရောင်ခြည်တော် အာရုံပြုရန် Animation အဝိုင်းလေးများ */}
+            {/* Halo animation circles for meditation focus */}
             <View style={styles.animationWrapper}>
                 {[1, 1.5, 2].map((scale, index) => (
                     <MotiView
@@ -23,7 +23,7 @@ const VirtuesMeditationCard = () => {
                             duration: 3000,
                             loop: true,
                             delay: index * 1000,
-                        }}
+                        } as any}
                         style={[styles.halo, { borderColor: themeMode === 'dark' ? '#FFD700' : '#4FC3F7' }]}
                     />
                 ))}
@@ -36,7 +36,7 @@ const VirtuesMeditationCard = () => {
                 </LinearGradient>
             </View>
 
-            {/* ဂုဏ်တော် စာသားအပိုင်း */}
+            {/* Virtues text card */}
             <View style={[styles.card, { backgroundColor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : '#FFFFFF', borderColor: colors.border }]}>
                 <Text style={[styles.paliText, { color: colors.textPrimary }]}>
                     "ဣတိပိသော ဘဂဝါ အရဟံ၊ သမ္မာသမ္ဗုဒ္ဓေါ၊ ဝိဇ္ဇာစရဏသမ္ပန္နော၊ သုဂတော၊ လောကဝိဒူ၊ အနုတ္တရော ပုရိသဒမ္မသာရထိ၊ သတ္တာ ဒေဝမနုဿာနံ၊ ဗုဒ္ဓေါ၊ ဘဂဝါ။"
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
         lineHeight: 34,
         textAlign: 'center',
         fontWeight: '600',
-        fontFamily: 'sans-serif-medium', // မြန်မာစာလုံးအတွက် သင့်တော်သော font သုံးပါ
+        fontFamily: 'sans-serif-medium', // Font family for Myanmar text display
     },
     guideBox: {
         marginTop: 20,

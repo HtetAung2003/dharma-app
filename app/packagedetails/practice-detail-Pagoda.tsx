@@ -83,20 +83,17 @@ export default function PracticeDetail() {
 const ReadingTracker = ({ categories }: { categories: Category[] }) => {
   useEffect(() => {
     const startTime = Date.now();
-    console.log(`⏱️ Timer started for: ${categories.join(", ")}`);
 
     return () => {
       const endTime = Date.now();
       const secondsRead = Math.floor((endTime - startTime) / 1000);
 
       if (secondsRead > 5) {
-        // 💡 ဤနေရာတွင် logic ကို အဓိက ပြင်ဆင်ထားပါသည်
-        // တစ်ခုချင်းစီကို Sequential (တန်းစီပြီး) သိမ်းခိုင်းခြင်းဖြစ်သည်
+        // Save reading time sequentially for each category
         const saveAll = async () => {
           for (const cat of categories) {
             try {
               await saveReadingTime(cat, secondsRead);
-              console.log(`✅ Saved ${secondsRead}s to ${cat}`);
             } catch (err) {
               console.error(`❌ Error saving ${cat}:`, err);
             }
@@ -106,7 +103,7 @@ const ReadingTracker = ({ categories }: { categories: Category[] }) => {
         saveAll();
       }
     };
-  }, []); // categories ကို dependency ထဲမထည့်ပါနှင့် (တစ်ကြိမ်ပဲ run ရန်)
+  }, []); // Do not include categories in dependency array (run only once on unmount)
 
   return null;
 };

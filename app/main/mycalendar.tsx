@@ -1,6 +1,6 @@
 import { useTheme } from "@/context/ThemeContext";
 import { ceMmDateTime } from "@/services/ceMmDateTime";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -30,7 +30,7 @@ const mycalendar = () => {
   const getDetailedInfo = (dateString: string) => {
     const mdt = new ceMmDateTime(new Date(dateString));
 
-    // Astrology array ကို Class ထဲကနေ တိုက်ရိုက်ယူမယ်
+    // Retrieve astrology array directly from ceMmDateTime
     const astroData = mdt.getAstrologyInfo ? mdt.getAstrologyInfo() : [];
 
     const formattedMmDate = [
@@ -49,10 +49,10 @@ const mycalendar = () => {
       mmDay: (mdt as any).fortnightDayText || mdt.mdText,
       mpName: mdt.mpText,
       fullString: formattedMmDate || mdt.ToMString(),
-      astrology: astroData, // ["နှစ်အမည်: ...", "မဟာဘုတ်: ..."]
+      astrology: astroData, // e.g. ["Year: ...", "Mahabote: ..."]
 
       holidays: mdt.getHolidays ? mdt.getHolidays() : [],
-      // Manual Data တွေကို တိုက်ရိုက်သုံးချင်လျှင်
+      // Manual astrological attributes if needed
       mahabote: (mdt as any).mahabote || "N/A",
       nagaHead: (mdt as any).nagaHead || "N/A",
     };
@@ -83,7 +83,7 @@ const mycalendar = () => {
             monthTextColor: colors.textPrimary,
             dayTextColor: colors.textPrimary,
             todayTextColor: "#FF5252",
-            selectedDayBackgroundColor: "transparent", // custom render သုံးထား၍ transparent ထားပါ
+            selectedDayBackgroundColor: "transparent", // Keep transparent because custom day renderer is used
           }}
           dayComponent={({ date, state, onPress }) => {
             if (!date) return <View style={styles.dayBox} />;
@@ -99,11 +99,13 @@ const mycalendar = () => {
                 style={[
                   styles.dayBox,
                   isSelected && {
-                    backgroundColor: themeMode === 'dark' ? "#FFD70044" : "#0288D122",
+                    backgroundColor:
+                      themeMode === "dark" ? "#FFD70044" : "#0288D122",
                     borderRadius: 8,
                   },
                   isHoliday && {
-                    backgroundColor: themeMode === 'dark' ? "#FF525215" : "#FF525208",
+                    backgroundColor:
+                      themeMode === "dark" ? "#FF525215" : "#FF525208",
                     borderRadius: 8,
                   },
                 ]}
@@ -158,13 +160,13 @@ const mycalendar = () => {
           <View
             style={[
               styles.detailCard,
-              { backgroundColor: themeMode === 'dark' ? "#1A2634" : "#F5F5F5" },
+              { backgroundColor: themeMode === "dark" ? "#1A2634" : "#F5F5F5" },
             ]}
           >
             <Text style={[styles.detailTitle, { color: colors.textPrimary }]}>
               {selected === todayStr
-                ? "🌟 ယနေ့အတွက် အချက်အလက်"
-                : `📅 ${selected} အချက်အလက်`}
+                ? " ယနေ့အတွက် အချက်အလက်"
+                : `${selected} အချက်အလက်`}
             </Text>
 
             <View style={styles.infoRow}>
@@ -174,7 +176,7 @@ const mycalendar = () => {
               <Text
                 style={[
                   styles.infoValue,
-                  { color: themeMode === 'dark' ? "#FFD700" : "#0288D1" },
+                  { color: themeMode === "dark" ? "#FFD700" : "#0288D1" },
                 ]}
               >
                 {selectedInfo.fullString}
@@ -189,16 +191,15 @@ const mycalendar = () => {
                     key={index}
                     style={[
                       styles.astroText,
-                      { color: colors.textPrimary, marginBottom: 4 },
+                      { color: colors.textPrimary, padding: 10 },
                     ]}
                   >
                     • {item}
                   </Text>
                 ))}
 
-                {/* ရက်ရာဇာ သို့မဟုတ် ပြဿဒါး အခြေအနေကို သီးသန့်ပြခြင်း */}
+                {/* Astrological indicators display */}
               </View>
-
             )}
 
             {/* {selectedInfo.specialDays.length > 0 && (
@@ -233,7 +234,11 @@ const styles = StyleSheet.create({
 
   // Thingyan Overlay Style
   overlayContainer: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     zIndex: -1,
   },
   pataukPlaceholder: {
@@ -246,7 +251,7 @@ const styles = StyleSheet.create({
   // Calendar Day Box Style
   dayBox: {
     width: 45,
-    height: 55, // အနည်းငယ် ပိုရှည်ထားခြင်းဖြင့် မြန်မာရက်စွဲ ပေါ်ရန် နေရာရစေသည်
+    height: 55, // Extra height to accommodate Myanmar date display
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 2,
@@ -305,7 +310,7 @@ const styles = StyleSheet.create({
   },
   infoValue: {
     fontSize: 20,
-    fontWeight: "800", // ပိုပြီး ထင်ရှားစေရန်
+    fontWeight: "800", // Bold weight for emphasis
   },
 
   // Special Indicators (Astro, Sabbath, Holiday)
@@ -356,5 +361,3 @@ const styles = StyleSheet.create({
 });
 
 export default mycalendar;
-
-

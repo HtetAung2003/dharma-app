@@ -98,26 +98,6 @@ const BottomNav = () => {
           ပြက္ခဒိန်
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.navItem}
-        onPress={() => router.push("/main/analysis")}
-      >
-        <Ionicons
-          name={
-            pathname === "/main/analysis"
-              ? "stats-chart"
-              : "stats-chart-outline"
-          }
-          size={24}
-          color={getIconColor("/main/analysis")}
-        />
-
-        <Text
-          style={[styles.navText, { color: getIconColor("/main/analysis") }]}
-        >
-          စစ်ဆေး
-        </Text>
-      </TouchableOpacity>
     </View>
   );
 };

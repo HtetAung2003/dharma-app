@@ -73,7 +73,7 @@ const MahasamayaSuttaFourKings = () => {
           </Text>
         </View>
          <View style={styles.divider} />
-        {/* ၁၆။ အရှေ့အရပ် - ဓတရဋ္ဌနတ်မင်း */}
+        {/* 16. East Direction - Dhatarattha Deva King */}
         <View style={styles.kingSection}>
           <Text style={[styles.directionTitle, { color: colors.secondary }]}>၁၆။ပုရိမဉ္စ ဒိသံ ရာဇာ၊</Text>
           <Text style={[styles.stanzaText, { color: colors.textPrimary, fontSize: dynamicSize(16.5) }]}>
@@ -91,7 +91,7 @@ const MahasamayaSuttaFourKings = () => {
 
         <View style={styles.divider} />
 
-        {/* ၁၇။ တောင်အရပ် - ဝိရူဠှကနတ်မင်း */}
+        {/* 17. South Direction - Virulhaka Deva King */}
         <View style={styles.kingSection}>
           <Text style={[styles.directionTitle, { color: colors.secondary }]}>၁၇။ဝိရူဠှော တံ ပသာသတိ။</Text>
           <Text style={[styles.stanzaText, { color: colors.textPrimary, fontSize: dynamicSize(16.5) }]}>
@@ -109,7 +109,7 @@ const MahasamayaSuttaFourKings = () => {
 
         <View style={styles.divider} />
 
-        {/* ၁၈။ အနောက်အရပ် - ဝိရူပက္ခနတ်မင်း */}
+        {/* 18. West Direction - Virupakkha Deva King */}
         <View style={styles.kingSection}>
           <Text style={[styles.directionTitle, { color: colors.secondary }]}>၁၈။ပစ္ဆိမဉ္စ ဒိသံ ရာဇာ၊</Text>
           <Text style={[styles.stanzaText, { color: colors.textPrimary, fontSize: dynamicSize(16.5) }]}>
@@ -129,7 +129,7 @@ const MahasamayaSuttaFourKings = () => {
 
         <View style={styles.divider} />
 
-        {/* ၁၉။ မြောက်အရပ် - ကုဝေရ (ဝေဿဝဏ) နတ်မင်း */}
+        {/* 19. North Direction - Kuvera (Vessavana) Deva King */}
         <View style={styles.kingSection}>
           <Text style={[styles.directionTitle, { color: colors.secondary }]}>၁၉။ဥတ္တရဉ္စ ဒိသံ ရာဇာ၊</Text>
           <Text style={[styles.stanzaText, { color: colors.textPrimary, fontSize: dynamicSize(16.5) }]}>

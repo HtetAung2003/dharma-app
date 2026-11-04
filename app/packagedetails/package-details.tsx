@@ -6,7 +6,7 @@ import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
 
-// အားလုံးသော Card Component များကို Import လုပ်ပါ
+// Import all Card components
 import PreceptsGuidelineCard from '@/components/guidelines/PreceptsGuidelineCard';
 import AnattaLakkhanaSuttaCard from '@/components/packages/AnattaLakkhanaSuttaCard';
 import AngulimalaSuttaCard from '@/components/packages/AngulimalaSuttaCard';
@@ -45,7 +45,7 @@ import PracticeDetailMahasamaya from './practice-detail-Mahasamaya';
 
 export default function PracticeDetail() {
   const router = useRouter();
-  // PlanScreen မှ ပို့လိုက်သော params များကို လက်ခံခြင်း
+  // Retrieve params sent from PlanScreen
   const { id, title, category, componentKey } = useLocalSearchParams<{ 
     id: string; 
     title: string; 
@@ -59,20 +59,20 @@ export default function PracticeDetail() {
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
 
-  // ⏱ အချိန်မှတ်သားသည့် Logic
+  // Track elapsed reading time
   useEffect(() => {
     const startTime = Date.now();
     return () => {
       const endTime = Date.now();
       const secondsRead = Math.floor((endTime - startTime) / 1000);
       if (secondsRead > 5) {
-        // category မပါလာပါက default 'Paritta' ဟု သတ်မှတ်မည်
+        // Default to 'Paritta' if category is not provided
         saveReadingTime(category || 'Paritta', secondsRead);
       }
     };
   }, [category]);
 
-  // 🗂 ComponentKey အလိုက် ပြသမည့် Card ကို ရွေးချယ်ခြင်း
+  // Select card component based on componentKey
   const SelectedCard = useMemo(() => {
     switch (componentKey) {
       case 'OkasaCard': return <OkasaCard />;
@@ -135,7 +135,7 @@ export default function PracticeDetail() {
         contentContainerStyle={styles.scrollContent} 
         showsVerticalScrollIndicator={false}
       >
-        {/* ရွေးချယ်ထားသော Card ကို ဤနေရာတွင် ပြပါသည် */}
+        {/* Render selected card component */}
         {SelectedCard}
       
         <View style={{ height: 100 }} /> 

@@ -1,4 +1,5 @@
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,10 +14,21 @@ export default function PersonalizationScreen() {
     router.replace('/main/dashboard');
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/main/settings');
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.content}>
-        <Text style={[styles.title, { color: colors.textPrimary }]}>အသွင်အပြင် ရွေးချယ်ပါ</Text>
+        <View style={styles.header}>
+          <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={handleBack} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={26} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>အသွင်အပြင် ရွေးချယ်ပါ</Text>
+        </View>
         <Text style={[styles.subTitle, { color: colors.textSecondary }]}>
           သင့်အတွက် ဖတ်ရအဆင်ပြေမယ့် အရောင်နဲ့ စာလုံးအရွယ်အစားကို ရွေးချယ်ပေးပါ။
         </Text>
@@ -71,8 +83,10 @@ export default function PersonalizationScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  backButton: { padding: 10 },
   content: { flex: 1, justifyContent: 'center' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' },
+  title: { flex: 1, fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginRight: 46 },
   subTitle: { fontSize: 16, textAlign: 'center', marginBottom: 40 },
   sectionTitle: { fontSize: 18, fontWeight: '600', marginBottom: 15 },
   row: { flexDirection: 'row', gap: 10, justifyContent: 'space-between' },

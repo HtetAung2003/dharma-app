@@ -45,7 +45,7 @@ const PancaSilaCard = () => {
 
         <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-        {/* ဝန်ခံခြင်း အပိုင်း */}
+        {/* Precept affirmation section */}
         <Text style={[
           styles.footerText, 
           { 
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   scriptText: {
-    textAlign: 'left', // သီလများကို နံပါတ်စဉ်ဖြင့်ဖြစ်၍ ဘယ်ဘက်ကပ်ထားပါသည်
+    textAlign: 'left', // Left align numbered precepts
     fontWeight: '500',
   },
   divider: {

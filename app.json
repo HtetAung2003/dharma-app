@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.htetaung.dharmamusicapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -40,11 +41,11 @@
         {
           "icon": "./assets/images/logo.png",
           "color": "#ffffff",
-          "sounds": [
-            "./assets/notibell.mp3"
-          ]
+          "sounds": ["./assets/notibell.mp3"]
         }
-      ]
+      ],
+      "expo-splash-screen",
+      "expo-status-bar"
     ],
     "experiments": {
       "typedRoutes": true

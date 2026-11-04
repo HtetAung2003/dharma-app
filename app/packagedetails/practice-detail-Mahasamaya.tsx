@@ -23,7 +23,6 @@ useEffect(() => {
     
       if (secondsRead > 5) {
         saveReadingTime('Sutta', secondsRead);
-        console.log(`Saved ${secondsRead}s to Sutta category`);
       }
     };
   }, []);

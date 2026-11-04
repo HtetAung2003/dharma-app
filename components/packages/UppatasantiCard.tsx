@@ -21,12 +21,12 @@ const UppatasantiCard = () => {
 
   return (
     <View style={styles.card}>
-      {/* နိဒါန်း */}
+      {/* Introduction */}
       <Text style={[styles.title, { color: colors.primary, fontSize: dynamicSize(18) }]}>
         နမော တဿ ဘဂဝတော အရဟတော သမ္မာသမ္ဗုဒ္ဓဿ။
       </Text>
 
-      {/* ဂါထာတော်များ ထည့်သွင်းထားသည့် အဝါနုရောင် Area */}
+      {/* Gatha verses area */}
       <View style={[
         styles.verseContainer,
         { backgroundColor: themeMode === 'dark' ? 'rgba(180, 83, 9, 0.05)' : '#FFFBEB' }
@@ -36,7 +36,7 @@ const UppatasantiCard = () => {
             key={index} 
             style={[
               styles.verseWrapper, 
-              index === verses.length - 1 && { borderBottomWidth: 0 } // နောက်ဆုံးတစ်ခုဆိုရင် border ဖျောက်မည်
+              index === verses.length - 1 && { borderBottomWidth: 0 } // Hide border for last element
             ]}
           >
             <Text style={[styles.verseText, { color: colors.textPrimary, fontSize: dynamicSize(17) }]}>
@@ -46,7 +46,7 @@ const UppatasantiCard = () => {
         ))}
       </View>
 
-      {/* ထူးခြားချက် Note */}
+      {/* Highlights note */}
       <View style={[styles.noteBox, { backgroundColor: themeMode === 'dark' ? '#1A242F' : '#F0F7FF' }]}>
         <Text style={[styles.noteTitle, { color: colors.primary, fontSize: dynamicSize(14) }]}>
           💡 ကျမ်းစာ၏ ထူးခြားချက်
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   },
   verseText: { 
     textAlign: 'center', 
-    lineHeight: 34, // ဖတ်ရလွယ်အောင် line height မြှင့်ထားပါတယ်
+    lineHeight: 34, // Increased line height for legibility
   },
   noteBox: { 
     padding: 16, 

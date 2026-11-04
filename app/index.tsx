@@ -19,8 +19,8 @@ export default function WelcomeScreen() {
   const router = useRouter();
   const { colors, fontSize, themeMode } = useTheme();
 
-  // အခြေခံ fontSize အပေါ်မူတည်ပြီး အချိုးကျ တွက်ချက်ခြင်း
-  const scale = fontSize / 16; // Default size 16 ကို base ထားပါသည်
+  // Calculate scale proportionally based on base font size (default base: 16)
+  const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
 
   return (
@@ -43,7 +43,7 @@ export default function WelcomeScreen() {
                 style={[styles.logo, { tintColor: colors.primary }]}
               />
             </View>
-            {/* မင်္ဂလာပါ စာသား - အခြေခံ ၂၀ အပေါ်မူတည်ပြီး ကြီးလာမည် */}
+            {/* Greeting text - dynamically scaled based on base size 20 */}
             <Text
               style={[
                 {
@@ -54,7 +54,7 @@ export default function WelcomeScreen() {
             >
               မင်္ဂလာပါ
             </Text>
-            {/* App Name - အခြေခံ ၄၂ အပေါ်မူတည်ပြီး ကြီးလာမည် */}
+            {/* App name - dynamically scaled based on base size 46 */}
             <Text
               style={[
                 styles.appName,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: SIZES.padding,
     justifyContent: "space-between",
-    paddingVertical: height * 0.05, // Font ကြီးရင် နေရာဆံ့အောင် Padding ကို လျှော့ထားသည်
+    paddingVertical: height * 0.05, // Reduce padding for larger font sizes to prevent overflow
   },
   headerSection: { alignItems: "center" },
   logoCircle: {

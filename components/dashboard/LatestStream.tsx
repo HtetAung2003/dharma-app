@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
-import { db } from '../../services/firebaseConfig'; // လမ်းကြောင်းမှန်အောင် ပြန်စစ်ပေးပါ
+import { db } from '../../services/firebaseConfig';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { useRouter } from 'expo-router';
 
-// Theme နဲ့ Store Context များ
+// Theme Context
 import { useTheme } from '../../context/ThemeContext';
 
 
@@ -21,7 +21,7 @@ const LatestStream = () => {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     
-    // Theme နဲ့ Music Store မှ လိုအပ်သည်များယူခြင်း
+    // Theme values from context
     const { colors, fontSize, themeMode } = useTheme();
    
 

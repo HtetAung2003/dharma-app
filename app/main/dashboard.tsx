@@ -1,7 +1,10 @@
 import Packages from "@/components/dashboard/PracticePackages";
 import { useAuth } from "@/context/AuthContext";
 import { ceMmDateTime } from "@/services/ceMmDateTime";
-import { registerForPushNotificationsAsync } from "@/services/notificationService";
+import {
+  registerForPushNotificationsAsync,
+  scheduleSabbathReminder,
+} from "@/services/notificationService";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Notifications from "expo-notifications";
@@ -45,12 +48,10 @@ const Dashboard = () => {
   const dateInfo = useMemo(() => {
     const now = new Date();
     const mdt = new ceMmDateTime(now);
-    // console.log(mdt.ToMString());
 
     const todaySpecials = mdt.getSpecialDay();
     const isTodaySabbath = mdt.isSabbath();
     const astro = mdt.getAstrologyInfo();
-    console.log(astro);
 
     let daysToSabbath = 0;
     let nextSabbathName = "ဥပုသ်နေ့";
@@ -87,8 +88,6 @@ const Dashboard = () => {
   }, [todayKey]);
 
   // In dashboard.tsx, add before the displayName line:
-  // console.log("userData:", userData);
-  //console.log('user:', user);
   // Display name logic with truncation for long names
   const displayName = userData?.fullName
     ? userData.fullName.length > 10
@@ -98,7 +97,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     registerForPushNotificationsAsync();
-    // scheduleSabbathReminder(dateInfo.daysLeft, dateInfo.nextEvent);
+    scheduleSabbathReminder(dateInfo.daysLeft, dateInfo.nextEvent);
     const subscription = Notifications.addNotificationResponseReceivedListener(
       () => router.push("/main/dashboard"),
     );
@@ -127,17 +126,10 @@ const Dashboard = () => {
             >
               မင်္ဂလာပါ {displayName} !
             </Text>
-            {/* <Text
-              style={[
-                styles.subText,
-                { color: colors.textSecondary, fontSize: dynamicSize(16) },
-              ]}
-            >
-              သင့်ရဲ့ ဓမ္မလမ်းခရီးကို အကောင်းဆုံး စတင်နိုင်ဖို့ ဒီနေ့ ဘာတွေ ရှိလဲ ကြည့်ကြပါစို့။
-            </Text> */}
+            {/* Subtext description placeholder */}
           </View>
 
-          <TouchableOpacity onPress={() => router.push("/personalization")}>
+          <TouchableOpacity onPress={() => router.push("/main/settings")}>
             <Ionicons
               name="cog-outline"
               size={dynamicSize(35)}
@@ -159,18 +151,7 @@ const Dashboard = () => {
           >
             <View style={styles.dateRow}>
               {/* tag of normal day .. */}
-              <View
-                style={[
-                  styles.astroBadge,
-                  {
-                    backgroundColor: dateInfo.isYatyaza
-                      ? "#4CAF5022"
-                      : dateInfo.isPyathada
-                        ? "#F4433622"
-                        : "rgba(255,215,0,0.1)",
-                  },
-                ]}
-              >
+              <View>
                 <Text
                   style={[styles.engDateText, { color: colors.textSecondary }]}
                 >
@@ -202,17 +183,7 @@ const Dashboard = () => {
 
             <View style={styles.countdownRow}>
               {/* calendar icon */}
-              <Ionicons
-                name={
-                  dateInfo.isTodaySabbath
-                    ? "sparkles"
-                    : "calendar-number-outline"
-                }
-                size={22}
-                color={
-                  dateInfo.isTodaySabbath ? colors.success : colors.primary
-                }
-              />
+
               <View style={{ marginLeft: 10, flex: 1 }}>
                 {dateInfo.isTodaySabbath ? (
                   <Text

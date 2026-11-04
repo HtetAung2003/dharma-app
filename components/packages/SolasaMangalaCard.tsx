@@ -30,7 +30,7 @@ const SolasaMangalaCard = () => {
 
   return (
     <View style={styles.card}>
-      {/* ခေါင်းစဉ် */}
+      {/* Title Header */}
       <View style={styles.headerSection}>
         <Text style={[styles.title, { color: colors.primary, fontSize: dynamicSize(19) }]}>
           သောဠသ မင်္ဂလာ ဂါထာတော်
@@ -40,7 +40,7 @@ const SolasaMangalaCard = () => {
         </Text>
       </View>
 
-      {/* ဂါထာတော်များ Area */}
+      {/* Gatha Verses Section */}
       <View style={[
         styles.verseContainer,
         { backgroundColor: themeMode === 'dark' ? 'rgba(16, 185, 129, 0.05)' : '#F0FDFA' }
@@ -54,7 +54,7 @@ const SolasaMangalaCard = () => {
         ))}
       </View>
 
-      {/* ရွတ်ဖတ်ရကျိုး Note */}
+      {/* Benefits Note */}
       <View style={[styles.benefitBox, { backgroundColor: themeMode === 'dark' ? '#1E293B' : '#E0F2FE' }]}>
         <Text style={[styles.benefitTitle, { color: colors.primary, fontSize: dynamicSize(15) }]}>
           🌿 ရွတ်ဖတ်ရကျိုး

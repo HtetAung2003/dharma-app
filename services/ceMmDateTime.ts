@@ -9,21 +9,21 @@ type SpecialDayType = "ရက်ရာဇာ" | "ပြဿဒါး";
 
 // Myanmar month names (Burmese/Unicode)
 const MONTH_NAMES = [
-  "First Waso",
-  "Tagu",
-  "Kason",
-  "Nayon",
-  "Waso",
-  "Wagaung",
-  "Tawthalin",
-  "Thadingyut",
-  "Tazaungmon",
-  "Nadaw",
-  "Pyatho",
-  "Tabodwe",
-  "Tabaung",
-  "Late Tagu",
-  "Late Kason",
+  "ပထမဝါဆို",
+  "တန်ခူး",
+  "ကဆုန်",
+  "နယုန်",
+  "ဝါဆို",
+  "ဝါခေါင်",
+  "တော်သလင်း",
+  "သီတင်းကျွတ်",
+  "တန်ဆောင်မုန်း",
+  "နတ်တော်",
+  "ပြာသို",
+  "တပို့တွဲ",
+  "တပေါင်း",
+  "နှောင်းတန်ခူး",
+  "နှောင်းကဆုန်",
 ];
 
 const MOON_PHASE_NAMES = ["လဆန်း", "လပြည့်", "လဆုတ်", "လကွယ်"];
@@ -456,8 +456,7 @@ function dateToJDN(date: Date): number {
   const m_adj = m + 12 * a - 3;
 
   const isGregorian =
-    y > 1752 ||
-    (y === 1752 && (m > 9 || (m === 9 && d >= 14)));
+    y > 1752 || (y === 1752 && (m > 9 || (m === 9 && d >= 14)));
 
   if (isGregorian) {
     return (
@@ -514,7 +513,7 @@ export class ceMmDateTime {
     const inputDate = date ? new Date(date.getTime()) : new Date();
     this._date = inputDate;
     this._jdn = dateToJDN(inputDate);
-    this._weekday = ((this._jdn + 2) % 7 + 7) % 7; // 0=Sat, 1=Sun, ..., 6=Fri
+    this._weekday = (((this._jdn + 2) % 7) + 7) % 7; // 0=Sat, 1=Sun, ..., 6=Fri
     this._yo = j2m(this._jdn);
 
     // Set legacy properties
@@ -559,15 +558,8 @@ export class ceMmDateTime {
       "သိုက်",
       "ပုတိ",
     ];
-    // const mahaboteList = [
-    //   "ဘင်္ဂ",
-    //   "မရဏ",
-    //   "အထွန်း",
-    //   "သိုက်",
-    //   "ရာဇ",
-    //   "ပုတိ",
-    //   "အဓိပတိ",
-    // ];
+    // Alternative standard ordering for mahaboteList:
+    // ["Binga", "Marana", "Ahtun", "Thike", "Yaza", "Puti", "Adhipati"]
     const sravanaYears = ["ပုဏ္ဏား", "ဗြဟ္မဏ", "သရဝန်"];
     const nakhatList = ["ဘီလူး", "နတ်", "လူ"];
 
@@ -691,7 +683,7 @@ export class ceMmDateTime {
   }
 
   public ToMString(): string {
-    // Format: "၁၅ တန်ခူး လပြည့် ၁၃၈၆"
+    // Example format: "[Day] [Month] [Moon Phase] [Myanmar Year]"
     const parts = [this.fortnightDayText, this.mm, this.mpText, this.my].filter(
       Boolean,
     );

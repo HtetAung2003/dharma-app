@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Easing, Dimensions } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/context/ThemeContext';
-import { MotiView } from 'moti';
+import { useTheme } from "@/context/ThemeContext";
+import { useEffect, useRef, useState } from "react";
+import { Animated, Dimensions, Easing, StyleSheet, View } from "react-native";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 export const MINDFUL_TIPS = [
-  // သတိကပ်ခြင်းနှင့် နေထိုင်မှု (Tips & Tricks)
+  // Mindfulness and Daily Living (Tips & Tricks)
   "ခဏတာတရားထိုင်ခြင်း: ၁ မိနစ်စာ သတိကပ်တာဟာ ဘာမှမလုပ်တာထက် အများကြီး ပိုကောင်းပါတယ်။",
   "ထွက်သက်ဝင်သက်ကို အားပြုပါ: စိတ်လှုပ်ရှားလာရင် ထွက်သက်ဝင်သက်ဆီ ပြန်လာပါ။",
   "သတိဖြင့် လမ်းလျှောက်ပါ: ခြေလှမ်းတိုင်းရဲ့ ထိတွေ့မှုကို ခံစားပါ။",
@@ -29,7 +27,7 @@ export const MINDFUL_TIPS = [
   "ရှင်းလင်းအောင်ထားပါ: အခန်းရှုပ်ပွနေရင် စိတ်လည်း ရှုပ်ပွတတ်ပါတယ်။",
   "ပြုံးလိုက်ပါ: အသာအယာလေး ပြုံးလိုက်တာက ကိုယ့်ရဲ့ အာုံကြောစနစ်ကို ငြိမ်သက်စေပါတယ်။",
 
-  // တရားတော်ကို နားလည်ခြင်း (Dhamma Insights)
+  // Dhamma Insights and Principles
   "အနိစ္စ: အရာရာဟာ ပြောင်းလဲနေတယ်၊ ဒါလည်း တစ်နေ့ ပြီးသွားမှာပဲ။",
   "ဒုက္ခ: ပြောင်းလဲမှုကို ဆန့်ကျင်ဖို့ ကြိုးစားခြင်းက နာကျင်မှုကို ဖြစ်စေပါတယ်။",
   "အနတ္တ: ငါ ဆိုတာ အမြဲတမ်းတည်ရှိနေတဲ့ အရာမဟုတ်ဘဲ ဖြစ်ပျက်နေတဲ့ ဖြစ်စဉ်တစ်ခုပါ။",
@@ -49,99 +47,106 @@ export const MINDFUL_TIPS = [
   "ရတနာသုံးပါး: ဘုရား၊ တရား၊ သံဃာကို အားကိုးရာအဖြစ် ယူပါ။",
   "ဖောင်ကဲ့သို့ တရားတော်: မြစ်ကို ဖြတ်ဖို့ ဖောင်ကို သုံးပါ၊ မြစ်တစ်ဖက် ရောက်ရင် ဖောင်ကို ထမ်းမသွားပါနဲ့။",
   "ကိုယ့်ကိုယ်ကိုယ် အားကိုးပါ: 'မိမိကိုယ်သာ ကိုးကွယ်ရာ' ပါပဲ။",
-  "လက်တွေ့စမ်းသပ်ပါ: ယုံရုံတင်မကဘဲ တရားတော်ကို လက်တွေ့ကျင့်ပြီး စမ်းသပ်ပါ။"
+  "လက်တွေ့စမ်းသပ်ပါ: ယုံရုံတင်မကဘဲ တရားတော်ကို လက်တွေ့ကျင့်ပြီး စမ်းသပ်ပါ။",
 ];
 
 const MindfulTipsBanner = () => {
-    // စဖွင့်ချင်းမှာ random တစ်ခု အရင်ပြရန်
-    const [currentIndex, setCurrentIndex] = useState(Math.floor(Math.random() * MINDFUL_TIPS.length));
-    const { colors, themeMode } = useTheme();
-    const scrollX = useRef(new Animated.Value(width)).current;
+  // Pick initial random tip on first render
+  const [currentIndex, setCurrentIndex] = useState(
+    Math.floor(Math.random() * MINDFUL_TIPS.length),
+  );
+  const { colors, themeMode } = useTheme();
+  const scrollX = useRef(new Animated.Value(width)).current;
 
-    useEffect(() => {
-        const startAnimation = () => {
-            scrollX.setValue(width); 
-            
-            Animated.timing(scrollX, {
-                toValue: -width * 2, // စာသားရှည်ရင် လွတ်အောင် width ကို ပိုပေးထားပါတယ်
-                duration: 15000, // ၁၅ စက္ကန့် (ဖြည်းဖြည်းချင်းဖတ်လို့ရအောင် duration တိုးထားပါတယ်)
-                easing: Easing.linear,
-                useNativeDriver: true,
-            }).start(({ finished }) => {
-                if (finished) {
-                    // Animation ပြီးတိုင်း နောက်ထပ် Random index တစ်ခုကို ရွေးချယ်ခြင်း
-                    let nextIndex;
-                    do {
-                        nextIndex = Math.floor(Math.random() * MINDFUL_TIPS.length);
-                    } while (nextIndex === currentIndex); // ရှေ့ကတစ်ခုနဲ့ ထပ်မနေအောင် စစ်ခြင်း
+  useEffect(() => {
+    const startAnimation = () => {
+      scrollX.setValue(width);
 
-                    setCurrentIndex(nextIndex);
-                    startAnimation();
-                }
-            });
-        };
+      Animated.timing(scrollX, {
+        toValue: -width * 2, // Extra width to allow full scroll of longer text
+        duration: 15000, // 15 seconds duration for smooth reading
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) {
+          // Select another random index on animation complete
+          let nextIndex;
+          do {
+            nextIndex = Math.floor(Math.random() * MINDFUL_TIPS.length);
+          } while (nextIndex === currentIndex); // Ensure no consecutive duplicates
 
-        startAnimation();
-        return () => scrollX.stopAnimation();
-    }, [currentIndex]);
+          setCurrentIndex(nextIndex);
+          startAnimation();
+        }
+      });
+    };
 
-    return (
-        <View style={styles.outerContainer}>
-            {/* ကျန်တဲ့ UI code တွေက အရင်အတိုင်းပါပဲ */}
-            <View style={[styles.container, { backgroundColor: themeMode === 'dark' ? 'rgba(255,255,255,0.05)' : '#E3F2FD', borderColor: colors.border }]}>
-                <View style={styles.iconWrapper}>
+    startAnimation();
+    return () => scrollX.stopAnimation();
+  }, [currentIndex]);
+
+  return (
+    <View style={styles.outerContainer}>
+      {/* Banner container */}
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor:
+              themeMode === "dark" ? "rgba(255,255,255,0.05)" : "#E3F2FD",
+            borderColor: colors.border,
+          },
+        ]}
+      >
+        {/* <View style={styles.iconWrapper}>
                     <Ionicons name="sparkles" size={16} color={themeMode === 'dark' ? '#FFD700' : '#0288D1'} />
-                </View>
+                </View> */}
 
-                <View style={styles.mask}>
-                    <Animated.Text
-                        style={[
-                            styles.tipText,
-                            { 
-                                color: colors.textPrimary,
-                                transform: [{ translateX: scrollX }] 
-                            }
-                        ]}
-                    >
-                        {MINDFUL_TIPS[currentIndex]}
-                    </Animated.Text>
-                </View>
-            </View>
+        <View style={styles.mask}>
+          <Animated.Text
+            style={[
+              styles.tipText,
+              {
+                color: colors.textPrimary,
+                transform: [{ translateX: scrollX }],
+              },
+            ]}
+          >
+            {MINDFUL_TIPS[currentIndex]}
+          </Animated.Text>
         </View>
-    );
+      </View>
+    </View>
+  );
 };
 const styles = StyleSheet.create({
-    outerContainer: {
-        paddingHorizontal: 5,
-        backgroundColor: 'transparent',
-        
-    
-    },
-    container: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 45, // ပိုပြီး Compact ဖြစ်အောင် အမြင့်လျှော့ထားပါတယ်
-        borderRadius: 25,
-        borderWidth: 1,
-        overflow: 'hidden', // စာသားတွေ ဘောင်ကျော်ရင် ဖျောက်ထားဖို့
-    },
-    iconWrapper: {
-        paddingHorizontal: 12,
-        zIndex: 2,
-        backgroundColor: 'transparent',
-    },
-    mask: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    tipText: {
-        fontSize: 14,
-        fontWeight: '500',
-        whiteSpace: 'nowrap', // စာသားကို line မဆင်းစေဖို့
-        width: width * 2, // စာသားအရှည်ကြီး ဆံ့အောင် width ပေးထားခြင်း
-    },
+  outerContainer: {
+    paddingHorizontal: 5,
+    backgroundColor: "transparent",
+  },
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    height: 45, // Compact height
+    borderRadius: 25,
+    borderWidth: 1,
+    overflow: "hidden", // Clip text that overflows bounds
+  },
+  iconWrapper: {
+    paddingHorizontal: 12,
+    zIndex: 2,
+    backgroundColor: "transparent",
+  },
+  mask: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  tipText: {
+    fontSize: 14,
+    fontWeight: "500",
+    width: width * 2,
+  },
 });
 
 export default MindfulTipsBanner;
-

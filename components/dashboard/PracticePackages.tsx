@@ -20,7 +20,7 @@ const PracticePackages = () => {
     const scale = fontSize / 16;
     const dynamicSize = (base: number) => base * scale;
 const handlePress = (item: any) => {
-    let targetPath: any; // သို့မဟုတ် targetPath: string
+    let targetPath: any;
 
     switch (item.id) {
         case '1':
@@ -44,7 +44,7 @@ const handlePress = (item: any) => {
     }
 
     router.push({
-        // as any သုံးပြီး TypeScript error ကို ကျော်လိုက်ပါ
+        // Cast to any to bypass strict route checking
         pathname: targetPath as any, 
         params: { 
             id: item.id, 
@@ -66,12 +66,12 @@ const handlePress = (item: any) => {
                         
             </View>
 
-            {/* Vertical List - FlatList ထဲမှာ scroll မလုပ်စေဘဲ Dashboard ရဲ့ ScrollView နဲ့ တွဲသုံးရင် scrollEnabled={false} ပေးထားပါ */}
+            {/* Vertical list container */}
             <View style={styles.listContainer}>
                 {PRACTICE_DATA.map((item) => (
                     <TouchableOpacity
                         key={item.id}
-                        onPress={() => handlePress(item)} // ဒီနေရာမှာ navigation ကို ခေါ်လိုက်ပါမယ်
+                        onPress={() => handlePress(item)}
                         style={[
                             styles.listItem,
                             {  
@@ -96,7 +96,7 @@ const handlePress = (item: any) => {
                             </View>
                         </View>
 
-                        {/* ညာဘက်က မြှားပုံစံလေး */}
+                        {/* Chevron right icon */}
                         <Ionicons name="chevron-forward" size={20} color={colors.primary} />
                     </TouchableOpacity>
                 ))}

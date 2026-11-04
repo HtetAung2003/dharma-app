@@ -33,7 +33,7 @@ const MahasamayaSuttaAsurasAndDevas = () => {
           </Text>
         </View>
            <View style={styles.divider} />
-        {/* ၂၆။ အသူရာများနှင့် ဝေပစိတ္တိနတ်မင်း */}
+        {/* 26. Asuras and Vepacitti Deva King */}
         <View style={styles.stanza}>
           <Text style={[styles.stanzaNumber, { color: colors.secondary }]}>၂၆။အဘယံ တဒါ နာဂရာဇာန’မာသိ၊</Text>
           <Text style={[styles.stanzaText, { color: colors.textPrimary, fontSize: dynamicSize(17) }]}>
@@ -45,7 +45,7 @@ const MahasamayaSuttaAsurasAndDevas = () => {
 
         <View style={styles.divider} />
 
-        {/* ၂၇။ ဗေမာစိတ္တိ၊ သုစိတ္တိ နှင့် ရာဟုအသူရင် */}
+        {/* 27. Vepacitti, Sucitti, and Rahu Asura */}
         <View style={styles.stanza}>
           <Text style={[styles.stanzaNumber, { color: colors.secondary }]}>၂၇။ဇိတာ ဝဇိရဟတ္ထေန၊</Text>
           <Text style={[styles.stanzaText, { color: colors.textPrimary, fontSize: dynamicSize(17) }]}>
@@ -67,7 +67,7 @@ const MahasamayaSuttaAsurasAndDevas = () => {
 
         <View style={styles.divider} />
 
-        {/* ၂၈။ အာပေါ၊ ပထဝီ၊ တေဇော၊ ဝါယော နတ်များ */}
+        {/* 28. Apo, Pathavi, Tejo, Vayo Devas */}
         <View style={styles.stanza}>
           <Text style={[styles.stanzaNumber, { color: colors.secondary }]}>၂၈။အာပေါ စ ဒေဝါ ပထဝီ၊</Text>
           <Text style={[styles.stanzaText, { color: colors.textPrimary, fontSize: dynamicSize(17) }]}>
@@ -108,7 +108,7 @@ const MahasamayaSuttaAsurasAndDevas = () => {
         </View>
 
         <View style={styles.divider} />
-        {/* ၃၀။ သဟဓမ္မ နတ်အုပ်စု */}
+        {/* 30. Sahadhamma Deva group */}
         <View style={styles.stanza}>
           <Text style={[styles.stanzaNumber, { color: colors.secondary }]}>၃၀။အထာဂုံ သဟဘူ ဒေဝါ၊</Text>
           <Text style={[styles.stanzaText, { color: colors.textPrimary, fontSize: dynamicSize(17) }]}>
@@ -147,7 +147,7 @@ const MahasamayaSuttaAsurasAndDevas = () => {
           </Text>
         </View>
    <View style={styles.divider} />
-        {/* ၃၂။ သုဠုမ္မာ နှင့် အခြားနတ်များ */}
+        {/* 32. Sulumma and other Devas */}
         <View style={styles.stanza}>
           <Text style={[styles.stanzaNumber, { color: colors.secondary }]}>၃၂။သုက္ကာ ကရမ္ဘာ အရုဏာ၊</Text>
           <Text style={[styles.stanzaText, { color: colors.textPrimary, fontSize: dynamicSize(17) }]}>

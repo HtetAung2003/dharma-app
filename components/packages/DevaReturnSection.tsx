@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     color: '#2c3e50',
     textAlign: 'center',
-    fontFamily: 'Pyidaungsu', // မြန်မာဖောင့် သီးသန့်ရှိရင် ထည့်ပေးပါ
+    fontFamily: 'Pyidaungsu', // Custom Myanmar font if available
   },
 });
 

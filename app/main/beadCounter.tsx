@@ -124,8 +124,8 @@ const BeadCounterScreen = () => {
       setHasBubblePermission(granted);
       if (!granted) {
         Alert.alert(
-          "Permission required",
-          'Please allow "Display over other apps" to enable floating bubble.',
+          "ခွင့်ပြုချက် လိုအပ်သည်",
+          'မျောနေသောခလုတ်ကို အသုံးပြုရန် “အခြားအက်ပ်များပေါ်တွင် ပြသရန်” ခွင့်ပြုချက်ပေးပါ။',
         );
         return;
       }
@@ -135,7 +135,7 @@ const BeadCounterScreen = () => {
       setIsBubbleShowing(true);
     } catch (error) {
       console.warn("Failed to enable floating bubble", error);
-      Alert.alert("Error", "Could not start floating bubble.");
+      Alert.alert("အမှား", "မျောနေသောခလုတ်ကို စတင်၍မရပါ။");
     }
   };
 
@@ -148,7 +148,7 @@ const BeadCounterScreen = () => {
       setIsBubbleShowing(false);
     } catch (error) {
       console.warn("Failed to disable floating bubble", error);
-      Alert.alert("Error", "Could not stop floating bubble.");
+      Alert.alert("အမှား", "မျောနေသောခလုတ်ကို ရပ်တန့်၍မရပါ။");
     }
   };
 
@@ -172,10 +172,10 @@ const BeadCounterScreen = () => {
 
   const handleResetCount = () => {
     if (count > 0 || rounds > 0) {
-      Alert.alert("Reset count", "Clear the current bead counter session?", [
-        { text: "Cancel", style: "cancel" },
+      Alert.alert("ရေတွက်မှု ပြန်လည်စတင်ရန်", "လက်ရှိ ပုတီးစိပ်ရေတွက်မှုကို ရှင်းလင်းမလား။", [
+        { text: "မလုပ်တော့ပါ", style: "cancel" },
         {
-          text: "Reset",
+          text: "ပြန်စမည်",
           onPress: () => {
             setCount(0);
             setRounds(0);
@@ -211,18 +211,17 @@ const BeadCounterScreen = () => {
       console.warn("Failed to save bead counter session", error);
     }
 
-    console.log("Saving...", record);
     router.back();
   };
 
   const handleFinish = () => {
     if (!startTime) return;
     Alert.alert(
-      "Save session",
-      "Do you want to save this bead counter session?",
+      "အစီအစဉ်ကို သိမ်းဆည်းရန်",
+      "ဤပုတီးစိပ်ရေတွက်မှုကို သိမ်းဆည်းမလား။",
       [
-        { text: "No", style: "cancel", onPress: () => router.back() },
-        { text: "Save", onPress: saveAndExit },
+        { text: "မသိမ်းပါ", style: "cancel", onPress: () => router.back() },
+        { text: "သိမ်းမည်", onPress: saveAndExit },
       ],
     );
   };
@@ -238,7 +237,7 @@ const BeadCounterScreen = () => {
       <SafeAreaView style={styles.safeArea}>
         <Stack.Screen
           options={{
-            headerTitle: "Bead Counter",
+            headerTitle: "ပုတီးစိပ်ကောင်တာ",
             headerTransparent: true,
             headerTintColor: colors.textPrimary,
             headerRight: () => (
@@ -253,7 +252,7 @@ const BeadCounterScreen = () => {
                     fontWeight: "bold",
                   }}
                 >
-                  Finish
+                  ပြီးဆုံး
                 </Text>
               </TouchableOpacity>
             ),
@@ -262,7 +261,7 @@ const BeadCounterScreen = () => {
 
         <RNView style={styles.topSection}>
           <RNView style={styles.selectorHeader}>
-            <Text style={[styles.label, { color: colors.textSecondary }]}>Choose a preset count</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>ပုတီးအရေအတွက် ရွေးပါ</Text>
             <TouchableOpacity
               onPress={handleResetCount}
               disabled={count === 0 && rounds === 0}
@@ -290,12 +289,12 @@ const BeadCounterScreen = () => {
                 onPress={() => {
                   if (count > 0 || rounds > 0) {
                     Alert.alert(
-                      "Change preset",
-                      "Reset the current session and switch preset?",
+                      "အရေအတွက် ပြောင်းရန်",
+                      "လက်ရှိအစီအစဉ်ကို ပြန်စပြီး အရေအတွက်အသစ် ပြောင်းမလား။",
                       [
-                        { text: "Cancel", style: "cancel" },
+                        { text: "မလုပ်တော့ပါ", style: "cancel" },
                         {
-                          text: "Switch",
+                          text: "ပြောင်းမည်",
                           onPress: () => {
                             setTarget(num);
                             setCount(0);
@@ -342,7 +341,7 @@ const BeadCounterScreen = () => {
               size={18}
               color={colors.secondary}
             />
-            <Text style={[styles.roundText, { color: colors.secondary }]}>{rounds} rounds</Text>
+            <Text style={[styles.roundText, { color: colors.secondary }]}>{rounds} ပတ်</Text>
           </RNView>
         </RNView>
 
@@ -352,7 +351,7 @@ const BeadCounterScreen = () => {
               key={animationKey}
               from={{ scale: 0.96, opacity: 0.9 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", damping: 12, stiffness: 150 }}
+              transition={{ type: "spring", damping: 12, stiffness: 150 } as any}
               style={[
                 styles.mainBead,
                 {
@@ -390,7 +389,7 @@ const BeadCounterScreen = () => {
             size={20}
             color={colors.textSecondary + "80"}
           />
-          <Text style={[styles.footerText, { color: colors.textSecondary + "80" }]}>Tap the circle once for each bead.</Text>
+          <Text style={[styles.footerText, { color: colors.textSecondary + "80" }]}>ပုတီးတစ်လုံးစီအတွက် စက်ဝိုင်းကို တစ်ချက်နှိပ်ပါ။</Text>
         </RNView>
 
         {isAndroid && (
@@ -416,7 +415,7 @@ const BeadCounterScreen = () => {
                   { color: colors.textSecondary },
                 ]}
               >
-                {isBubbleShowing ? "Floating bubble ON" : "Floating bubble OFF"}
+                {isBubbleShowing ? "မျောနေသောခလုတ် ဖွင့်ထားသည်" : "မျောနေသောခလုတ် ပိတ်ထားသည်"}
               </Text>
             </RNView>
 
@@ -432,7 +431,7 @@ const BeadCounterScreen = () => {
               ]}
             >
               <Text style={styles.bubbleButtonText}>
-                {isBubbleShowing ? "Disable Bubble" : "Enable Bubble"}
+                {isBubbleShowing ? "မျောနေသောခလုတ် ပိတ်ရန်" : "မျောနေသောခလုတ် ဖွင့်ရန်"}
               </Text>
             </TouchableOpacity>
 
@@ -443,7 +442,7 @@ const BeadCounterScreen = () => {
                   { color: colors.textSecondary + "B3" },
                 ]}
               >
-                Requires Android "Display over other apps" permission.
+                Android ၏ “အခြားအက်ပ်များပေါ်တွင် ပြသရန်” ခွင့်ပြုချက် လိုအပ်သည်။
               </Text>
             )}
           </RNView>

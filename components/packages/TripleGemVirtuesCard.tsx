@@ -36,7 +36,7 @@ const TripleGemVirtuesCard = () => {
         }
       ]}>
         
-        {/* ၁။ ဘုရားဂုဏ်တော် */}
+        {/* 1. Buddha Virtues */}
         <SectionTitle title="၁။ ဘုရားဂုဏ်တော် (၉) ပါး" />
         <Text style={[styles.scriptText, { color: colors.textPrimary, fontSize: dynamicSize(20) }]}>
           "ဣတိပိ သော ဘဂဝါ အရဟံ၊ သမ္မာသမ္ဗုဒ္ဓေါ၊ ဝိဇ္ဇာစရဏသမ္ပန္နော၊ သုဂတော၊ လောကဝိဒူ၊ အနုတ္တရော ပုရိသဒမ္မသာရထိ၊ သတ္ထာ ဒေဝမနုဿာနံ၊ ဗုဒ္ဓေါ၊ ဘဂဝါ" တိ။
@@ -44,7 +44,7 @@ const TripleGemVirtuesCard = () => {
 
         <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-        {/* ၂။ တရားဂုဏ်တော် */}
+        {/* 2. Dhamma Virtues */}
         <SectionTitle title="၂။ တရားဂုဏ်တော် (၆) ပါး" />
         <Text style={[styles.scriptText, { color: colors.textPrimary, fontSize: dynamicSize(20) }]}>
           "သွာက္ခာတော ဘဂဝတော ဓမ္မော၊ သန္ဒိဋ္ဌိကော၊ အကာလိကော၊ ဧဟိပဿိကော၊ ဩပနေယျိကော၊ ပစ္စတ္တံ ဝေဒိတဗ္ဗော ဝိညူဟီ" တိ။
@@ -52,7 +52,7 @@ const TripleGemVirtuesCard = () => {
 
         <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-        {/* ၃။ သံဃာဂုဏ်တော် */}
+        {/* 3. Sangha Virtues */}
         <SectionTitle title="၃။ သံဃာဂုဏ်တော် (၉) ပါး" />
         <View style={styles.listSection}>
           <Text style={[styles.listText, { color: colors.textPrimary, fontSize: dynamicSize(20) }]}>

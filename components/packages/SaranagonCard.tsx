@@ -27,7 +27,7 @@ const SaranagonCard = () => {
           borderColor: themeMode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#E2E8F0'
         }
       ]}>
-        {/* နမောတဿ အပိုင်း */}
+        {/* Namo Tassa section */}
         <View style={styles.namoSection}>
           <Text style={[styles.namoText, { color: colors.textPrimary, fontSize: dynamicSize(20) }]}>
             နမော တဿ ဘဂဝတော အရဟတော သမ္မာသမ္ဗုဒ္ဓဿ။ (၃ ကြိမ်)
@@ -36,7 +36,7 @@ const SaranagonCard = () => {
 
         <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
-        {/* သရဏဂုံ အပိုင်း */}
+        {/* Saranagon section */}
         <View style={styles.listSection}>
           <Text style={[styles.scriptText, { color: colors.textPrimary, fontSize: dynamicSize(20), lineHeight: dynamicSize(38) }]}>
             ဗုဒ္ဓံ သရဏံ ဂစ္ဆာမိ။{"\n"}

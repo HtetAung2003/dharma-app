@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   scriptText: {
-    textAlign: 'center', // ရွတ်ဖတ်ရန် အဆင်ပြေစေရန် အလယ်တွင်ထားပါသည်
+    textAlign: 'center', // Center align for recitation convenience
     fontWeight: '500',
   },
   verseNum: {

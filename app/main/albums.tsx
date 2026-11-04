@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    minWidth: 60, // နေရာလွတ် အနည်းဆုံး သတ်မှတ်ခြင်း
+    minWidth: 60, // Minimum width allocation
   },
   durationText: {
     fontWeight: '600',

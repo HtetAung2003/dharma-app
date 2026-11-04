@@ -1,25 +1,32 @@
-import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Stack, useRouter } from 'expo-router';
-import { View } from 'moti';
-import { useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
+import { Stack, useRouter } from "expo-router";
+import { View } from "moti";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Theme & Firebase Imports
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { SIZES } from '../../constants/Theme';
-import { useTheme } from '../../context/ThemeContext';
-import { auth, db } from '../../services/firebaseConfig';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { SIZES } from "../../constants/Theme";
+import { useTheme } from "../../context/ThemeContext";
+import { auth, db } from "../../services/firebaseConfig";
 
 const RegisterScreen = () => {
   const router = useRouter();
   const { colors, fontSize, themeMode } = useTheme();
-  
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
@@ -32,31 +39,41 @@ const RegisterScreen = () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
-      // ၁။ Firebase Auth 
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      console.log("Starting registration with email:", email);
 
-try {
-    await setDoc(doc(db, "users", user.uid), {
-      uid: user.uid,
-      fullName: name || "",
-      email: email || "",
-      createdAt: new Date().toISOString(),
-      role: 'user'
-    });
-    console.log("Document successfully written!");
-  } catch (error) {
-    console.error("Error writing document: ", error);
-  }
-      router.replace('/personalization')
+      // 1. Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+
+      const user = userCredential.user;
+      try {
+        console.log("Writing user document to Firestore...");
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          fullName: name || "",
+          email: email || "",
+          createdAt: new Date().toISOString(),
+          role: "user",
+        });
+      } catch (error) {
+        console.error("Error writing document to Firestore: ", error);
+      }
       Alert.alert("အောင်မြင်ပါသည်", "အကောင့်အသစ် ဖွင့်လှစ်ပြီးပါပြီ။", [
-        { text: "OK", onPress: () => router.replace('/personalization') }
+        { text: "OK", onPress: () => router.replace("/personalization") },
       ]);
     } catch (error: any) {
+      console.error("Registration Error Code:", error.code);
+      console.error("Registration Full Error:", error);
+
       let message = "အမှားတစ်ခုရှိနေပါသည်။";
-      if (error.code === 'auth/email-already-in-use') message = "ဤအီးမေးလ်မှာ အသုံးပြုပြီးသားဖြစ်နေသည်။";
-      if (error.code === 'auth/weak-password') message = "လျှို့ဝှက်နံပါတ်မှာ အားနည်းလွန်းသည်။";
-      
+      if (error.code === "auth/email-already-in-use")
+        message = "ဤအီးမေးလ်မှာ အသုံးပြုပြီးသားဖြစ်နေသည်။";
+      if (error.code === "auth/weak-password")
+        message = "လျှို့ဝှက်နံပါတ်မှာ အားနည်းလွန်းသည်။";
+
       Alert.alert("မအောင်မြင်ပါ", message);
     } finally {
       setLoading(false);
@@ -65,24 +82,41 @@ try {
 
   return (
     <LinearGradient
-      colors={ [colors.splashBackground , colors.gradientMiddle , colors.gradientEnd]} 
+      colors={[
+        colors.splashBackground,
+        colors.gradientMiddle,
+        colors.gradientEnd,
+      ]}
       style={styles.background}
     >
-   
       <SafeAreaView style={{ flex: 1 }}>
         {/* sign up form */}
-        <Stack.Screen options={{ headerTitle: "အကောင့်သစ်ဖွင့်ရန်", headerTransparent: true }} />
+        <Stack.Screen
+          options={{
+            headerTitle: "အကောင့်သစ်ဖွင့်ရန်",
+            headerTransparent: true,
+          }}
+        />
 
-        <View 
+        <View
           from={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           style={styles.container}
         >
           <View style={styles.formSection}>
             <View style={styles.inputWrapper}>
-              <Text style={[styles.label, { color: colors.textSecondary }]}>အမည်</Text>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>
+                အမည်
+              </Text>
               <TextInput
-                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: colors.inputBackground,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  },
+                ]}
                 placeholder="သင့်အမည် ရိုက်ထည့်ပါ"
                 placeholderTextColor={colors.placeholder}
                 value={name}
@@ -91,9 +125,18 @@ try {
             </View>
 
             <View style={styles.inputWrapper}>
-              <Text style={[styles.label, { color: colors.textSecondary }]}>အီးမေးလ်</Text>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>
+                အီးမေးလ်
+              </Text>
               <TextInput
-                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: colors.inputBackground,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  },
+                ]}
                 placeholder="example@email.com"
                 placeholderTextColor={colors.placeholder}
                 value={email}
@@ -103,9 +146,18 @@ try {
             </View>
 
             <View style={styles.inputWrapper}>
-              <Text style={[styles.label, { color: colors.textSecondary }]}>လျှို့ဝှက်နံပါတ်</Text>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>
+                လျှို့ဝှက်နံပါတ်
+              </Text>
               <TextInput
-                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border, color: colors.textPrimary }]}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: colors.inputBackground,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  },
+                ]}
                 placeholder="အနည်းဆုံး ၆ လုံး"
                 placeholderTextColor={colors.placeholder}
                 secureTextEntry
@@ -114,17 +166,33 @@ try {
               />
             </View>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.mainButton, { backgroundColor: colors.primary }]}
               onPress={handleRegister}
               disabled={loading}
             >
-              {loading ? <ActivityIndicator color={colors.textOnPrimary} /> : <Text style={[styles.buttonText, { color: colors.textOnPrimary }]}>အကောင့်သစ်ယူမည်</Text>}
+              {loading ? (
+                <ActivityIndicator color={colors.textOnPrimary} />
+              ) : (
+                <Text
+                  style={[styles.buttonText, { color: colors.textOnPrimary }]}
+                >
+                  အကောင့်သစ်ယူမည်
+                </Text>
+              )}
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 20 }}>
-              <Text style={{ textAlign: 'center', color: colors.textSecondary }}>
-                အကောင့်ရှိပြီးသားလား? <Text style={{ color: colors.primary, fontWeight: 'bold' }}>ဝင်ရန်</Text>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={{ marginTop: 20 }}
+            >
+              <Text
+                style={{ textAlign: "center", color: colors.textSecondary }}
+              >
+                အကောင့်ရှိပြီးသားလား?{" "}
+                <Text style={{ color: colors.primary, fontWeight: "bold" }}>
+                  ဝင်ရန်
+                </Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -136,16 +204,25 @@ try {
 
 const styles = StyleSheet.create({
   background: { flex: 1 },
-  container: { flex: 1, justifyContent: 'center', padding: 20 },
+  container: { flex: 1, justifyContent: "center", padding: 20 },
   formSection: { rowGap: 15 },
   inputWrapper: { rowGap: 8 },
-  label: { fontSize: 14, fontWeight: '600', marginLeft: 4 },
-  input: { height: 55, borderRadius: SIZES.radius, paddingHorizontal: 16, fontSize: 16, borderWidth: 1 },
-  mainButton: { height: 55, borderRadius: SIZES.radius, justifyContent: 'center', alignItems: 'center', marginTop: 10 },
-  buttonText: { fontSize: 16, fontWeight: 'bold' }
+  label: { fontSize: 14, fontWeight: "600", marginLeft: 4 },
+  input: {
+    height: 55,
+    borderRadius: SIZES.radius,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    borderWidth: 1,
+  },
+  mainButton: {
+    height: 55,
+    borderRadius: SIZES.radius,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  buttonText: { fontSize: 16, fontWeight: "bold" },
 });
 
 export default RegisterScreen;
-
-
-

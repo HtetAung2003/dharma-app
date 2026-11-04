@@ -1,24 +1,43 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getApp, getApps, initializeApp } from 'firebase/app';
-import { getAuth, getReactNativePersistence, initializeAuth, type Auth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { Platform } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getApp, getApps, initializeApp } from "firebase/app";
+import {
+  getAuth,
+  // @ts-ignore
+  getReactNativePersistence,
+  initializeAuth,
+  type Auth,
+} from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { Platform } from "react-native";
 
+// const requiredEnv = {
+//   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+//   authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+//   projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+//   storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+//   messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+//   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+// };
 const requiredEnv = {
-  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyDHj8KE1SeQiZ2A7NyrIkPDjJAzOB_1DkM",
+  authDomain: "mindbloom-24b0a.firebaseapp.com",
+  projectId: "mindbloom-24b0a",
+  storageBucket: "mindbloom-24b0a.firebasestorage.app",
+  messagingSenderId: "774082288008",
+  appId: "1:774082288008:web:826891c0216b426fb6823d",
+  measurementId: "G-55XK5L3CK5",
 };
-
 const missingEnv = Object.entries(requiredEnv)
   .filter(([, value]) => !value)
-  .map(([key]) => `EXPO_PUBLIC_FIREBASE_${key.replace(/[A-Z]/g, (letter) => `_${letter}`).toUpperCase()}`);
+  .map(
+    ([key]) =>
+      `EXPO_PUBLIC_FIREBASE_${key.replace(/[A-Z]/g, (letter) => `_${letter}`).toUpperCase()}`,
+  );
 
 if (missingEnv.length > 0) {
-  throw new Error(`Firebase configuration is incomplete. Set: ${missingEnv.join(', ')}`);
+  throw new Error(
+    `Firebase configuration is incomplete. Set: ${missingEnv.join(", ")}`,
+  );
 }
 
 const firebaseConfig = {
@@ -34,13 +53,19 @@ const firebaseConfig = {
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 let auth: Auth;
-if (Platform.OS === 'web') {
+if (Platform.OS === "web") {
   auth = getAuth(app);
 } else {
   try {
-    auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+    auth = initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage),
+    });
   } catch (error) {
-    if (!(error instanceof Error) || !error.message.toLowerCase().includes('already initialized')) throw error;
+    if (
+      !(error instanceof Error) ||
+      !error.message.toLowerCase().includes("already initialized")
+    )
+      throw error;
     auth = getAuth(app);
   }
 }

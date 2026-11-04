@@ -14,7 +14,7 @@ export default function MainLayout() {
     <Slot /> 
   </View>
 
-  {/* ၂။ Overlay Components Container */}
+  {/* 2. Overlay Components Container */}
   <View style={styles.overlayWrapper}>
     {/* Tips Banner */}
     <View style={{ backgroundColor: colors.background ,marginBottom: 15 }}>

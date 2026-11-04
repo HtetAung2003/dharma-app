@@ -8,7 +8,7 @@ const ShinThiwaliGathaCard = () => {
   const scale = fontSize / 16;
   const dynamicSize = (base: number) => base * scale;
 
-  // လာဘ်လာဘအတွက် သီးသန့် Gold accent color
+  // Gold accent color theme for prosperity
   const goldColor = '#D97706'; 
 
   return (

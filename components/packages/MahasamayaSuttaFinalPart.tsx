@@ -25,7 +25,7 @@ const MahasamayaSuttaFinalPart = () => {
         }
       ]}>
         
-        {/* ၃၃။ ခေမိယ၊ တုသိတ နှင့် ယာမနတ်များ */}
+        {/* 33. Khemiya, Tusita, and Yama Devas */}
         <View style={styles.stanza}>
           <Text style={[styles.stanzaNumber, { color: colors.secondary }]}>၃၃။ခေမိယာ တုသိတာ ယာမာ၊</Text>
           <Text style={[styles.stanzaText, { color: colors.textPrimary, fontSize: dynamicSize(17) }]}>
@@ -66,7 +66,7 @@ const MahasamayaSuttaFinalPart = () => {
         </View>
         <View style={styles.divider} />
 
-        {/* ၃၆။ ဗြဟ္မာမင်းကြီးများ ကြွရောက်လာပုံ */}
+        {/* 36. Arrival of Great Brahmas */}
         <View style={styles.kingSection}>
           <View style={styles.stanza}>
             <Text style={[styles.stanzaNumber, { color: colors.secondary }]}>၃၆။သဟဿံ ဗြဟ္မလောကာနံ၊</Text>
@@ -85,7 +85,7 @@ const MahasamayaSuttaFinalPart = () => {
         <View style={styles.divider} />
           <Text style={[styles.subTitle, { color: colors.secondary  }]}> နိဂုံး(၇)ဂါထာ</Text>
 
-        {/* ၃၇။ မာရ်နတ်မင်း လာရောက်နှောင့်ယှက်ပုံ */}
+        {/* 37. Mara's disruption attempt */}
         <View style={styles.maraSection}>
           <View style={styles.stanza}>
             <Text style={[styles.stanzaNumber, { color: colors.secondary  }]}>၃၇။တေ စ သဗ္ဗေ အဘိက္ကန္တေ၊</Text>
@@ -124,7 +124,7 @@ const MahasamayaSuttaFinalPart = () => {
             </Text>
           </View>
             <View style={styles.divider} />
-        {/* ၃၉။ မာရ်နတ်မင်း ရှုံးနိမ့်၍ ပြန်လည်ဆုတ်ခွာပုံ */}
+        {/* 39. Retreat and defeat of Mara */}
         <View style={styles.stanza}>
           <Text style={[styles.stanzaNumber, { color: colors.secondary }]}>၃၉။သဗ္ဗေ ဝိဇိတသင်္ဂါမာ၊</Text>
           <Text style={[styles.stanzaText, { color: colors.textPrimary, fontSize: dynamicSize(17) }]}>

@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   scriptText: {
-    textAlign: 'justify', // စာသားဘယ်ညာညီစေရန်
+    textAlign: 'justify', // Justify text alignment
     fontWeight: '500',
   },
 });

@@ -10,12 +10,12 @@ const JayantoCard = () => {
 
   return (
     <View style={styles.container}>
-      {/* နိဒါန်း */}
+      {/* Introduction */}
       <Text style={[styles.mainTitle, { color: colors.primary, fontSize: dynamicSize(20) }]}>
         ဇယန္တော ဂါထာတော် (ပါဠိတော်)
       </Text>
 
-      {/* ဂါထာတော်ပိုင်း - Victory Gold Theme */}
+      {/* Gatha verses section */}
       <View style={[
         styles.verseCard, 
         { 
@@ -56,7 +56,7 @@ const JayantoCard = () => {
         </Text>
       </View>
 
-      {/* မြန်မာပြန် အနှစ်ချုပ် */}
+      {/* Myanmar translation summary */}
       <View style={[styles.translationBox, { backgroundColor: themeMode === 'dark' ? '#161B22' : '#F8FAFC' }]}>
         <Text style={[styles.transTitle, { color: colors.primary, fontSize: dynamicSize(15) }]}>
           ✨ မြန်မာပြန် အနှစ်ချုပ်
