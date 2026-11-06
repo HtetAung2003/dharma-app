@@ -2,7 +2,6 @@ import { useTheme } from '@/context/ThemeContext';
 import { Slot } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import BottomNav from './bottomnav';
-import MindfulTipsBanner from './MindfulTipsBanner';
 
 export default function MainLayout() {
         const { colors } = useTheme();
@@ -18,7 +17,7 @@ export default function MainLayout() {
   <View style={styles.overlayWrapper}>
     {/* Tips Banner */}
     <View style={{ backgroundColor: colors.background ,marginBottom: 15 }}>
-    <MindfulTipsBanner />
+    {/* <MindfulTipsBanner /> */}
 </View>
    
     

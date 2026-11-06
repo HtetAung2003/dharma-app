@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
@@ -167,7 +167,7 @@ const handlePress = (item: PlanItem) => {
         </Text>
         <View style={{ width: 40 }} />
       </View>
-<View style={styles.searchContainer}>
+      <View style={styles.searchContainer}>
         <View style={[styles.searchBar, { backgroundColor: colors.inputBackground }]}>
           <Ionicons name="search" size={20} color={colors.textSecondary} style={{ marginRight: 10 }} />
           <TextInput
@@ -188,6 +188,7 @@ const handlePress = (item: PlanItem) => {
         {filteredSections.length > 0 ? (
           filteredSections.map((section, sIndex) => (
             <View key={sIndex} style={styles.sectionWrapper}>
+               {/* <View key={sIndex} > */}
               <Text style={[styles.sectionHeader, { color: colors.textPrimary, fontSize: dynamicSize(16) }]}>
                 {section.sectionTitle}
               </Text>
@@ -263,8 +264,8 @@ const styles = StyleSheet.create({
   scrollContent: { paddingHorizontal: 20, paddingTop: 10 },
   sectionWrapper: { marginBottom: 25 },
   sectionHeader: { fontWeight: 'bold', marginBottom: 12, marginLeft: 5 },
-  card: { borderRadius: 16, overflow: 'hidden', elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 5, shadowOffset: { width: 0, height: 2 } },
-  itemRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 , marginBottom: 10 },
+  card: { overflow: 'hidden', elevation: 2, },
+  itemRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16,marginBottom: 15 },
   itemTextContainer: { flex: 1 },
   itemTitle: { fontWeight: '600' },
   itemSubTitle: { marginTop: 4 },

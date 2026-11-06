@@ -87,14 +87,6 @@ const Dashboard = () => {
     };
   }, [todayKey]);
 
-  // In dashboard.tsx, add before the displayName line:
-  // Display name logic with truncation for long names
-  const displayName = userData?.fullName
-    ? userData.fullName.length > 10
-      ? `${userData.fullName.substring(0, 10)}..`
-      : userData.fullName
-    : "ဧည့်သည်";
-
   useEffect(() => {
     registerForPushNotificationsAsync();
     scheduleSabbathReminder(dateInfo.daysLeft, dateInfo.nextEvent);
@@ -115,7 +107,7 @@ const Dashboard = () => {
     >
       <SafeAreaView style={styles.container} edges={["top"]}>
         {/* Header Section */}
-        <View style={styles.header}>
+        <View style={[styles.header , { backgroundColor: colors.card }]}>
           <View style={{ width: "70%" }}>
             <Text
               numberOfLines={1}
@@ -124,7 +116,7 @@ const Dashboard = () => {
                 { color: colors.textPrimary, fontSize: dynamicSize(24) },
               ]}
             >
-              မင်္ဂလာပါ {displayName} !
+              မင်္ဂလာပါ 
             </Text>
             {/* Subtext description placeholder */}
           </View>
@@ -166,11 +158,7 @@ const Dashboard = () => {
                   style={[
                     styles.astroText,
                     {
-                      color: dateInfo.isYatyaza
-                        ? colors.success
-                        : dateInfo.isPyathada
-                          ? colors.error
-                          : "#202020",
+                      color: colors.textPrimary
                     },
                   ]}
                 >
@@ -180,10 +168,8 @@ const Dashboard = () => {
             </View>
 
             <View style={styles.divider} />
-
             <View style={styles.countdownRow}>
               {/* calendar icon */}
-
               <View style={{ marginLeft: 10, flex: 1 }}>
                 {dateInfo.isTodaySabbath ? (
                   <Text
@@ -232,13 +218,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
     width: "100%",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    // shadowColor: "#000",
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 4,
+    // },
+    // shadowOpacity: 0.15,
+    // shadowRadius: 8,
     elevation: 8,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,

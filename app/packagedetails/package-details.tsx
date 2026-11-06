@@ -1,8 +1,8 @@
 import { saveReadingTime } from '@/services/statsService';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { BackHandler, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -71,7 +71,19 @@ export default function PracticeDetail() {
       }
     };
   }, [category]);
+  
+useEffect(() => {
+    const backAction = () => {
+      if (showModal) {
+        setShowModal(false);
+        return true; // Prevent default behavior (going back to previous screen)
+      }
+      return false; // Let default behavior happen (router.back())
+    };
 
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () => backHandler.remove();
+  }, [showModal]);
   // Select card component based on componentKey
   const SelectedCard = useMemo(() => {
     switch (componentKey) {

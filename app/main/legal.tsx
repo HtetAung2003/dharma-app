@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
 import {
   Linking,
   ScrollView,
@@ -8,14 +11,11 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useTheme } from "../../context/ThemeContext";
 
 type TabType = "terms" | "privacy" | "contact";
 
-const SUPPORT_EMAIL = "[Your Email Address]";
+const SUPPORT_EMAIL = "dharmaapp@outlook.com";
 
 export default function LegalAndSupportScreen() {
   const router = useRouter();

@@ -1,6 +1,5 @@
-import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import { Stack, useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
@@ -85,7 +84,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   backButton: { padding: 10 },
-  content: { flex: 1, justifyContent: 'center' },
+  content: {  justifyContent: 'center' },
   title: { flex: 1, fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginRight: 46 },
   subTitle: { fontSize: 16, textAlign: 'center', marginBottom: 40 },
   sectionTitle: { fontSize: 18, fontWeight: '600', marginBottom: 15 },
@@ -99,6 +98,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   activeBtn: { borderWidth: 2 },
-  finishBtn: { padding: 18, borderRadius: 15, borderWidth: 1, alignItems: 'center' },
+  finishBtn: { padding: 18, borderRadius: 15, borderWidth: 1, alignItems: 'center', marginTop: 20 },
   finishBtnText: { fontSize: 18, fontWeight: 'bold' },
 });
