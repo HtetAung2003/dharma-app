@@ -1,28 +1,22 @@
+import { BeadCounterProvider } from "@/context/BeadCounterContext";
+import { DraggableBeadFAB } from "@/components/DraggableBeadFAB";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import * as QuickActions from "expo-quick-actions";
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack, useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef } from "react";
 import { ActivityIndicator, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { COLORS } from "../constants/Theme";
 
 function AppNavigator() {
-  const { user, loading: authLoading } = useAuth();
-  const { loading: themeLoading } = useTheme();
-  const segments = useSegments();
+  const { loading: authLoading } = useAuth();
+  const { themeMode, loading: themeLoading } = useTheme();
   const router = useRouter();
   const handledInitialQuickAction = useRef(false);
   const loading = authLoading || themeLoading;
-
-  // useEffect(() => {
-  //   if (loading) return;
-  //   const rootRoute = segments.length === 0 || segments[0] === "index";
-  //   const inAuthGroup = segments[0] === "auth";
-  //   const isPersonalization = segments[0] === "personalization";
-  //   if ((!rootRoute && !inAuthGroup) || isPersonalization)
-  //     router.replace("/auth/login");
-  //   else if (user && inAuthGroup) router.replace("/main/dashboard");
-  // }, [user, loading, segments, router]);
 
   useEffect(() => {
     const handleQuickAction = (action?: QuickActions.Action) => {
@@ -73,22 +67,30 @@ function AppNavigator() {
       </View>
     );
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="auth/login" />
-      <Stack.Screen name="auth/register" />
-      <Stack.Screen name="personalization" />
-      <Stack.Screen name="main" options={{ gestureEnabled: false }} />
-    </Stack>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <StatusBar style={themeMode === "dark" ? "light" : "dark"} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="auth/login" />
+        <Stack.Screen name="auth/register" />
+        <Stack.Screen name="personalization" />
+        <Stack.Screen name="main" options={{ gestureEnabled: false }} />
+      </Stack>
+      <DraggableBeadFAB />
+    </GestureHandlerRootView>
   );
 }
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <AppNavigator />
-      </AuthProvider>
-    </ThemeProvider>
+    <SafeAreaProvider style={{ flex: 1 }}>
+      <ThemeProvider>
+        <AuthProvider>
+          <BeadCounterProvider>
+            <AppNavigator />
+          </BeadCounterProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

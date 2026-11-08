@@ -677,9 +677,18 @@ export class ceMmDateTime {
     return holidays.map((h) => HOLIDAY_NAMES[h] || h);
   }
 
-  public isSabbath() {
+  public isSabbath(): boolean {
     const sabbath = cal_sabbath(this._yo.md, this._yo.mm, this._yo.myt);
-    return sabbath > 0;
+    return sabbath === 1;
+  }
+
+  public isSabbathEve(): boolean {
+    const sabbath = cal_sabbath(this._yo.md, this._yo.mm, this._yo.myt);
+    return sabbath === 2;
+  }
+
+  public getSabbathType(): number {
+    return cal_sabbath(this._yo.md, this._yo.mm, this._yo.myt);
   }
 
   public ToMString(): string {
@@ -690,8 +699,13 @@ export class ceMmDateTime {
     return parts.join(" ");
   }
 
-  public getSpecialDay() {
-    const out = this.isSabbath() ? ["ဥပုသ်နေ့"] : [];
+  public getSpecialDay(): string[] {
+    const out: string[] = [];
+    if (this.isSabbath()) {
+      out.push("ဥပုသ်နေ့");
+    } else if (this.isSabbathEve()) {
+      out.push("အဖိတ်နေ့");
+    }
     return [...out, ...this.specialDays];
   }
 }

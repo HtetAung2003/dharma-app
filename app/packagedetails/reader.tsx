@@ -118,7 +118,7 @@ const handleFavoritePress = async () => {
     setIsFav(status);
 };
     return (
-        <SafeAreaView edges={['top']} style={[styles.container, { backgroundColor: themeMode === 'dark' ? '#05111D' : '#F5F9FF' }]}>
+        <SafeAreaView edges={['top', 'bottom']} style={[styles.container, { backgroundColor: themeMode === 'dark' ? '#05111D' : '#F5F9FF' }]}>
        <View style={styles.header}>
     <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
         <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />

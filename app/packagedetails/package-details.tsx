@@ -156,16 +156,28 @@ useEffect(() => {
   
 
       {/* Guidelines Modal */}
-      <Modal visible={showModal} animationType="slide" transparent={true}>
+      <Modal
+        visible={showModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowModal(false)}
+      >
         <View style={styles.modalOverlay}>
+          {/* Backdrop: Clicking outside the modal sheet closes it */}
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={() => setShowModal(false)}
+          />
+
           <View style={[styles.modalContent, { backgroundColor: themeMode === 'dark' ? '#161B22' : '#FFF' }]}>
             <TouchableOpacity onPress={() => setShowModal(false)} style={styles.modalHandleWrapper}>
-               <Text style={{ color: colors.textPrimary, fontSize: dynamicSize(16) }}>ပိတ်ရန်</Text>
+              <Text style={{ color: colors.textPrimary, fontSize: dynamicSize(16) }}>ပိတ်ရန်</Text>
             </TouchableOpacity>
             
             <ScrollView showsVerticalScrollIndicator={false}>
-               <PreceptsGuidelineCard />
-               <View style={{ height: 40 }} />
+              <PreceptsGuidelineCard />
+              <View style={{ height: 40 }} />
             </ScrollView>
           </View>
         </View>

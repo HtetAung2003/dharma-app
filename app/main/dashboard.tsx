@@ -51,6 +51,7 @@ const Dashboard = () => {
 
     const todaySpecials = mdt.getSpecialDay();
     const isTodaySabbath = mdt.isSabbath();
+    const isTodaySabbathEve = mdt.isSabbathEve();
     const astro = mdt.getAstrologyInfo();
 
     let daysToSabbath = 0;
@@ -78,6 +79,7 @@ const Dashboard = () => {
       engDate: now.toDateString(),
       mmDate: mdt.ToMString(),
       isTodaySabbath,
+      isTodaySabbathEve,
       todaySpecial: todaySpecials.join(", "),
       daysLeft: daysToSabbath,
       nextEvent: nextSabbathName,
@@ -178,7 +180,17 @@ const Dashboard = () => {
                       { color: colors.success, fontWeight: "bold" },
                     ]}
                   >
-                    ယနေ့သည် {dateInfo.todaySpecial} ဖြစ်ပါသည်။
+                    ယနေ့သည် {dateInfo.todaySpecial || "ဥပုသ်နေ့"} ဖြစ်ပါသည်။
+                  </Text>
+                ) : dateInfo.isTodaySabbathEve ? (
+                  <Text
+                    style={[styles.statusText, { color: colors.textPrimary }]}
+                  >
+                    ယနေ့သည် <Text style={{ color: colors.primary, fontWeight: "bold" }}>အဖိတ်နေ့</Text> ဖြစ်ပါသည်။ မနက်ဖြန် (၁) ရက်အကြာတွင်{" "}
+                    <Text style={{ fontWeight: "700" }}>
+                      {dateInfo.nextEvent}
+                    </Text>{" "}
+                    ရောက်ပါမည်။
                   </Text>
                 ) : (
                   <Text

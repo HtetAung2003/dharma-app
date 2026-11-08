@@ -1,0 +1,1113 @@
+diff --git a/node_modules/@increase21/rn-floating-bubble/android/src/main/java/com/rnfloatingbubble/FloatingBubbleModule.kt b/node_modules/@increase21/rn-floating-bubble/android/src/main/java/com/rnfloatingbubble/FloatingBubbleModule.kt
+index 0030548..36afb7d 100644
+--- a/node_modules/@increase21/rn-floating-bubble/android/src/main/java/com/rnfloatingbubble/FloatingBubbleModule.kt
++++ b/node_modules/@increase21/rn-floating-bubble/android/src/main/java/com/rnfloatingbubble/FloatingBubbleModule.kt
+@@ -6,12 +6,15 @@ import android.content.Intent
+ import android.net.Uri
+ import android.os.Build
+ import android.provider.Settings
++import com.facebook.react.bridge.Arguments
+ import com.facebook.react.bridge.LifecycleEventListener
+ import com.facebook.react.bridge.Promise
+ import com.facebook.react.bridge.ReactApplicationContext
+ import com.facebook.react.bridge.ReactContextBaseJavaModule
+ import com.facebook.react.bridge.ReactMethod
+ import com.facebook.react.bridge.ReadableMap
++import com.facebook.react.bridge.WritableMap
++import com.facebook.react.modules.core.DeviceEventManagerModule
+ 
+ /**
+  * React Native module that exposes the floating bubble API to JavaScript.
+@@ -22,6 +25,8 @@ import com.facebook.react.bridge.ReadableMap
+  *   FloatingBubble.isShowing()           → Promise<boolean>
+  *   FloatingBubble.hasPermission()       → Promise<boolean>
+  *   FloatingBubble.requestPermission()   → Promise<boolean>
++ *   FloatingBubble.updateData(options)   → Promise<void>
++ *   FloatingBubble.getData()             → Promise<CounterData>
+  */
+ class FloatingBubbleModule(
+     private val reactContext: ReactApplicationContext
+@@ -29,12 +34,22 @@ class FloatingBubbleModule(
+ 
+     companion object {
+         const val NAME = "FloatingBubble"
++        private var instance: FloatingBubbleModule? = null
++
++        fun sendEvent(eventName: String, params: WritableMap?) {
++            try {
++                instance?.reactContext
++                    ?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
++                    ?.emit(eventName, params)
++            } catch (_: Exception) {}
++        }
+     }
+ 
+     // Held across onHostPause / onHostResume for the permission request flow
+     private var pendingPermissionPromise: Promise? = null
+ 
+     init {
++        instance = this
+         reactContext.addLifecycleEventListener(this)
+     }
+ 
+@@ -55,15 +70,25 @@ class FloatingBubbleModule(
+             return
+         }
+ 
+-        val sizeDp          = if (options.hasKey("size"))             options.getInt("size")              else 60
+-        // ARGB values like 0xFF4285F4 exceed Int.MAX_VALUE in JS; getInt() would clamp them
+-        val color           = if (options.hasKey("color"))            options.getDouble("color").toLong().toInt() else 0xFF4285F4.toInt()
++        val sizeDp          = if (options.hasKey("size"))             options.getInt("size")              else 72
++        // ARGB values like 0xFFF59E0B exceed Int.MAX_VALUE in JS; getInt() would clamp them
++        val color           = if (options.hasKey("color"))            options.getDouble("color").toLong().toInt() else 0xFFF59E0B.toInt()
+         val icon            = if (options.hasKey("icon"))             options.getString("icon")           else null
+-        // useLauncherIcon defaults to true when no explicit icon is provided
+-        val useLauncherIcon = if (options.hasKey("useLauncherIcon"))  options.getBoolean("useLauncherIcon") else (icon == null)
++        val useLauncherIcon = if (options.hasKey("useLauncherIcon"))  options.getBoolean("useLauncherIcon") else false
+         val initX           = if (options.hasKey("initialX"))         options.getInt("initialX")          else 0
+-        val initY           = if (options.hasKey("initialY"))         options.getInt("initialY")          else 100
+-        val enableDismiss   = if (options.hasKey("enableDismiss"))    options.getBoolean("enableDismiss") else false
++        val initY           = if (options.hasKey("initialY"))         options.getInt("initialY")          else 200
++        val enableDismiss   = if (options.hasKey("enableDismiss"))    options.getBoolean("enableDismiss") else true
++
++        val prefs = reactContext.getSharedPreferences(FloatingBubbleService.PREFS_NAME, Context.MODE_PRIVATE)
++        val count = if (options.hasKey("count")) options.getInt("count") else prefs.getInt("count", 0)
++        val rounds = if (options.hasKey("rounds")) options.getInt("rounds") else prefs.getInt("rounds", 0)
++        val target = if (options.hasKey("target")) options.getInt("target") else prefs.getInt("target", 9)
++
++        prefs.edit()
++            .putInt("count", count)
++            .putInt("rounds", rounds)
++            .putInt("target", target)
++            .apply()
+ 
+         val intent = Intent(reactContext, FloatingBubbleService::class.java).apply {
+             putExtra(FloatingBubbleService.EXTRA_SIZE,              sizeDp)
+@@ -72,6 +97,9 @@ class FloatingBubbleModule(
+             putExtra(FloatingBubbleService.EXTRA_INITIAL_X,         initX)
+             putExtra(FloatingBubbleService.EXTRA_INITIAL_Y,         initY)
+             putExtra(FloatingBubbleService.EXTRA_ENABLE_DISMISS,    enableDismiss)
++            putExtra(FloatingBubbleService.EXTRA_COUNT,             count)
++            putExtra(FloatingBubbleService.EXTRA_ROUNDS,            rounds)
++            putExtra(FloatingBubbleService.EXTRA_TARGET,            target)
+             icon?.let { putExtra(FloatingBubbleService.EXTRA_ICON, it) }
+         }
+ 
+@@ -84,6 +112,52 @@ class FloatingBubbleModule(
+         promise.resolve(null)
+     }
+ 
++    @ReactMethod
++    fun updateData(options: ReadableMap, promise: Promise) {
++        try {
++            val prefs = reactContext.getSharedPreferences(FloatingBubbleService.PREFS_NAME, Context.MODE_PRIVATE)
++            val currentCount = prefs.getInt("count", 0)
++            val currentRounds = prefs.getInt("rounds", 0)
++            val currentTarget = prefs.getInt("target", 9)
++
++            val count = if (options.hasKey("count")) options.getInt("count") else currentCount
++            val rounds = if (options.hasKey("rounds")) options.getInt("rounds") else currentRounds
++            val target = if (options.hasKey("target")) options.getInt("target") else currentTarget
++
++            prefs.edit()
++                .putInt("count", count)
++                .putInt("rounds", rounds)
++                .putInt("target", target)
++                .apply()
++
++            FloatingBubbleService.updateCounter(count, rounds, target)
++            promise.resolve(null)
++        } catch (e: Exception) {
++            promise.reject("UPDATE_ERROR", e.message)
++        }
++    }
++
++    @ReactMethod
++    fun getData(promise: Promise) {
++        try {
++            val prefs = reactContext.getSharedPreferences(FloatingBubbleService.PREFS_NAME, Context.MODE_PRIVATE)
++            val map = Arguments.createMap().apply {
++                putInt("count", prefs.getInt("count", 0))
++                putInt("rounds", prefs.getInt("rounds", 0))
++                putInt("target", prefs.getInt("target", 9))
++            }
++            promise.resolve(map)
++        } catch (e: Exception) {
++            promise.reject("GET_ERROR", e.message)
++        }
++    }
++
++    @ReactMethod
++    fun addListener(eventName: String?) {}
++
++    @ReactMethod
++    fun removeListeners(count: Int?) {}
++
+     @ReactMethod
+     fun hide(promise: Promise) {
+         reactContext.stopService(
+@@ -153,6 +227,7 @@ class FloatingBubbleModule(
+     }
+ 
+     override fun invalidate() {
++        if (instance == this) instance = null
+         reactContext.removeLifecycleEventListener(this)
+         super.invalidate()
+     }
+diff --git a/node_modules/@increase21/rn-floating-bubble/android/src/main/java/com/rnfloatingbubble/FloatingBubbleService.kt b/node_modules/@increase21/rn-floating-bubble/android/src/main/java/com/rnfloatingbubble/FloatingBubbleService.kt
+index b8f0cac..d2b7739 100644
+--- a/node_modules/@increase21/rn-floating-bubble/android/src/main/java/com/rnfloatingbubble/FloatingBubbleService.kt
++++ b/node_modules/@increase21/rn-floating-bubble/android/src/main/java/com/rnfloatingbubble/FloatingBubbleService.kt
+@@ -6,6 +6,7 @@ import android.app.NotificationChannel
+ import android.app.NotificationManager
+ import android.app.PendingIntent
+ import android.app.Service
++import android.content.Context
+ import android.content.Intent
+ import android.graphics.Bitmap
+ import android.graphics.BitmapFactory
+@@ -16,8 +17,13 @@ import android.graphics.Paint
+ import android.graphics.PixelFormat
+ import android.graphics.PorterDuff
+ import android.graphics.PorterDuffXfermode
++import android.graphics.RectF
++import android.graphics.Typeface
+ import android.os.Build
+ import android.os.IBinder
++import android.os.VibrationEffect
++import android.os.Vibrator
++import android.os.VibratorManager
+ import android.util.Base64
+ import android.util.TypedValue
+ import android.view.Gravity
+@@ -27,32 +33,24 @@ import android.view.WindowManager
+ import android.view.animation.OvershootInterpolator
+ import android.widget.ImageView
+ import androidx.core.app.NotificationCompat
++import com.facebook.react.bridge.Arguments
+ import kotlin.math.abs
+ import kotlin.math.hypot
+ import kotlin.math.roundToInt
+ 
+ /**
+- * Foreground service that renders and manages the floating bubble overlay.
++ * Foreground service that renders and manages the floating bead counter bubble overlay.
+  *
+- * The bubble is added to the [WindowManager] so it persists over all
+- * other apps.  Touch handling supports:
++ * Persists over all other apps with WindowManager.
++ * Touch handling:
+  *   - Drag to reposition
+- *   - Spring-snap to the nearest screen edge on release
+- *   - Tap to bring the host app to the foreground
+- *   - Dragging reveals a dismiss zone (✕) at the bottom of the screen;
+- *     release onto it to close the bubble (opt-in via [enableDismiss])
+- *
+- * Icon resolution order (first match wins):
+- *   1. Developer-supplied base64 image  (`icon` option)
+- *   2. App launcher icon               (`useLauncherIcon = true`, the default)
+- *   3. Filled colour circle            (always available fallback)
++ *   - Spring-snap to edge on release
++ *   - Single Tap: Increment bead count, vibrate haptically, redraw count
++ *   - Long Press (>650ms): Open host app
++ *   - Drag into dismiss zone (✕): Close bubble
+  */
+ class FloatingBubbleService : Service() {
+ 
+-    // -------------------------------------------------------------------------
+-    // Companion / constants
+-    // -------------------------------------------------------------------------
+-
+     companion object {
+         const val EXTRA_SIZE              = "size"
+         const val EXTRA_COLOR             = "color"
+@@ -61,63 +59,84 @@ class FloatingBubbleService : Service() {
+         const val EXTRA_INITIAL_Y         = "initialY"
+         const val EXTRA_USE_LAUNCHER_ICON = "useLauncherIcon"
+         const val EXTRA_ENABLE_DISMISS    = "enableDismiss"
++        const val EXTRA_COUNT             = "count"
++        const val EXTRA_ROUNDS            = "rounds"
++        const val EXTRA_TARGET            = "target"
++        const val PREFS_NAME              = "bead_counter_prefs"
+ 
+         private const val NOTIFICATION_ID      = 1001
+         private const val CHANNEL_ID           = "rn_floating_bubble_channel"
+         private const val CLOSE_ZONE_SIZE_DP   = 44
+         private const val CLOSE_ZONE_BOTTOM_DP = 40
+-        // Pixel radius within which the bubble snaps onto the close zone
+         private const val SNAP_THRESHOLD_DP    = 55
+-    }
+ 
+-    // -------------------------------------------------------------------------
+-    // State
+-    // -------------------------------------------------------------------------
++        private var activeService: FloatingBubbleService? = null
++
++        fun updateCounter(count: Int, rounds: Int, target: Int) {
++            activeService?.let { service ->
++                service.count = count
++                service.rounds = rounds
++                if (target > 0) service.target = target
++                service.updateBubbleBitmap()
++                service.updateNotification()
++            }
++        }
++    }
+ 
+     private var windowManager: WindowManager?       = null
+     private var bubbleView: ImageView?              = null
+     private var params: WindowManager.LayoutParams? = null
+ 
+-    // Dismiss zone (only created when enableDismiss = true)
+     private var closeView: ImageView?               = null
+     private var closeParams: WindowManager.LayoutParams? = null
+ 
+-    private var bubbleSizeDp    = 60
+-    private var bubbleColor     = Color.parseColor("#4285F4")
++    private var bubbleSizeDp    = 72
++    private var bubbleColor     = Color.parseColor("#F59E0B")
+     private var iconBase64: String? = null
+-    private var useLauncherIcon = true
++    private var useLauncherIcon = false
+     private var initialX        = 0
+-    private var initialY        = 100
+-    private var enableDismiss   = false
++    private var initialY        = 200
++    private var enableDismiss   = true
+ 
+-    // -------------------------------------------------------------------------
+-    // Service lifecycle
+-    // -------------------------------------------------------------------------
++    var count: Int  = 0
++    var rounds: Int = 0
++    var target: Int = 9
+ 
+     override fun onBind(intent: Intent?): IBinder? = null
+ 
+     override fun onCreate() {
+         super.onCreate()
++        activeService = this
+         createNotificationChannel()
+     }
+ 
+     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
++        activeService = this
++        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
++
+         intent?.let {
+-            bubbleSizeDp    = it.getIntExtra(EXTRA_SIZE,              60)
+-            bubbleColor     = it.getIntExtra(EXTRA_COLOR,             Color.parseColor("#4285F4"))
++            bubbleSizeDp    = it.getIntExtra(EXTRA_SIZE,              72)
++            bubbleColor     = it.getIntExtra(EXTRA_COLOR,             Color.parseColor("#F59E0B"))
+             iconBase64      = it.getStringExtra(EXTRA_ICON)
+-            useLauncherIcon = it.getBooleanExtra(EXTRA_USE_LAUNCHER_ICON, true)
++            useLauncherIcon = it.getBooleanExtra(EXTRA_USE_LAUNCHER_ICON, false)
+             initialX        = it.getIntExtra(EXTRA_INITIAL_X,         0)
+-            initialY        = it.getIntExtra(EXTRA_INITIAL_Y,         100)
+-            enableDismiss   = it.getBooleanExtra(EXTRA_ENABLE_DISMISS, false)
++            initialY        = it.getIntExtra(EXTRA_INITIAL_Y,         200)
++            enableDismiss   = it.getBooleanExtra(EXTRA_ENABLE_DISMISS, true)
++            count           = it.getIntExtra(EXTRA_COUNT,             prefs.getInt("count", 0))
++            rounds          = it.getIntExtra(EXTRA_ROUNDS,            prefs.getInt("rounds", 0))
++            target          = it.getIntExtra(EXTRA_TARGET,            prefs.getInt("target", 9))
++        } ?: run {
++            count  = prefs.getInt("count", 0)
++            rounds = prefs.getInt("rounds", 0)
++            target = prefs.getInt("target", 9)
+         }
++        if (target <= 0) target = 9
+ 
+         startForeground(NOTIFICATION_ID, buildNotification())
+ 
+         try {
+             setupBubble()
+         } catch (_: Exception) {
+-            // Overlay permission revoked (e.g. sticky restart after the user disabled it)
+             removeBubble()
+             stopSelf()
+             return START_NOT_STICKY
+@@ -127,25 +146,21 @@ class FloatingBubbleService : Service() {
+     }
+ 
+     override fun onDestroy() {
++        if (activeService == this) activeService = null
+         super.onDestroy()
+         removeBubble()
+     }
+ 
+-    // -------------------------------------------------------------------------
+-    // Bubble setup
+-    // -------------------------------------------------------------------------
+-
+     private fun setupBubble() {
+-        // show() may be called while already showing; drop the old views first
+         removeBubble()
+         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+ 
+         val sizePx = dp2px(bubbleSizeDp)
+         bubbleView = ImageView(this).apply {
+-            elevation = 8f
+-            scaleType = ImageView.ScaleType.CENTER_CROP
++            elevation = 12f
++            scaleType = ImageView.ScaleType.FIT_CENTER
+         }
+-        bubbleView!!.setImageBitmap(resolveIcon(sizePx))
++        updateBubbleBitmap()
+ 
+         val windowType = overlayWindowType()
+ 
+@@ -167,11 +182,6 @@ class FloatingBubbleService : Service() {
+         attachTouchListener()
+     }
+ 
+-    /**
+-     * Creates the dismiss zone — a translucent circle with a ✕ drawn on it,
+-     * anchored to the bottom-centre of the screen. Hidden (alpha 0) at rest;
+-     * fades in when the user begins dragging.
+-     */
+     private fun setupCloseZone(windowType: Int) {
+         val sizePx       = dp2px(CLOSE_ZONE_SIZE_DP)
+         val screenWidth  = resources.displayMetrics.widthPixels
+@@ -179,7 +189,7 @@ class FloatingBubbleService : Service() {
+ 
+         closeView = ImageView(this).apply {
+             alpha = 0f
+-            elevation = 10f
++            elevation = 14f
+             setImageBitmap(buildCloseZoneBitmap(sizePx))
+         }
+ 
+@@ -204,21 +214,19 @@ class FloatingBubbleService : Service() {
+         closeView  = null
+     }
+ 
+-    // -------------------------------------------------------------------------
+-    // Touch handling
+-    // -------------------------------------------------------------------------
+-
+     private fun attachTouchListener() {
+         var downParamsX = 0
+         var downParamsY = 0
+         var downRawX    = 0f
+         var downRawY    = 0f
++        var downTime    = 0L
+         var isDragging  = false
+         var isOverClose = false
+ 
+         bubbleView?.setOnTouchListener { _: View, event: MotionEvent ->
+             when (event.action) {
+                 MotionEvent.ACTION_DOWN -> {
++                    downTime = System.currentTimeMillis()
+                     downParamsX = params?.x ?: 0
+                     downParamsY = params?.y ?: 0
+                     downRawX    = event.rawX
+@@ -232,9 +240,8 @@ class FloatingBubbleService : Service() {
+                     val dx = (event.rawX - downRawX).toInt()
+                     val dy = (event.rawY - downRawY).toInt()
+ 
+-                    if (!isDragging && (abs(dx) > 8 || abs(dy) > 8)) {
++                    if (!isDragging && (abs(dx) > 10 || abs(dy) > 10)) {
+                         isDragging = true
+-                        // Show X zone as soon as a real drag starts
+                         if (enableDismiss) showCloseZone()
+                     }
+ 
+@@ -262,7 +269,17 @@ class FloatingBubbleService : Service() {
+                     when {
+                         isDragging && enableDismiss && isOverClose -> stopSelf()
+                         isDragging -> snapToEdge()
+-                        else -> openHostApp()
++                        else -> {
++                            val duration = System.currentTimeMillis() - downTime
++                            if (duration > 650) {
++                                // Long press (>650ms): open the host app!
++                                triggerVibration(longPress = true)
++                                openHostApp()
++                            } else {
++                                // Single tap: Increment bead count immediately!
++                                onBubbleTapped()
++                            }
++                        }
+                     }
+ 
+                     isDragging  = false
+@@ -283,9 +300,195 @@ class FloatingBubbleService : Service() {
+         }
+     }
+ 
+-    // -------------------------------------------------------------------------
+-    // Close zone helpers
+-    // -------------------------------------------------------------------------
++    private fun onBubbleTapped() {
++        count++
++        var roundCompleted = false
++        if (count >= target) {
++            rounds++
++            count = 0
++            roundCompleted = true
++        }
++
++        if (roundCompleted) {
++            triggerRoundCompleteVibration()
++        } else {
++            triggerVibration(longPress = false)
++        }
++
++        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
++        prefs.edit()
++            .putInt("count", count)
++            .putInt("rounds", rounds)
++            .putInt("target", target)
++            .apply()
++
++        val eventData = Arguments.createMap().apply {
++            putInt("count", count)
++            putInt("rounds", rounds)
++            putInt("target", target)
++        }
++        FloatingBubbleModule.sendEvent("onBeadCountChanged", eventData)
++
++        updateBubbleBitmap()
++        updateNotification()
++    }
++
++    fun updateBubbleBitmap() {
++        val sizePx = dp2px(bubbleSizeDp)
++        val bitmap = if (iconBase64 != null) {
++            resolveIcon(sizePx)
++        } else if (useLauncherIcon) {
++            getLauncherIconBitmap(sizePx)?.let { clipToCircle(it) } ?: buildBeadCounterBitmap(sizePx)
++        } else {
++            buildBeadCounterBitmap(sizePx)
++        }
++        bubbleView?.post {
++            bubbleView?.setImageBitmap(bitmap)
++        }
++    }
++
++    fun updateNotification() {
++        try {
++            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as? NotificationManager
++            notificationManager?.notify(NOTIFICATION_ID, buildNotification())
++        } catch (_: Exception) {}
++    }
++
++    private fun getVibrator(): Vibrator? {
++        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
++            val vm = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
++            vm?.defaultVibrator
++        } else {
++            @Suppress("DEPRECATION")
++            getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
++        }
++    }
++
++    private fun triggerVibration(longPress: Boolean) {
++        try {
++            val vibrator = getVibrator()
++            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
++                if (longPress) {
++                    vibrator?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 70, 60, 70), -1))
++                } else {
++                    vibrator?.vibrate(VibrationEffect.createOneShot(45, VibrationEffect.DEFAULT_AMPLITUDE))
++                }
++            } else {
++                @Suppress("DEPRECATION")
++                if (longPress) {
++                    vibrator?.vibrate(longArrayOf(0, 70, 60, 70), -1)
++                } else {
++                    vibrator?.vibrate(45)
++                }
++            }
++        } catch (_: Exception) {}
++    }
++
++    private fun triggerRoundCompleteVibration() {
++        try {
++            val vibrator = getVibrator()
++            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
++                vibrator?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 90, 80, 150), -1))
++            } else {
++                @Suppress("DEPRECATION")
++                vibrator?.vibrate(longArrayOf(0, 90, 80, 150), -1)
++            }
++        } catch (_: Exception) {}
++    }
++
++    private fun buildBeadCounterBitmap(sizePx: Int): Bitmap {
++        val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
++        val canvas = Canvas(bitmap)
++        val cx = sizePx / 2f
++        val cy = sizePx / 2f
++        val radius = sizePx / 2f - 4f
++
++        // 1. Drop shadow
++        val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
++            color = Color.argb(65, 0, 0, 0)
++            maskFilter = BlurMaskFilter(6f, BlurMaskFilter.Blur.NORMAL)
++        }
++        canvas.drawCircle(cx, cy + 3f, radius, shadowPaint)
++
++        // 2. Yellow/Gold background circle
++        val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
++            color = bubbleColor
++        }
++        canvas.drawCircle(cx, cy, radius, bgPaint)
++
++        // 3. Progress arc / border ring
++        val strokeW = sizePx * 0.055f
++        val ringBgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
++            color = Color.argb(45, 0, 0, 0)
++            style = Paint.Style.STROKE
++            strokeWidth = strokeW
++        }
++        val ringInset = strokeW / 2f + 3f
++        val ringRect = RectF(
++            cx - radius + ringInset,
++            cy - radius + ringInset,
++            cx + radius - ringInset,
++            cy + radius - ringInset
++        )
++        canvas.drawArc(ringRect, 0f, 360f, false, ringBgPaint)
++
++        val progressPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
++            color = Color.parseColor("#1E293B")
++            style = Paint.Style.STROKE
++            strokeWidth = strokeW
++            strokeCap = Paint.Cap.ROUND
++        }
++        val sweepAngle = if (target > 0) (count.toFloat() / target.toFloat()) * 360f else 0f
++        if (sweepAngle > 0f) {
++            canvas.drawArc(ringRect, -90f, sweepAngle, false, progressPaint)
++        }
++
++        // 4. Rounds pill badge at the top
++        val badgeHeight = sizePx * 0.22f
++        val badgeWidth = sizePx * 0.62f
++        val badgeTop = cy - radius + sizePx * 0.08f
++        val badgeRect = RectF(
++            cx - badgeWidth / 2f,
++            badgeTop,
++            cx + badgeWidth / 2f,
++            badgeTop + badgeHeight
++        )
++        val badgeBgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
++            color = Color.parseColor("#0F172A")
++        }
++        canvas.drawRoundRect(badgeRect, badgeHeight / 2f, badgeHeight / 2f, badgeBgPaint)
++
++        val badgeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
++            color = Color.WHITE
++            textSize = badgeHeight * 0.62f
++            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
++            textAlign = Paint.Align.CENTER
++        }
++        val badgeTextY = badgeRect.centerY() - ((badgeTextPaint.descent() + badgeTextPaint.ascent()) / 2f)
++        canvas.drawText("$rounds ပတ်", cx, badgeTextY, badgeTextPaint)
++
++        // 5. Count text in the center
++        val countTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
++            color = Color.parseColor("#1A3C5A")
++            textSize = sizePx * 0.34f
++            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
++            textAlign = Paint.Align.CENTER
++        }
++        val countY = cy + sizePx * 0.11f
++        canvas.drawText("$count", cx, countY, countTextPaint)
++
++        // 6. Target text below count (e.g. "/ 9")
++        val targetTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
++            color = Color.parseColor("#475569")
++            textSize = sizePx * 0.16f
++            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
++            textAlign = Paint.Align.CENTER
++        }
++        val targetY = cy + sizePx * 0.26f
++        canvas.drawText("/ $target", cx, targetY, targetTextPaint)
++
++        return bitmap
++    }
+ 
+     private fun showCloseZone() {
+         closeView?.animate()?.alpha(1f)?.setDuration(200)?.start()
+@@ -295,10 +498,6 @@ class FloatingBubbleService : Service() {
+         closeView?.animate()?.alpha(0f)?.setDuration(150)?.start()
+     }
+ 
+-    /**
+-     * Returns true if the centre of the bubble is within [SNAP_THRESHOLD_DP] dp
+-     * of the centre of the close zone.
+-     */
+     private fun isOverCloseZone(): Boolean {
+         val cp = closeParams ?: return false
+         val pp = params      ?: return false
+@@ -315,7 +514,6 @@ class FloatingBubbleService : Service() {
+                 dp2px(SNAP_THRESHOLD_DP)
+     }
+ 
+-    /** Moves the bubble so its centre aligns with the close zone centre. */
+     private fun snapBubbleToCloseZone() {
+         val cp = closeParams ?: return
+         val bubbleSizePx = dp2px(bubbleSizeDp)
+@@ -325,10 +523,6 @@ class FloatingBubbleService : Service() {
+         safeUpdateLayout()
+     }
+ 
+-    // -------------------------------------------------------------------------
+-    // Snap animation
+-    // -------------------------------------------------------------------------
+-
+     private fun snapToEdge() {
+         val screenWidth = resources.displayMetrics.widthPixels
+         val currentX    = params?.x ?: 0
+@@ -353,10 +547,6 @@ class FloatingBubbleService : Service() {
+         } catch (_: Exception) {}
+     }
+ 
+-    // -------------------------------------------------------------------------
+-    // Open host app
+-    // -------------------------------------------------------------------------
+-
+     private fun openHostApp() {
+         val intent = packageManager
+             .getLaunchIntentForPackage(packageName)
+@@ -369,10 +559,6 @@ class FloatingBubbleService : Service() {
+         intent?.let { startActivity(it) }
+     }
+ 
+-    // -------------------------------------------------------------------------
+-    // Icon resolution  (priority: base64 → launcher icon → colour circle)
+-    // -------------------------------------------------------------------------
+-
+     private fun resolveIcon(sizePx: Int): Bitmap {
+         iconBase64?.let { b64 ->
+             decodeBase64Bitmap(b64)?.let { raw ->
+@@ -382,7 +568,7 @@ class FloatingBubbleService : Service() {
+         if (useLauncherIcon) {
+             getLauncherIconBitmap(sizePx)?.let { return clipToCircle(it) }
+         }
+-        return buildColoredCircle(sizePx, bubbleColor)
++        return buildBeadCounterBitmap(sizePx)
+     }
+ 
+     private fun getLauncherIconBitmap(sizePx: Int): Bitmap? {
+@@ -412,26 +598,6 @@ class FloatingBubbleService : Service() {
+     private fun scaleBitmap(src: Bitmap, targetPx: Int): Bitmap =
+         Bitmap.createScaledBitmap(src, targetPx, targetPx, true)
+ 
+-    private fun buildColoredCircle(sizePx: Int, color: Int): Bitmap {
+-        val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
+-        val canvas = Canvas(bitmap)
+-        val cx = sizePx / 2f
+-        val cy = sizePx / 2f
+-        val radius = sizePx / 2f - 4f
+-        val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+-            this.color = Color.argb(60, 0, 0, 0)
+-            maskFilter  = BlurMaskFilter(6f, BlurMaskFilter.Blur.NORMAL)
+-        }
+-        canvas.drawCircle(cx, cy + 3f, radius, shadowPaint)
+-        val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { this.color = color }
+-        canvas.drawCircle(cx, cy, radius, fillPaint)
+-        return bitmap
+-    }
+-
+-    /**
+-     * Draws the dismiss zone bitmap: a semi-transparent dark circle with a
+-     * white ✕ in the centre, matching the standard Android chat-head style.
+-     */
+     private fun buildCloseZoneBitmap(sizePx: Int): Bitmap {
+         val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
+         val canvas = Canvas(bitmap)
+@@ -439,13 +605,11 @@ class FloatingBubbleService : Service() {
+         val cy = sizePx / 2f
+         val radius = sizePx / 2f - 2f
+ 
+-        // Semi-transparent dark background circle
+         val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+             color = Color.argb(160, 30, 30, 30)
+         }
+         canvas.drawCircle(cx, cy, radius, bgPaint)
+ 
+-        // Muted light-gray ✕ lines
+         val crossPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+             color       = Color.argb(210, 200, 200, 200)
+             strokeWidth = sizePx * 0.07f
+@@ -465,10 +629,6 @@ class FloatingBubbleService : Service() {
+         } catch (_: Exception) { null }
+     }
+ 
+-    // -------------------------------------------------------------------------
+-    // Notification (required for foreground service)
+-    // -------------------------------------------------------------------------
+-
+     private fun buildNotification(): Notification {
+         val openIntent    = packageManager.getLaunchIntentForPackage(packageName)
+         val pendingIntent = PendingIntent.getActivity(
+@@ -476,8 +636,8 @@ class FloatingBubbleService : Service() {
+             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+         )
+         return NotificationCompat.Builder(this, CHANNEL_ID)
+-            .setContentTitle(getString(R.string.floating_bubble_notification_title))
+-            .setContentText(getString(R.string.floating_bubble_notification_text))
++            .setContentTitle("ပုတီးစိပ်ကောင်တာ")
++            .setContentText("ပုတီးရေတွက်မှု: $count / $target ($rounds ပတ်)")
+             .setSmallIcon(R.drawable.ic_notification)
+             .setContentIntent(pendingIntent)
+             .setOngoing(true)
+@@ -500,10 +660,6 @@ class FloatingBubbleService : Service() {
+         }
+     }
+ 
+-    // -------------------------------------------------------------------------
+-    // Generic helpers
+-    // -------------------------------------------------------------------------
+-
+     private fun overlayWindowType(): Int =
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+diff --git a/node_modules/@increase21/rn-floating-bubble/lib/index.d.ts b/node_modules/@increase21/rn-floating-bubble/lib/index.d.ts
+index aebab74..51d6634 100644
+--- a/node_modules/@increase21/rn-floating-bubble/lib/index.d.ts
++++ b/node_modules/@increase21/rn-floating-bubble/lib/index.d.ts
+@@ -1,80 +1,27 @@
+ export interface FloatingBubbleOptions {
+-    /**
+-     * Bubble diameter in dp. Defaults to 60.
+-     */
+     size?: number;
+-    /**
+-     * Bubble background color as an ARGB integer (e.g. 0xFF4285F4).
+-     * Only used when both `icon` and `useLauncherIcon` resolve to nothing.
+-     */
+     color?: number;
+-    /**
+-     * Base64-encoded PNG/JPG to use as the bubble icon.
+-     * Takes priority over `useLauncherIcon`.
+-     */
+     icon?: string;
+-    /**
+-     * When `true` (the default when no `icon` is provided) the library reads
+-     * the host app's launcher icon from the PackageManager and clips it to a
+-     * circle.  Set to `false` to force the plain colour circle instead.
+-     *
+-     * The icon resolution order is:
+-     *   1. `icon` (base64)  — developer-supplied custom image
+-     *   2. launcher icon    — `useLauncherIcon: true` (default)
+-     *   3. colour circle    — fallback when everything else fails
+-     *
+-     * @default true (when `icon` is not set)
+-     */
+     useLauncherIcon?: boolean;
+-    /**
+-     * Initial X position of the bubble in screen pixels. Defaults to 0 (left edge).
+-     */
+     initialX?: number;
+-    /**
+-     * Initial Y position of the bubble in screen pixels. Defaults to 100.
+-     */
+     initialY?: number;
+-    /**
+-     * When `true`, dragging the bubble reveals a dismiss zone (✕) at the bottom
+-     * of the screen; releasing the bubble onto it closes it.
+-     * Mimics the standard Android chat-head dismiss pattern.
+-     *
+-     * When `false` (the default) the bubble can only be hidden programmatically
+-     * via `FloatingBubble.hide()`.
+-     *
+-     * @default false
+-     */
+     enableDismiss?: boolean;
++    count?: number;
++    rounds?: number;
++    target?: number;
++}
++export interface BeadCounterData {
++    count: number;
++    rounds: number;
++    target: number;
+ }
+ declare const FloatingBubble: {
+-    /**
+-     * Display the floating bubble.
+-     *
+-     * Requires SYSTEM_ALERT_WINDOW permission — call `requestPermission()`
+-     * and wait for user approval before calling `show()`.
+-     *
+-     * @throws if the permission has not been granted.
+-     */
+     show(options?: FloatingBubbleOptions): Promise<void>;
+-    /**
+-     * Hide and destroy the floating bubble.
+-     */
++    updateData(options: { count?: number; rounds?: number; target?: number }): Promise<void>;
++    getData(): Promise<BeadCounterData>;
+     hide(): Promise<void>;
+-    /**
+-     * Returns `true` if the bubble is currently visible.
+-     */
+     isShowing(): Promise<boolean>;
+-    /**
+-     * Returns `true` if the SYSTEM_ALERT_WINDOW permission has been granted.
+-     */
+     hasPermission(): Promise<boolean>;
+-    /**
+-     * Opens the system settings screen so the user can grant the
+-     * SYSTEM_ALERT_WINDOW ("Display over other apps") permission.
+-     *
+-     * The returned promise resolves once the user returns to the app.
+-     * The resolved value is `true` if permission was granted.
+-     */
+     requestPermission(): Promise<boolean>;
+ };
+ export default FloatingBubble;
+diff --git a/node_modules/@increase21/rn-floating-bubble/lib/index.js b/node_modules/@increase21/rn-floating-bubble/lib/index.js
+index 11ad423..af3c824 100644
+--- a/node_modules/@increase21/rn-floating-bubble/lib/index.js
++++ b/node_modules/@increase21/rn-floating-bubble/lib/index.js
+@@ -11,65 +11,55 @@ const NativeFloatingBubble = NativeModules.FloatingBubble
+         },
+     });
+ const FloatingBubble = {
+-    /**
+-     * Display the floating bubble.
+-     *
+-     * Requires SYSTEM_ALERT_WINDOW permission — call `requestPermission()`
+-     * and wait for user approval before calling `show()`.
+-     *
+-     * @throws if the permission has not been granted.
+-     */
+     show(options = {}) {
+         if (Platform.OS !== 'android') {
+             return Promise.reject(new Error('FloatingBubble is only supported on Android.'));
+         }
+         const hasCustomIcon = options.icon != null;
+         const opts = {
+-            size: options.size ?? 60,
+-            color: options.color ?? 0xff4285f4,
++            size: options.size ?? 72,
++            color: options.color ?? 0xfff59e0b,
+             icon: options.icon ?? null,
+-            // Default: use launcher icon only when no custom icon is provided
+-            useLauncherIcon: options.useLauncherIcon ?? !hasCustomIcon,
++            useLauncherIcon: options.useLauncherIcon ?? false,
+             initialX: options.initialX ?? 0,
+-            initialY: options.initialY ?? 100,
+-            enableDismiss: options.enableDismiss ?? false,
++            initialY: options.initialY ?? 200,
++            enableDismiss: options.enableDismiss ?? true,
++            count: options.count ?? 0,
++            rounds: options.rounds ?? 0,
++            target: options.target ?? 9,
+         };
+         return NativeFloatingBubble.show(opts);
+     },
+-    /**
+-     * Hide and destroy the floating bubble.
+-     */
++    updateData(options) {
++        if (Platform.OS !== 'android') {
++            return Promise.resolve();
++        }
++        return NativeFloatingBubble.updateData(options);
++    },
++    getData() {
++        if (Platform.OS !== 'android') {
++            return Promise.resolve({ count: 0, rounds: 0, target: 9 });
++        }
++        return NativeFloatingBubble.getData();
++    },
+     hide() {
+         if (Platform.OS !== 'android') {
+             return Promise.resolve();
+         }
+         return NativeFloatingBubble.hide();
+     },
+-    /**
+-     * Returns `true` if the bubble is currently visible.
+-     */
+     isShowing() {
+         if (Platform.OS !== 'android') {
+             return Promise.resolve(false);
+         }
+         return NativeFloatingBubble.isShowing();
+     },
+-    /**
+-     * Returns `true` if the SYSTEM_ALERT_WINDOW permission has been granted.
+-     */
+     hasPermission() {
+         if (Platform.OS !== 'android') {
+             return Promise.resolve(false);
+         }
+         return NativeFloatingBubble.hasPermission();
+     },
+-    /**
+-     * Opens the system settings screen so the user can grant the
+-     * SYSTEM_ALERT_WINDOW ("Display over other apps") permission.
+-     *
+-     * The returned promise resolves once the user returns to the app.
+-     * The resolved value is `true` if permission was granted.
+-     */
+     requestPermission() {
+         if (Platform.OS !== 'android') {
+             return Promise.resolve(false);
+@@ -78,4 +68,3 @@ const FloatingBubble = {
+     },
+ };
+ export default FloatingBubble;
+-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxFQUFFLGFBQWEsRUFBRSxRQUFRLEVBQUUsTUFBTSxjQUFjLENBQUM7QUFFdkQsTUFBTSxhQUFhLEdBQ2pCLHlGQUF5RjtJQUN6RixRQUFRLENBQUMsTUFBTSxDQUFDLEVBQUUsR0FBRyxFQUFFLGdDQUFnQyxFQUFFLE9BQU8sRUFBRSxFQUFFLEVBQUUsQ0FBQztJQUN2RSxzREFBc0Q7SUFDdEQsK0JBQStCLENBQUM7QUFFbEMsTUFBTSxvQkFBb0IsR0FBRyxhQUFhLENBQUMsY0FBYztJQUN2RCxDQUFDLENBQUMsYUFBYSxDQUFDLGNBQWM7SUFDOUIsQ0FBQyxDQUFDLElBQUksS0FBSyxDQUNQLEVBQUUsRUFDRjtRQUNFLEdBQUc7WUFDRCxNQUFNLElBQUksS0FBSyxDQUFDLGFBQWEsQ0FBQyxDQUFDO1FBQ2pDLENBQUM7S0FDRixDQUNGLENBQUM7QUFtRE4sTUFBTSxjQUFjLEdBQUc7SUFDckI7Ozs7Ozs7T0FPRztJQUNILElBQUksQ0FBQyxVQUFpQyxFQUFFO1FBQ3RDLElBQUksUUFBUSxDQUFDLEVBQUUsS0FBSyxTQUFTLEVBQUUsQ0FBQztZQUM5QixPQUFPLE9BQU8sQ0FBQyxNQUFNLENBQUMsSUFBSSxLQUFLLENBQUMsOENBQThDLENBQUMsQ0FBQyxDQUFDO1FBQ25GLENBQUM7UUFDRCxNQUFNLGFBQWEsR0FBRyxPQUFPLENBQUMsSUFBSSxJQUFJLElBQUksQ0FBQztRQUMzQyxNQUFNLElBQUksR0FBRztZQUNYLElBQUksRUFBRSxPQUFPLENBQUMsSUFBSSxJQUFJLEVBQUU7WUFDeEIsS0FBSyxFQUFFLE9BQU8sQ0FBQyxLQUFLLElBQUksVUFBVTtZQUNsQyxJQUFJLEVBQUUsT0FBTyxDQUFDLElBQUksSUFBSSxJQUFJO1lBQzFCLGtFQUFrRTtZQUNsRSxlQUFlLEVBQUUsT0FBTyxDQUFDLGVBQWUsSUFBSSxDQUFDLGFBQWE7WUFDMUQsUUFBUSxFQUFFLE9BQU8sQ0FBQyxRQUFRLElBQUksQ0FBQztZQUMvQixRQUFRLEVBQUUsT0FBTyxDQUFDLFFBQVEsSUFBSSxHQUFHO1lBQ2pDLGFBQWEsRUFBRSxPQUFPLENBQUMsYUFBYSxJQUFJLEtBQUs7U0FDOUMsQ0FBQztRQUNGLE9BQU8sb0JBQW9CLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDO0lBQ3pDLENBQUM7SUFFRDs7T0FFRztJQUNILElBQUk7UUFDRixJQUFJLFFBQVEsQ0FBQyxFQUFFLEtBQUssU0FBUyxFQUFFLENBQUM7WUFDOUIsT0FBTyxPQUFPLENBQUMsT0FBTyxFQUFFLENBQUM7UUFDM0IsQ0FBQztRQUNELE9BQU8sb0JBQW9CLENBQUMsSUFBSSxFQUFFLENBQUM7SUFDckMsQ0FBQztJQUVEOztPQUVHO0lBQ0gsU0FBUztRQUNQLElBQUksUUFBUSxDQUFDLEVBQUUsS0FBSyxTQUFTLEVBQUUsQ0FBQztZQUM5QixPQUFPLE9BQU8sQ0FBQyxPQUFPLENBQUMsS0FBSyxDQUFDLENBQUM7UUFDaEMsQ0FBQztRQUNELE9BQU8sb0JBQW9CLENBQUMsU0FBUyxFQUFFLENBQUM7SUFDMUMsQ0FBQztJQUVEOztPQUVHO0lBQ0gsYUFBYTtRQUNYLElBQUksUUFBUSxDQUFDLEVBQUUsS0FBSyxTQUFTLEVBQUUsQ0FBQztZQUM5QixPQUFPLE9BQU8sQ0FBQyxPQUFPLENBQUMsS0FBSyxDQUFDLENBQUM7UUFDaEMsQ0FBQztRQUNELE9BQU8sb0JBQW9CLENBQUMsYUFBYSxFQUFFLENBQUM7SUFDOUMsQ0FBQztJQUVEOzs7Ozs7T0FNRztJQUNILGlCQUFpQjtRQUNmLElBQUksUUFBUSxDQUFDLEVBQUUsS0FBSyxTQUFTLEVBQUUsQ0FBQztZQUM5QixPQUFPLE9BQU8sQ0FBQyxPQUFPLENBQUMsS0FBSyxDQUFDLENBQUM7UUFDaEMsQ0FBQztRQUNELE9BQU8sb0JBQW9CLENBQUMsaUJBQWlCLEVBQUUsQ0FBQztJQUNsRCxDQUFDO0NBQ0YsQ0FBQztBQUVGLGVBQWUsY0FBYyxDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgTmF0aXZlTW9kdWxlcywgUGxhdGZvcm0gfSBmcm9tICdyZWFjdC1uYXRpdmUnO1xuXG5jb25zdCBMSU5LSU5HX0VSUk9SID1cbiAgXCJUaGUgcGFja2FnZSAnQGluY3JlYXNlMjEvcm4tZmxvYXRpbmctYnViYmxlJyBkb2Vzbid0IHNlZW0gdG8gYmUgbGlua2VkLiBNYWtlIHN1cmU6IFxcblxcblwiICtcbiAgUGxhdGZvcm0uc2VsZWN0KHsgaW9zOiBcIi0gWW91IGhhdmUgcnVuICdwb2QgaW5zdGFsbCdcXG5cIiwgZGVmYXVsdDogJycgfSkgK1xuICAnLSBZb3UgcmVidWlsdCB0aGUgYXBwIGFmdGVyIGluc3RhbGxpbmcgdGhlIHBhY2thZ2VcXG4nICtcbiAgJy0gWW91IGFyZSBub3QgdXNpbmcgRXhwbyBHb1xcbic7XG5cbmNvbnN0IE5hdGl2ZUZsb2F0aW5nQnViYmxlID0gTmF0aXZlTW9kdWxlcy5GbG9hdGluZ0J1YmJsZVxuICA/IE5hdGl2ZU1vZHVsZXMuRmxvYXRpbmdCdWJibGVcbiAgOiBuZXcgUHJveHkoXG4gICAgICB7fSxcbiAgICAgIHtcbiAgICAgICAgZ2V0KCkge1xuICAgICAgICAgIHRocm93IG5ldyBFcnJvcihMSU5LSU5HX0VSUk9SKTtcbiAgICAgICAgfSxcbiAgICAgIH1cbiAgICApO1xuXG5leHBvcnQgaW50ZXJmYWNlIEZsb2F0aW5nQnViYmxlT3B0aW9ucyB7XG4gIC8qKlxuICAgKiBCdWJibGUgZGlhbWV0ZXIgaW4gZHAuIERlZmF1bHRzIHRvIDYwLlxuICAgKi9cbiAgc2l6ZT86IG51bWJlcjtcbiAgLyoqXG4gICAqIEJ1YmJsZSBiYWNrZ3JvdW5kIGNvbG9yIGFzIGFuIEFSR0IgaW50ZWdlciAoZS5nLiAweEZGNDI4NUY0KS5cbiAgICogT25seSB1c2VkIHdoZW4gYm90aCBgaWNvbmAgYW5kIGB1c2VMYXVuY2hlckljb25gIHJlc29sdmUgdG8gbm90aGluZy5cbiAgICovXG4gIGNvbG9yPzogbnVtYmVyO1xuICAvKipcbiAgICogQmFzZTY0LWVuY29kZWQgUE5HL0pQRyB0byB1c2UgYXMgdGhlIGJ1YmJsZSBpY29uLlxuICAgKiBUYWtlcyBwcmlvcml0eSBvdmVyIGB1c2VMYXVuY2hlckljb25gLlxuICAgKi9cbiAgaWNvbj86IHN0cmluZztcbiAgLyoqXG4gICAqIFdoZW4gYHRydWVgICh0aGUgZGVmYXVsdCB3aGVuIG5vIGBpY29uYCBpcyBwcm92aWRlZCkgdGhlIGxpYnJhcnkgcmVhZHNcbiAgICogdGhlIGhvc3QgYXBwJ3MgbGF1bmNoZXIgaWNvbiBmcm9tIHRoZSBQYWNrYWdlTWFuYWdlciBhbmQgY2xpcHMgaXQgdG8gYVxuICAgKiBjaXJjbGUuICBTZXQgdG8gYGZhbHNlYCB0byBmb3JjZSB0aGUgcGxhaW4gY29sb3VyIGNpcmNsZSBpbnN0ZWFkLlxuICAgKlxuICAgKiBUaGUgaWNvbiByZXNvbHV0aW9uIG9yZGVyIGlzOlxuICAgKiAgIDEuIGBpY29uYCAoYmFzZTY0KSAg4oCUIGRldmVsb3Blci1zdXBwbGllZCBjdXN0b20gaW1hZ2VcbiAgICogICAyLiBsYXVuY2hlciBpY29uICAgIOKAlCBgdXNlTGF1bmNoZXJJY29uOiB0cnVlYCAoZGVmYXVsdClcbiAgICogICAzLiBjb2xvdXIgY2lyY2xlICAgIOKAlCBmYWxsYmFjayB3aGVuIGV2ZXJ5dGhpbmcgZWxzZSBmYWlsc1xuICAgKlxuICAgKiBAZGVmYXVsdCB0cnVlICh3aGVuIGBpY29uYCBpcyBub3Qgc2V0KVxuICAgKi9cbiAgdXNlTGF1bmNoZXJJY29uPzogYm9vbGVhbjtcbiAgLyoqXG4gICAqIEluaXRpYWwgWCBwb3NpdGlvbiBvZiB0aGUgYnViYmxlIGluIHNjcmVlbiBwaXhlbHMuIERlZmF1bHRzIHRvIDAgKGxlZnQgZWRnZSkuXG4gICAqL1xuICBpbml0aWFsWD86IG51bWJlcjtcbiAgLyoqXG4gICAqIEluaXRpYWwgWSBwb3NpdGlvbiBvZiB0aGUgYnViYmxlIGluIHNjcmVlbiBwaXhlbHMuIERlZmF1bHRzIHRvIDEwMC5cbiAgICovXG4gIGluaXRpYWxZPzogbnVtYmVyO1xuICAvKipcbiAgICogV2hlbiBgdHJ1ZWAsIGRyYWdnaW5nIHRoZSBidWJibGUgcmV2ZWFscyBhIGRpc21pc3Mgem9uZSAo4pyVKSBhdCB0aGUgYm90dG9tXG4gICAqIG9mIHRoZSBzY3JlZW47IHJlbGVhc2luZyB0aGUgYnViYmxlIG9udG8gaXQgY2xvc2VzIGl0LlxuICAgKiBNaW1pY3MgdGhlIHN0YW5kYXJkIEFuZHJvaWQgY2hhdC1oZWFkIGRpc21pc3MgcGF0dGVybi5cbiAgICpcbiAgICogV2hlbiBgZmFsc2VgICh0aGUgZGVmYXVsdCkgdGhlIGJ1YmJsZSBjYW4gb25seSBiZSBoaWRkZW4gcHJvZ3JhbW1hdGljYWxseVxuICAgKiB2aWEgYEZsb2F0aW5nQnViYmxlLmhpZGUoKWAuXG4gICAqXG4gICAqIEBkZWZhdWx0IGZhbHNlXG4gICAqL1xuICBlbmFibGVEaXNtaXNzPzogYm9vbGVhbjtcbn1cblxuY29uc3QgRmxvYXRpbmdCdWJibGUgPSB7XG4gIC8qKlxuICAgKiBEaXNwbGF5IHRoZSBmbG9hdGluZyBidWJibGUuXG4gICAqXG4gICAqIFJlcXVpcmVzIFNZU1RFTV9BTEVSVF9XSU5ET1cgcGVybWlzc2lvbiDigJQgY2FsbCBgcmVxdWVzdFBlcm1pc3Npb24oKWBcbiAgICogYW5kIHdhaXQgZm9yIHVzZXIgYXBwcm92YWwgYmVmb3JlIGNhbGxpbmcgYHNob3coKWAuXG4gICAqXG4gICAqIEB0aHJvd3MgaWYgdGhlIHBlcm1pc3Npb24gaGFzIG5vdCBiZWVuIGdyYW50ZWQuXG4gICAqL1xuICBzaG93KG9wdGlvbnM6IEZsb2F0aW5nQnViYmxlT3B0aW9ucyA9IHt9KTogUHJvbWlzZTx2b2lkPiB7XG4gICAgaWYgKFBsYXRmb3JtLk9TICE9PSAnYW5kcm9pZCcpIHtcbiAgICAgIHJldHVybiBQcm9taXNlLnJlamVjdChuZXcgRXJyb3IoJ0Zsb2F0aW5nQnViYmxlIGlzIG9ubHkgc3VwcG9ydGVkIG9uIEFuZHJvaWQuJykpO1xuICAgIH1cbiAgICBjb25zdCBoYXNDdXN0b21JY29uID0gb3B0aW9ucy5pY29uICE9IG51bGw7XG4gICAgY29uc3Qgb3B0cyA9IHtcbiAgICAgIHNpemU6IG9wdGlvbnMuc2l6ZSA/PyA2MCxcbiAgICAgIGNvbG9yOiBvcHRpb25zLmNvbG9yID8/IDB4ZmY0Mjg1ZjQsXG4gICAgICBpY29uOiBvcHRpb25zLmljb24gPz8gbnVsbCxcbiAgICAgIC8vIERlZmF1bHQ6IHVzZSBsYXVuY2hlciBpY29uIG9ubHkgd2hlbiBubyBjdXN0b20gaWNvbiBpcyBwcm92aWRlZFxuICAgICAgdXNlTGF1bmNoZXJJY29uOiBvcHRpb25zLnVzZUxhdW5jaGVySWNvbiA/PyAhaGFzQ3VzdG9tSWNvbixcbiAgICAgIGluaXRpYWxYOiBvcHRpb25zLmluaXRpYWxYID8/IDAsXG4gICAgICBpbml0aWFsWTogb3B0aW9ucy5pbml0aWFsWSA/PyAxMDAsXG4gICAgICBlbmFibGVEaXNtaXNzOiBvcHRpb25zLmVuYWJsZURpc21pc3MgPz8gZmFsc2UsXG4gICAgfTtcbiAgICByZXR1cm4gTmF0aXZlRmxvYXRpbmdCdWJibGUuc2hvdyhvcHRzKTtcbiAgfSxcblxuICAvKipcbiAgICogSGlkZSBhbmQgZGVzdHJveSB0aGUgZmxvYXRpbmcgYnViYmxlLlxuICAgKi9cbiAgaGlkZSgpOiBQcm9taXNlPHZvaWQ+IHtcbiAgICBpZiAoUGxhdGZvcm0uT1MgIT09ICdhbmRyb2lkJykge1xuICAgICAgcmV0dXJuIFByb21pc2UucmVzb2x2ZSgpO1xuICAgIH1cbiAgICByZXR1cm4gTmF0aXZlRmxvYXRpbmdCdWJibGUuaGlkZSgpO1xuICB9LFxuXG4gIC8qKlxuICAgKiBSZXR1cm5zIGB0cnVlYCBpZiB0aGUgYnViYmxlIGlzIGN1cnJlbnRseSB2aXNpYmxlLlxuICAgKi9cbiAgaXNTaG93aW5nKCk6IFByb21pc2U8Ym9vbGVhbj4ge1xuICAgIGlmIChQbGF0Zm9ybS5PUyAhPT0gJ2FuZHJvaWQnKSB7XG4gICAgICByZXR1cm4gUHJvbWlzZS5yZXNvbHZlKGZhbHNlKTtcbiAgICB9XG4gICAgcmV0dXJuIE5hdGl2ZUZsb2F0aW5nQnViYmxlLmlzU2hvd2luZygpO1xuICB9LFxuXG4gIC8qKlxuICAgKiBSZXR1cm5zIGB0cnVlYCBpZiB0aGUgU1lTVEVNX0FMRVJUX1dJTkRPVyBwZXJtaXNzaW9uIGhhcyBiZWVuIGdyYW50ZWQuXG4gICAqL1xuICBoYXNQZXJtaXNzaW9uKCk6IFByb21pc2U8Ym9vbGVhbj4ge1xuICAgIGlmIChQbGF0Zm9ybS5PUyAhPT0gJ2FuZHJvaWQnKSB7XG4gICAgICByZXR1cm4gUHJvbWlzZS5yZXNvbHZlKGZhbHNlKTtcbiAgICB9XG4gICAgcmV0dXJuIE5hdGl2ZUZsb2F0aW5nQnViYmxlLmhhc1Blcm1pc3Npb24oKTtcbiAgfSxcblxuICAvKipcbiAgICogT3BlbnMgdGhlIHN5c3RlbSBzZXR0aW5ncyBzY3JlZW4gc28gdGhlIHVzZXIgY2FuIGdyYW50IHRoZVxuICAgKiBTWVNURU1fQUxFUlRfV0lORE9XIChcIkRpc3BsYXkgb3ZlciBvdGhlciBhcHBzXCIpIHBlcm1pc3Npb24uXG4gICAqXG4gICAqIFRoZSByZXR1cm5lZCBwcm9taXNlIHJlc29sdmVzIG9uY2UgdGhlIHVzZXIgcmV0dXJucyB0byB0aGUgYXBwLlxuICAgKiBUaGUgcmVzb2x2ZWQgdmFsdWUgaXMgYHRydWVgIGlmIHBlcm1pc3Npb24gd2FzIGdyYW50ZWQuXG4gICAqL1xuICByZXF1ZXN0UGVybWlzc2lvbigpOiBQcm9taXNlPGJvb2xlYW4+IHtcbiAgICBpZiAoUGxhdGZvcm0uT1MgIT09ICdhbmRyb2lkJykge1xuICAgICAgcmV0dXJuIFByb21pc2UucmVzb2x2ZShmYWxzZSk7XG4gICAgfVxuICAgIHJldHVybiBOYXRpdmVGbG9hdGluZ0J1YmJsZS5yZXF1ZXN0UGVybWlzc2lvbigpO1xuICB9LFxufTtcblxuZXhwb3J0IGRlZmF1bHQgRmxvYXRpbmdCdWJibGU7XG4iXX0=
+\ No newline at end of file
+diff --git a/node_modules/@increase21/rn-floating-bubble/src/index.ts b/node_modules/@increase21/rn-floating-bubble/src/index.ts
+index 334a0f3..bcf4c4b 100644
+--- a/node_modules/@increase21/rn-floating-bubble/src/index.ts
++++ b/node_modules/@increase21/rn-floating-bubble/src/index.ts
+@@ -19,83 +19,67 @@ const NativeFloatingBubble = NativeModules.FloatingBubble
+ 
+ export interface FloatingBubbleOptions {
+   /**
+-   * Bubble diameter in dp. Defaults to 60.
++   * Bubble diameter in dp. Defaults to 72.
+    */
+   size?: number;
+   /**
+-   * Bubble background color as an ARGB integer (e.g. 0xFF4285F4).
+-   * Only used when both `icon` and `useLauncherIcon` resolve to nothing.
++   * Bubble background color as an ARGB integer (e.g. 0xFFF59E0B).
+    */
+   color?: number;
+   /**
+    * Base64-encoded PNG/JPG to use as the bubble icon.
+-   * Takes priority over `useLauncherIcon`.
+    */
+   icon?: string;
+-  /**
+-   * When `true` (the default when no `icon` is provided) the library reads
+-   * the host app's launcher icon from the PackageManager and clips it to a
+-   * circle.  Set to `false` to force the plain colour circle instead.
+-   *
+-   * The icon resolution order is:
+-   *   1. `icon` (base64)  — developer-supplied custom image
+-   *   2. launcher icon    — `useLauncherIcon: true` (default)
+-   *   3. colour circle    — fallback when everything else fails
+-   *
+-   * @default true (when `icon` is not set)
+-   */
+   useLauncherIcon?: boolean;
+-  /**
+-   * Initial X position of the bubble in screen pixels. Defaults to 0 (left edge).
+-   */
+   initialX?: number;
+-  /**
+-   * Initial Y position of the bubble in screen pixels. Defaults to 100.
+-   */
+   initialY?: number;
+-  /**
+-   * When `true`, dragging the bubble reveals a dismiss zone (✕) at the bottom
+-   * of the screen; releasing the bubble onto it closes it.
+-   * Mimics the standard Android chat-head dismiss pattern.
+-   *
+-   * When `false` (the default) the bubble can only be hidden programmatically
+-   * via `FloatingBubble.hide()`.
+-   *
+-   * @default false
+-   */
+   enableDismiss?: boolean;
++  count?: number;
++  rounds?: number;
++  target?: number;
++}
++
++export interface BeadCounterData {
++  count: number;
++  rounds: number;
++  target: number;
+ }
+ 
+ const FloatingBubble = {
+-  /**
+-   * Display the floating bubble.
+-   *
+-   * Requires SYSTEM_ALERT_WINDOW permission — call `requestPermission()`
+-   * and wait for user approval before calling `show()`.
+-   *
+-   * @throws if the permission has not been granted.
+-   */
+   show(options: FloatingBubbleOptions = {}): Promise<void> {
+     if (Platform.OS !== 'android') {
+       return Promise.reject(new Error('FloatingBubble is only supported on Android.'));
+     }
+     const hasCustomIcon = options.icon != null;
+     const opts = {
+-      size: options.size ?? 60,
+-      color: options.color ?? 0xff4285f4,
++      size: options.size ?? 72,
++      color: options.color ?? 0xfff59e0b,
+       icon: options.icon ?? null,
+-      // Default: use launcher icon only when no custom icon is provided
+-      useLauncherIcon: options.useLauncherIcon ?? !hasCustomIcon,
++      useLauncherIcon: options.useLauncherIcon ?? false,
+       initialX: options.initialX ?? 0,
+-      initialY: options.initialY ?? 100,
+-      enableDismiss: options.enableDismiss ?? false,
++      initialY: options.initialY ?? 200,
++      enableDismiss: options.enableDismiss ?? true,
++      count: options.count ?? 0,
++      rounds: options.rounds ?? 0,
++      target: options.target ?? 9,
+     };
+     return NativeFloatingBubble.show(opts);
+   },
+ 
+-  /**
+-   * Hide and destroy the floating bubble.
+-   */
++  updateData(options: { count?: number; rounds?: number; target?: number }): Promise<void> {
++    if (Platform.OS !== 'android') {
++      return Promise.resolve();
++    }
++    return NativeFloatingBubble.updateData(options);
++  },
++
++  getData(): Promise<BeadCounterData> {
++    if (Platform.OS !== 'android') {
++      return Promise.resolve({ count: 0, rounds: 0, target: 9 });
++    }
++    return NativeFloatingBubble.getData();
++  },
++
+   hide(): Promise<void> {
+     if (Platform.OS !== 'android') {
+       return Promise.resolve();
+@@ -103,9 +87,6 @@ const FloatingBubble = {
+     return NativeFloatingBubble.hide();
+   },
+ 
+-  /**
+-   * Returns `true` if the bubble is currently visible.
+-   */
+   isShowing(): Promise<boolean> {
+     if (Platform.OS !== 'android') {
+       return Promise.resolve(false);
+@@ -113,9 +94,6 @@ const FloatingBubble = {
+     return NativeFloatingBubble.isShowing();
+   },
+ 
+-  /**
+-   * Returns `true` if the SYSTEM_ALERT_WINDOW permission has been granted.
+-   */
+   hasPermission(): Promise<boolean> {
+     if (Platform.OS !== 'android') {
+       return Promise.resolve(false);
+@@ -123,13 +101,6 @@ const FloatingBubble = {
+     return NativeFloatingBubble.hasPermission();
+   },
+ 
+-  /**
+-   * Opens the system settings screen so the user can grant the
+-   * SYSTEM_ALERT_WINDOW ("Display over other apps") permission.
+-   *
+-   * The returned promise resolves once the user returns to the app.
+-   * The resolved value is `true` if permission was granted.
+-   */
+   requestPermission(): Promise<boolean> {
+     if (Platform.OS !== 'android') {
+       return Promise.resolve(false);

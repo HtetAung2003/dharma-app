@@ -58,8 +58,20 @@ export default function PracticeDetail() {
       </TouchableOpacity>
 
       {/* Guidelines Modal */}
-      <Modal visible={showModal} animationType="slide" transparent={true}>
+      <Modal
+        visible={showModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowModal(false)}
+      >
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' }}>
+          {/* Backdrop: Touching outside closes modal */}
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={() => setShowModal(false)}
+          />
+
           <View style={[
             styles.modalContent, 
             { backgroundColor: themeMode === 'dark' ? '#161B22' : '#FFF' }

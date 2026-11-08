@@ -1,11 +1,10 @@
-import { AntDesign } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { View } from "moti";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Import Theme Context
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -17,6 +16,7 @@ import { auth, db } from "../../services/firebaseConfig";
 const LoginScreen = () => {
   const router = useRouter();
   const { colors, fontSize, themeMode } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +39,7 @@ const LoginScreen = () => {
           password,
         );
         const user = userCredential.user;
-        
+
         const userDoc = await getDoc(doc(db, "users", user.uid));
 
         router.replace("/personalization"); // Navigate to Personalization screen
@@ -61,7 +61,7 @@ const LoginScreen = () => {
       ]}
       style={styles.background}
     >
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
         {/* Header options placeholder */}
         {/* Sign up section */}
         <View
@@ -137,7 +137,7 @@ const LoginScreen = () => {
           </View>
         </View>
         {/* // other authentication options */}
-        <View style={styles.socialSection}>
+        {/* <View style={styles.socialSection}>
           <Text style={[styles.orText, { color: colors.textSecondary }]}>
             သို့မဟုတ် အခြားနည်းလမ်းဖြင့် ဝင်ရန်
           </Text>
@@ -149,9 +149,14 @@ const LoginScreen = () => {
               <AntDesign name="apple" size={30} color={colors.textPrimary} />
             </TouchableOpacity>
           </View>
-        </View>
+        </View> */}
         {/* footer section */}
-        <View style={styles.footerSection}>
+        <View
+          style={[
+            styles.footerSection,
+            { marginBottom: Math.max(insets.bottom, 16) },
+          ]}
+        >
           <TouchableOpacity
             style={[styles.button, { backgroundColor: colors.secondary }]}
             onPress={handleLogin}

@@ -11,7 +11,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Theme & Firebase Imports
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -23,6 +23,7 @@ import { auth, db } from "../../services/firebaseConfig";
 const RegisterScreen = () => {
   const router = useRouter();
   const { colors, fontSize, themeMode } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -89,7 +90,7 @@ const RegisterScreen = () => {
       ]}
       style={styles.background}
     >
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
         {/* sign up form */}
         <Stack.Screen
           options={{
@@ -101,7 +102,7 @@ const RegisterScreen = () => {
         <View
           from={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          style={styles.container}
+          style={[styles.container, { paddingBottom: Math.max(insets.bottom, 20) }]}
         >
           <View style={styles.formSection}>
             <View style={styles.inputWrapper}>

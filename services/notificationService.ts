@@ -67,10 +67,10 @@ export async function scheduleSabbathReminder(
     await Notifications.cancelAllScheduledNotificationsAsync();
 
     if (daysLeft === 0) {
-      // Today is Sabbath day: schedule reminder to fire shortly
+      // Today is Sabbath day
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: "🙏 ယနေ့သည် ဥပုသ်နေ့ဖြစ်ပါသည်",
+          title: "🙏 ယနေ့သည် ဥပုသ်နေ့ ဖြစ်ပါသည်",
           body: "ကုသိုလ်ကောင်းမှုများ ပြုလုပ်ရန် မမေ့ပါနှင့်။",
           data: { screen: "Dashboard" },
           sound: Platform.OS === "ios" ? "notibell.mp3" : true,
@@ -80,14 +80,15 @@ export async function scheduleSabbathReminder(
           type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
           seconds: 1,
           repeats: false,
-          channelId: Platform.OS === "android" ? "sabbath-reminders" : undefined,
+          channelId:
+            Platform.OS === "android" ? "sabbath-reminders" : undefined,
         },
       });
-    } else if (daysLeft === 1 && isTomorrowSabbath()) {
-      // Tomorrow is Sabbath day: schedule preview reminder
+    } else if (daysLeft === 1 || isTomorrowSabbath()) {
+      // Tomorrow is Sabbath day
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: `📌 မနက်ဖြန်သည် ${eventName} ဖြစ်ပါသည်`,
+          title: "📌 မနက်ဖြန်သည် ဥပုသ်နေ့ ဖြစ်ပါသည်",
           body: "ဥပုသ်စောင့်တည်ရန် သို့မဟုတ် ကုသိုလ်ပြုရန် ပြင်ဆင်နိုင်ပါသည်။",
           data: { screen: "Dashboard" },
           sound: Platform.OS === "ios" ? "notibell.mp3" : true,
@@ -97,7 +98,8 @@ export async function scheduleSabbathReminder(
           type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
           seconds: 5,
           repeats: false,
-          channelId: Platform.OS === "android" ? "sabbath-reminders" : undefined,
+          channelId:
+            Platform.OS === "android" ? "sabbath-reminders" : undefined,
         },
       });
     }
